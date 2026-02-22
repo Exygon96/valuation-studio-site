@@ -124,6 +124,11 @@ a{color:inherit;text-decoration:none}
   box-shadow:var(--shadow);white-space:nowrap;
 }
 .h-btn:hover{color:var(--ink);background:var(--surface-2)}
+.h-btn-group{display:flex;align-items:center;gap:0;border:1px solid var(--border);border-radius:6px;overflow:hidden;box-shadow:var(--shadow)}
+.h-btn-group .h-btn{border:none;border-radius:0;box-shadow:none;border-right:1px solid var(--border)}
+.h-btn-group .h-btn:last-child{border-right:none}
+.h-btn-save{color:var(--ink-3)}
+.h-btn-save:hover{color:var(--gold)!important}
 .h-note{font-size:11px;color:var(--ink-5);white-space:nowrap;font-family:var(--ff-mono);letter-spacing:.2px}
 #dark-btn{width:28px;height:28px;padding:0;border-radius:6px;font-size:13px;display:flex;align-items:center;justify-content:center;border:1px solid var(--border);background:var(--surface);box-shadow:var(--shadow);color:var(--ink-4)}
 #dark-btn:hover{color:var(--ink)}
@@ -201,6 +206,27 @@ input[type=range]::-webkit-slider-thumb{
   box-shadow:0 1px 4px rgba(26,24,20,.15);transition:transform .1s;
 }
 input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.15)}
+
+/* Benchmark reference anchors under growth slider */
+.bench-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;margin-top:8px}
+.bench-pill{
+  display:flex;flex-direction:column;align-items:center;gap:2px;
+  padding:7px 4px 6px;border-radius:8px;cursor:pointer;
+  background:var(--surface-2);border:1px solid var(--border);
+  transition:all .14s ease;user-select:none;
+}
+.bench-pill:hover{background:var(--blue-bg);border-color:rgba(26,75,140,.2)}
+.bench-pill.active{background:var(--blue-bg);border-color:rgba(26,75,140,.25)}
+.bp-rate{font-family:var(--ff-mono);font-size:12px;font-weight:600;color:var(--ink-2)}
+.bp-lbl{font-size:9px;color:var(--ink-5);font-weight:400;text-align:center;line-height:1.3}
+.bench-pill:hover .bp-rate,.bench-pill.active .bp-rate{color:var(--blue)}
+.bench-pill:hover .bp-lbl,.bench-pill.active .bp-lbl{color:var(--ink-4)}
+
+/* Growth assumptions card */
+.growth-card{
+  background:var(--surface-2);border:1px solid var(--border);
+  border-radius:var(--r);padding:12px 12px 14px;margin-bottom:8px;
+}
 
 /* Segmented control */
 .seg{
@@ -737,7 +763,10 @@ input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.15)}
   <div class="h-sep"></div>
   <button id="dark-btn" onclick="toggleDark()" title="Dark mode">🌙</button>
   <button class="h-btn" onclick="showMethodology()" id="meth-btn">How it works</button>
-  <button class="h-btn" onclick="shareURL()" title="Copy a link with all your current inputs — share it with anyone">⬆ Save &amp; Share</button>
+  <div class="h-btn-group">
+    <button class="h-btn" onclick="shareURL()" title="Copy a shareable link with all your current inputs">⬆ Share</button>
+    <button class="h-btn h-btn-save" onclick="saveReport()" title="Download a self-contained valuation report as an HTML file — open in browser and print to PDF">⬇ Save Report</button>
+  </div>
   <div class="h-note">Not financial advice</div>
 </header>
 
@@ -805,6 +834,7 @@ input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.15)}
     <label>Revenue</label>
     <input type="text" id="inp-revenue" placeholder="e.g. 45183"/>
   </div>
+  <div id="warn-scale" class="warn" style="display:none">⚠ Revenue looks small — remember all figures should be in <strong>millions</strong>. Apple's revenue is ~416,000M, Netflix ~45,000M.</div>
   <div class="field">
     <label>Free cash flow</label>
     <input type="text" id="inp-fcf" placeholder="e.g. 9461"/>
@@ -824,17 +854,24 @@ input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.15)}
   <div id="err-rev" class="err">Revenue must be a positive number.</div>
 
   <div class="sb-lbl" style="margin-top:4px">Growth assumptions</div>
-  <div class="field">
-    <label>Years to forecast</label>
-    <input type="number" id="inp-years" value="8" min="3" max="30" step="1" oninput="update()"/>
-  </div>
-  <div class="sl-row">
-    <div class="sl-top"><span>Revenue growth per year</span><span id="lbl-cagr">10%</span></div>
-    <input type="range" id="sl-cagr" min="-30" max="100" step="1" value="10" oninput="onSl('cagr')"/>
-  </div>
-  <div class="sl-row">
-    <div class="sl-top"><span>Margin change per year</span><span id="lbl-dpp">0.0pp</span></div>
-    <input type="range" id="sl-dpp" min="-5" max="5" step="0.1" value="0" oninput="onSl('dpp')"/>
+  <div class="growth-card">
+    <div class="sl-row">
+      <div class="sl-top"><span>Years to forecast</span><span id="lbl-years">8 yrs</span></div>
+      <input type="range" id="sl-years" min="3" max="20" step="1" value="8" oninput="onSl('years')"/>
+    </div>
+    <div class="sl-row" style="margin-bottom:4px">
+      <div class="sl-top"><span>Revenue growth per year</span><span id="lbl-cagr">10%</span></div>
+      <input type="range" id="sl-cagr" min="-30" max="100" step="1" value="10" oninput="onSl('cagr')"/>
+    </div>
+    <div class="bench-grid" id="bench-grid">
+      <div class="bench-pill" id="bp-5" onclick="setBench(5)"><span class="bp-rate">5%</span><span class="bp-lbl">Mature</span></div>
+      <div class="bench-pill" id="bp-10" onclick="setBench(10)"><span class="bp-rate">10%</span><span class="bp-lbl">S&amp;P avg</span></div>
+      <div class="bench-pill" id="bp-20" onclick="setBench(20)"><span class="bp-rate">20%</span><span class="bp-lbl">Fast growth</span></div>
+    </div>
+    <div class="sl-row" style="margin-top:10px;margin-bottom:0">
+      <div class="sl-top"><span>Margin change per year</span><span id="lbl-dpp">0.0pp</span></div>
+      <input type="range" id="sl-dpp" min="-5" max="5" step="0.1" value="0" oninput="onSl('dpp')"/>
+    </div>
   </div>
 
   <div class="sb-lbl" style="margin-top:4px">Terminal value method</div>
@@ -1307,7 +1344,7 @@ function getInputs(){
     netCashRaw:pf(document.getElementById('inp-netcash').value),
     cagr:parseInt(document.getElementById('sl-cagr').value)/100,
     dpp:parseFloat(document.getElementById('sl-dpp').value)/100,
-    years:parseInt(document.getElementById('inp-years').value)||8,
+    years:parseInt(document.getElementById('sl-years').value)||8,
     disc:parseInt(document.getElementById('sl-disc').value)/100,
     termMode,
     tg:parseFloat(document.getElementById('sl-tg').value)/100,
@@ -1336,12 +1373,25 @@ function buildInp(raw){
 function clearPills(){document.querySelectorAll('.co-pill').forEach(b=>b.classList.remove('active'))}
 function hideOnboardHint(){const h=document.getElementById('onboard-hint');if(h){h.style.display='none';localStorage.setItem('vs-onboarded','1')}}
 
+function setBench(v){
+  document.getElementById('sl-cagr').value=v;
+  onSl('cagr');
+}
+function syncBenchPills(){
+  const v=parseInt(document.getElementById('sl-cagr').value);
+  [5,10,20].forEach(n=>{
+    const el=document.getElementById('bp-'+n);
+    if(el)el.classList.toggle('active',v===n);
+  });
+}
+
 function onSl(k){
   clearPills();
-  if(k==='cagr')document.getElementById('lbl-cagr').textContent=document.getElementById('sl-cagr').value+'%';
+  if(k==='cagr'){document.getElementById('lbl-cagr').textContent=document.getElementById('sl-cagr').value+'%';syncBenchPills();}
   else if(k==='dpp')document.getElementById('lbl-dpp').textContent=parseFloat(document.getElementById('sl-dpp').value).toFixed(1)+'pp';
   else if(k==='tg')document.getElementById('lbl-tg').textContent=parseFloat(document.getElementById('sl-tg').value).toFixed(1)+'%';
   else if(k==='tmult')document.getElementById('lbl-tmult').textContent=parseFloat(document.getElementById('sl-tmult').value).toFixed(1)+'×';
+  else if(k==='years')document.getElementById('lbl-years').textContent=document.getElementById('sl-years').value+' yrs';
   update();
 }
 
@@ -1358,7 +1408,7 @@ function onDiscChange(){
 }
 function setDisc(v){document.getElementById('sl-disc').value=v;onDiscChange();}
 
-['inp-price','inp-shares','inp-revenue','inp-fcf','inp-netcash','inp-years']
+['inp-price','inp-shares','inp-revenue','inp-fcf','inp-netcash']
   .forEach(id=>document.getElementById(id).addEventListener('input',()=>{clearPills();update()}));
 
 // When company name is cleared, wipe the company-specific financials
@@ -1417,9 +1467,9 @@ function loadPreset(key,isAuto){
   document.getElementById('inp-revenue').value=p.revenue;
   document.getElementById('inp-fcf').value=p.fcf;
   document.getElementById('inp-netcash').value=p.netcash;
-  document.getElementById('sl-cagr').value=p.cagr;document.getElementById('lbl-cagr').textContent=p.cagr+'%';
+  document.getElementById('sl-cagr').value=p.cagr;document.getElementById('lbl-cagr').textContent=p.cagr+'%';syncBenchPills();
   document.getElementById('sl-dpp').value=p.dpp;document.getElementById('lbl-dpp').textContent=p.dpp.toFixed(1)+'pp';
-  document.getElementById('inp-years').value=p.years;
+  document.getElementById('sl-years').value=p.years;document.getElementById('lbl-years').textContent=p.years+' yrs';
   setTerm(p.termMode);
   document.getElementById('sl-tg').value=p.tg;document.getElementById('lbl-tg').textContent=p.tg.toFixed(1)+'%';
   document.getElementById('sl-tmult').value=p.tmult;document.getElementById('lbl-tmult').textContent=parseFloat(p.tmult).toFixed(1)+'×';
@@ -1433,8 +1483,8 @@ function loadPreset(key,isAuto){
 function resetInputs(){
   clearPills();
   ['inp-company','inp-price','inp-shares','inp-revenue','inp-fcf','inp-netcash'].forEach(id=>document.getElementById(id).value='');
-  document.getElementById('inp-years').value=8;
-  document.getElementById('sl-cagr').value=10;document.getElementById('lbl-cagr').textContent='10%';
+  document.getElementById('sl-years').value=8;document.getElementById('lbl-years').textContent='8 yrs';
+  document.getElementById('sl-cagr').value=10;document.getElementById('lbl-cagr').textContent='10%';syncBenchPills();
   document.getElementById('sl-dpp').value=0;document.getElementById('lbl-dpp').textContent='0.0pp';
   document.getElementById('sl-tg').value=2;document.getElementById('lbl-tg').textContent='2.0%';
   document.getElementById('sl-tmult').value=15;document.getElementById('lbl-tmult').textContent='15.0×';
@@ -1459,6 +1509,202 @@ function hideMethodology(){document.getElementById('app-view').style.display='fl
 function toggleMobile(){document.getElementById('sidebar').classList.toggle('open');document.getElementById('overlay').classList.toggle('show')}
 function closeMobile(){document.getElementById('sidebar').classList.remove('open');document.getElementById('overlay').classList.remove('show')}
 function showToast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2600)}
+function saveReport(){
+  const raw=getInputs();
+  const inp=buildInp(raw);
+  if(!inp){showToast('Enter company data first');return;}
+  const res=fairValue(inp);
+  const irr=impliedIRR(inp,inp.price);
+  const up=res.ok?(res.fvps/inp.price-1):null;
+  const date=new Date().toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'});
+  const termStr=inp.termMode==='multiple'?`Exit multiple ${fmt(inp.tmult,1)}×`:`Terminal growth ${fmt(inp.tg*100,1)}%`;
+
+  // Scenario grid — base scenario across growth 0–20%, terminal range
+  const isM=inp.termMode==='multiple';
+  const growths=[0.05,0.08,0.10,0.12,0.15,0.20];
+  const terminals=isM?[8,10,12,15,18]:[0.01,0.02,0.03,0.04];
+  function gridHTML(dpp){
+    let h=`<tr><th style="text-align:left;padding:6px 10px;font-size:10px;background:#f5f3ee;color:#8a857c;font-family:monospace;border:1px solid #e0dbd0">Growth ↓ / Terminal →</th>`;
+    terminals.forEach(tv=>h+=`<th style="padding:6px 8px;font-size:10px;background:#f5f3ee;color:#8a857c;font-family:monospace;text-align:center;border:1px solid #e0dbd0">${isM?fmt(tv,0)+'×':fmt(tv*100,1)+'%'}</th>`);
+    h+=`</tr>`;
+    growths.forEach(g=>{
+      h+=`<tr><td style="padding:6px 10px;font-size:11px;font-family:monospace;font-weight:600;color:#4a4640;background:#faf9f6;border:1px solid #e0dbd0">${fmt(g*100,0)}%</td>`;
+      terminals.forEach(tv=>{
+        const ci={...inp,cagr:g,dpp:inp.dpp+dpp};
+        if(isM){ci.termMode='multiple';ci.tmult=tv;}else{ci.termMode='growth';ci.tg=tv;}
+        const r=impliedIRR(ci,ci.price);
+        if(r===null){h+=`<td style="padding:6px 8px;text-align:center;background:#f5f3ee;border:1px solid #e0dbd0;font-family:monospace;font-size:11px;color:#b8b3aa">—</td>`;return;}
+        // colour
+        let bg,fg;
+        if(r<0.05){bg='#fca5a5';fg='#7f1d1d';}
+        else if(r<0.08){bg='#fdd8b8';fg='#78350f';}
+        else if(r<0.10){bg='#fef3c7';fg='#92400e';}
+        else if(r<0.13){bg='#d1fae5';fg='#065f46';}
+        else if(r<0.17){bg='#6ee7b7';fg='#065f46';}
+        else{bg='#047857';fg='#ffffff';}
+        h+=`<td style="padding:6px 8px;text-align:center;background:${bg};border:1px solid #e0dbd0;font-family:monospace;font-size:11px;font-weight:700;color:${fg}">${fmt(r*100,1)}%</td>`;
+      });
+      h+=`</tr>`;
+    });
+    return h;
+  }
+
+  // Forecast table rows
+  const rows=res.ok?res.rows:[];
+  let forecastRows='';
+  rows.forEach(r=>{
+    forecastRows+=`<tr>
+      <td style="padding:5px 10px;border-bottom:1px solid #e0dbd0;font-family:monospace;font-size:11px">Y${r.year}</td>
+      <td style="padding:5px 10px;border-bottom:1px solid #e0dbd0;font-family:monospace;font-size:11px;text-align:right">${fmt(r.rev,0)}</td>
+      <td style="padding:5px 10px;border-bottom:1px solid #e0dbd0;font-family:monospace;font-size:11px;text-align:right">${fmt(r.marg*100,1)}%</td>
+      <td style="padding:5px 10px;border-bottom:1px solid #e0dbd0;font-family:monospace;font-size:11px;text-align:right">${fmt(r.fcf,0)}</td>
+      <td style="padding:5px 10px;border-bottom:1px solid #e0dbd0;font-family:monospace;font-size:11px;text-align:right">${fmt(r.discFcf,0)}</td>
+    </tr>`;
+  });
+
+  const goodColor=up!==null&&up>=0?'#1a5c32':'#7a1a1a';
+  const fvDisplay=res.ok?fmt(res.fvps):'N/A';
+  const upDisplay=up!==null?`${up>=0?'+':''}${fmt(up*100,1)}%`:'N/A';
+  const irrDisplay=irr!==null?`${fmt(irr*100,1)}%`:'N/A';
+  const irrColor=irr!==null?(irr>=0.10?'#1a5c32':'#7a1a1a'):'#8a857c';
+
+  const html=`<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>${inp.company||'Valuation'} — Report</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,600&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap');
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'DM Sans',sans-serif;background:#f4f0e8;color:#1a1814;font-size:13px;line-height:1.5;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .page{max-width:800px;margin:0 auto;padding:48px 48px 64px;background:#f4f0e8}
+  /* Header */
+  .report-header{display:flex;justify-content:space-between;align-items:flex-start;padding-bottom:20px;border-bottom:2px solid #1a1814;margin-bottom:28px}
+  .rh-brand{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:#8a857c}
+  .rh-date{font-family:'DM Mono',monospace;font-size:10px;color:#8a857c;text-align:right}
+  .report-co{margin-bottom:28px}
+  .co-name{font-family:'Cormorant Garamond',serif;font-size:38px;font-weight:700;letter-spacing:-1px;line-height:1;color:#1a1814;margin-bottom:6px}
+  .co-sub{font-size:12px;color:#8a857c;font-family:'DM Mono',monospace;letter-spacing:.3px}
+  /* Key metrics row */
+  .metrics-row{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:#d8d3ca;border:1px solid #d8d3ca;border-radius:10px;overflow:hidden;margin-bottom:28px}
+  .metric{background:#f4f0e8;padding:16px 18px}
+  .metric-lbl{font-size:10px;font-weight:500;color:#8a857c;text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px}
+  .metric-val{font-family:'Cormorant Garamond',serif;font-size:30px;font-weight:600;letter-spacing:-.5px;line-height:1;color:#1a1814}
+  .metric-sub{font-size:10px;color:#8a857c;margin-top:4px;font-family:'DM Mono',monospace}
+  /* Inputs */
+  .section{margin-bottom:28px}
+  .section-title{font-family:'DM Mono',monospace;font-size:10px;font-weight:500;letter-spacing:1.5px;text-transform:uppercase;color:#b07d2e;margin-bottom:12px;padding-bottom:6px;border-bottom:1px solid #d8d3ca}
+  .inputs-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+  .inp-item{background:#ede8de;border-radius:7px;padding:10px 12px}
+  .inp-lbl{font-size:9.5px;color:#8a857c;margin-bottom:3px;text-transform:uppercase;letter-spacing:.4px}
+  .inp-val{font-family:'DM Mono',monospace;font-size:13px;font-weight:500;color:#1a1814}
+  /* Bridge */
+  .bridge{background:#ede8de;border-radius:8px;overflow:hidden;margin-bottom:20px}
+  .bridge-row{display:flex;justify-content:space-between;padding:8px 14px;border-bottom:1px solid #d8d3ca;font-size:12px}
+  .bridge-row:last-child{border-bottom:none;font-weight:600;background:#e4ddd0}
+  .br-l{color:#4a4640}.br-r{font-family:'DM Mono',monospace;color:#1a1814}
+  /* Tables */
+  table{width:100%;border-collapse:collapse}
+  .tbl-head th{text-align:left;padding:6px 10px;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:#8a857c;background:#f5f3ee;border-bottom:1px solid #d8d3ca;font-family:'DM Mono',monospace}
+  /* Disclaimer */
+  .disclaimer{margin-top:36px;padding-top:16px;border-top:1px solid #d8d3ca;font-size:10px;color:#b8b3aa;line-height:1.6;font-family:'DM Mono',monospace}
+  /* Print */
+  @media print{body{background:#fff}.page{padding:32px 32px 48px;background:#fff}}
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="report-header">
+    <div class="rh-brand">Valuation Studio — DCF Analysis</div>
+    <div class="rh-date">Generated ${date}<br>Not financial advice</div>
+  </div>
+
+  <div class="report-co">
+    <div class="co-name">${inp.company||'Unnamed Company'}</div>
+    <div class="co-sub">DCF Valuation · ${termStr} · ${inp.years}-year forecast · Required return ${fmt(inp.disc*100,0)}%</div>
+  </div>
+
+  <div class="metrics-row">
+    <div class="metric">
+      <div class="metric-lbl">Fair Value / Share</div>
+      <div class="metric-val" style="color:${goodColor}">${fvDisplay}</div>
+      <div class="metric-sub">${inp.pccy}</div>
+    </div>
+    <div class="metric">
+      <div class="metric-lbl">vs Market Price</div>
+      <div class="metric-val" style="color:${goodColor}">${upDisplay}</div>
+      <div class="metric-sub">${fmt(inp.price)} ${inp.pccy} market price</div>
+    </div>
+    <div class="metric">
+      <div class="metric-lbl">Implied Return</div>
+      <div class="metric-val" style="color:${irrColor}">${irrDisplay}</div>
+      <div class="metric-sub">annual, at market price</div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Inputs &amp; Assumptions</div>
+    <div class="inputs-grid">
+      <div class="inp-item"><div class="inp-lbl">Revenue (LTM)</div><div class="inp-val">${fmt(inp.revLTM,0)} M ${inp.fccy}</div></div>
+      <div class="inp-item"><div class="inp-lbl">Free Cash Flow</div><div class="inp-val">${fmt(inp.fcfLTM,0)} M ${inp.fccy}</div></div>
+      <div class="inp-item"><div class="inp-lbl">FCF Margin</div><div class="inp-val">${fmt(inp.fcfMargin*100,1)}%</div></div>
+      <div class="inp-item"><div class="inp-lbl">Net Cash / (Debt)</div><div class="inp-val">${fmt(-inp.netDebt,0)} M ${inp.fccy}</div></div>
+      <div class="inp-item"><div class="inp-lbl">Shares Outstanding</div><div class="inp-val">${fmt(inp.shares,0)} M</div></div>
+      <div class="inp-item"><div class="inp-lbl">Stock Price</div><div class="inp-val">${fmt(inp.price,2)} ${inp.pccy}</div></div>
+      <div class="inp-item"><div class="inp-lbl">Revenue Growth / yr</div><div class="inp-val">${fmt(inp.cagr*100,1)}%</div></div>
+      <div class="inp-item"><div class="inp-lbl">Margin Change / yr</div><div class="inp-val">${fmt(inp.dpp*100,1)}pp</div></div>
+      <div class="inp-item"><div class="inp-lbl">Terminal Value</div><div class="inp-val">${termStr}</div></div>
+    </div>
+  </div>
+
+  ${res.ok?`
+  <div class="section">
+    <div class="section-title">Valuation Bridge</div>
+    <div class="bridge">
+      <div class="bridge-row"><span class="br-l">PV of forecast cash flows</span><span class="br-r">${fmt(res.pvFCFs,0)} M</span></div>
+      <div class="bridge-row"><span class="br-l">PV of terminal value</span><span class="br-r">${fmt(res.pvTV,0)} M</span></div>
+      <div class="bridge-row"><span class="br-l">Less net debt</span><span class="br-r">(${fmt(inp.netDebt,0)} M)</span></div>
+      <div class="bridge-row"><span class="br-l">Total equity value</span><span class="br-r">${fmt(res.equityPV,0)} M</span></div>
+      <div class="bridge-row"><span class="br-l">÷ Shares outstanding</span><span class="br-r">${fmt(inp.shares,0)} M</span></div>
+      <div class="bridge-row"><span class="br-l">Fair value per share</span><span class="br-r">${fmt(res.fvps,2)} ${inp.pccy}</span></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Year-by-Year Forecast</div>
+    <table>
+      <thead class="tbl-head"><tr><th>Year</th><th>Revenue (M)</th><th>Margin</th><th>FCF (M)</th><th>PV today (M)</th></tr></thead>
+      <tbody>${forecastRows}</tbody>
+    </table>
+  </div>`:''}
+
+  <div class="section">
+    <div class="section-title">Implied Return — Scenario Grid (Base margins)</div>
+    <table><tbody>${gridHTML(0)}</tbody></table>
+  </div>
+
+  <div class="disclaimer">
+    Generated by Valuation Studio on ${date}. All figures for informational purposes only — not financial or investment advice.
+    Inputs reflect user-entered assumptions which may differ from actual reported figures.
+    Past growth is not indicative of future results. Always verify data from primary sources before making any investment decision.
+  </div>
+
+</div>
+</body>
+</html>`;
+
+  const blob=new Blob([html],{type:'text/html;charset=utf-8'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  const safeName=(inp.company||'valuation').replace(/[^a-z0-9]/gi,'_').replace(/_+/g,'_').toLowerCase();
+  a.download=safeName+'_valuation.html';
+  a.click();
+  URL.revokeObjectURL(a.href);
+  showToast('Report saved ✓  Open in browser → Print → Save as PDF');
+}
+
 function shareURL(){
   const raw=getInputs();
   const p=new URLSearchParams({co:raw.company,px:raw.price,sh:raw.shares,rev:raw.revLTM,fcf:raw.fcfLTM,nc:raw.netCashRaw,cagr:document.getElementById('sl-cagr').value,dpp:document.getElementById('sl-dpp').value,yr:raw.years,disc:document.getElementById('sl-disc').value,tm:termMode,tg:document.getElementById('sl-tg').value,tmult:raw.tmult||'',fccy:raw.fccy,pccy:raw.pccy,fxr:raw.fxRate});
@@ -1476,9 +1722,9 @@ function loadFromURL(){
   const set=(id,v)=>{if(v&&v!=='null')document.getElementById(id).value=v};
   set('inp-company',p.get('co'));set('inp-price',p.get('px'));set('inp-shares',p.get('sh'));
   set('inp-revenue',p.get('rev'));set('inp-fcf',p.get('fcf'));set('inp-netcash',p.get('nc'));
-  set('inp-years',p.get('yr'));
+  if(p.get('yr')){const v=+p.get('yr');document.getElementById('sl-years').value=v;document.getElementById('lbl-years').textContent=v+' yrs'}
   if(p.get('tmult')){const v=+p.get('tmult');if(v>0){document.getElementById('sl-tmult').value=v;document.getElementById('lbl-tmult').textContent=v.toFixed(1)+'×';}}
-  if(p.get('cagr')){const v=+p.get('cagr');document.getElementById('sl-cagr').value=v;document.getElementById('lbl-cagr').textContent=v+'%'}
+  if(p.get('cagr')){const v=+p.get('cagr');document.getElementById('sl-cagr').value=v;document.getElementById('lbl-cagr').textContent=v+'%';syncBenchPills()}
   if(p.get('dpp')){const v=+p.get('dpp');document.getElementById('sl-dpp').value=v;document.getElementById('lbl-dpp').textContent=v.toFixed(1)+'pp'}
   if(p.get('tg')){const v=+p.get('tg');document.getElementById('sl-tg').value=v;document.getElementById('lbl-tg').textContent=v.toFixed(1)+'%'}
   if(p.get('disc')){const v=+p.get('disc');document.getElementById('sl-disc').value=v;onDiscChange()}
@@ -1527,6 +1773,9 @@ function update(){
   const revFieldVal=document.getElementById('inp-revenue').value.trim();
   document.getElementById('warn-fcf').style.display=(hasFCF&&raw.fcfLTM<0)?'block':'none';
   document.getElementById('err-rev').style.display=(revFieldVal!==''&&!hasRev)?'block':'none';
+  // Scale sanity check: revenue entered but suspiciously small given the stock price
+  const showScaleWarn=hasRev&&isFinite(raw.price)&&raw.price>1&&raw.revLTM<50&&raw.revLTM>0;
+  document.getElementById('warn-scale').style.display=showScaleWarn?'block':'none';
   document.getElementById('margin-chip').style.display=(hasFCF&&hasRev)?'':'none';
   if(hasFCF&&hasRev){
     const m=raw.fcfLTM/raw.revLTM;
@@ -2533,6 +2782,7 @@ if(savedTheme){document.documentElement.setAttribute('data-theme',savedTheme);do
 // Hide onboarding hint for returning users
 if(localStorage.getItem('vs-onboarded')){const h=document.getElementById('onboard-hint');if(h)h.style.display='none';}
 onDiscChange();
+syncBenchPills();
 // Init drag after DOM is ready
 setTimeout(()=>initIRRDrag(),200);
 loadFromURL();
