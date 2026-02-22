@@ -1,0 +1,1640 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Valuation Studio — DCF Analysis</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+/* ═══════════════════════════════════════════════════
+   TOKENS
+═══════════════════════════════════════════════════ */
+:root{
+  --cream:    #f5f2ec;
+  --cream-b:  #ede9e0;
+  --cream-c:  #e4dfd3;
+  --white:    #ffffff;
+  --ink:      #1c1917;
+  --ink-2:    #44403c;
+  --ink-3:    #78716c;
+  --ink-4:    #a8a29e;
+  --ink-5:    #d6d3cd;
+  --navy:     #1e3a5f;
+  --navy-b:   #162d4a;
+  --gold:     #92713a;
+  --green:    #14532d;
+  --green-b:  #dcfce7;
+  --red:      #7f1d1d;
+  --red-b:    #fee2e2;
+
+  --ff-head: 'Playfair Display', Georgia, serif;
+  --ff-body: 'DM Sans', system-ui, sans-serif;
+  --ff-mono: 'DM Mono', 'Courier New', monospace;
+
+  --r-sm: 6px; --r-md: 10px; --r-lg: 14px;
+  --sh-sm: 0 1px 3px rgba(28,25,23,.06);
+  --sh-md: 0 4px 16px rgba(28,25,23,.08);
+
+  --sidebar-w: 300px;
+  --header-h:  52px;
+}
+
+/* ═══════════════════════════════════════════════════
+   RESET
+═══════════════════════════════════════════════════ */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden}
+body{font-family:var(--ff-body);background:var(--cream);color:var(--ink);-webkit-font-smoothing:antialiased;font-size:14px}
+input,select,button{font-family:inherit;font-size:inherit}
+button{cursor:pointer;border:none;background:none}
+
+/* ═══════════════════════════════════════════════════
+   APP SHELL
+═══════════════════════════════════════════════════ */
+#shell{display:flex;flex-direction:column;height:100vh}
+
+/* ── Header ── */
+#header{
+  height:var(--header-h);
+  background:rgba(245,242,236,.92);
+  backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--ink-5);
+  display:flex;align-items:center;
+  padding:0 20px;
+  gap:12px;
+  flex-shrink:0;
+  z-index:50;
+}
+.h-logo{display:flex;align-items:center;gap:9px;text-decoration:none}
+.h-logo-mark{
+  width:26px;height:26px;border-radius:6px;
+  background:var(--ink);
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;
+}
+.h-logo-mark svg{width:14px;height:14px}
+.h-logo-name{font-family:var(--ff-head);font-size:15px;font-weight:600;color:var(--ink);letter-spacing:-.2px}
+.h-sep{flex:1}
+.h-disclaimer{font-size:11px;color:var(--ink-4);max-width:380px;line-height:1.4;text-align:right}
+
+/* ── Body ── */
+#body{display:flex;flex:1;overflow:hidden}
+
+/* ── Sidebar ── */
+#sidebar{
+  width:var(--sidebar-w);
+  flex-shrink:0;
+  background:var(--cream);
+  border-right:1px solid var(--ink-5);
+  overflow-y:auto;
+  padding:18px 16px 32px;
+  display:flex;flex-direction:column;gap:0;
+}
+#sidebar::-webkit-scrollbar{width:4px}
+#sidebar::-webkit-scrollbar-track{background:transparent}
+#sidebar::-webkit-scrollbar-thumb{background:var(--ink-5);border-radius:2px}
+
+/* Sidebar sections */
+.sb-sec-hdr{
+  font-family:var(--ff-mono);
+  font-size:9.5px;font-weight:500;letter-spacing:1.4px;
+  text-transform:uppercase;color:var(--ink-4);
+  padding:16px 0 6px;
+  border-bottom:1px solid var(--ink-5);
+  margin-bottom:10px;
+}
+.sb-sec-hdr:first-child{padding-top:4px}
+
+/* Input rows */
+.field{margin-bottom:10px}
+.field label{
+  display:block;
+  font-size:10.5px;font-weight:500;
+  color:var(--ink-3);margin-bottom:4px;
+  letter-spacing:.02em;
+}
+.field input[type=text],
+.field input[type=number]{
+  width:100%;
+  background:var(--white);
+  border:1px solid var(--ink-5);
+  border-radius:var(--r-sm);
+  padding:7px 10px;
+  font-size:13px;font-family:var(--ff-mono);
+  color:var(--ink);
+  transition:border-color .12s,box-shadow .12s;
+  outline:none;
+}
+.field input:focus{
+  border-color:var(--navy);
+  box-shadow:0 0 0 2px rgba(30,58,95,.1);
+}
+.field input.err{border-color:#dc2626}
+
+/* Slider */
+.slider-wrap{margin-bottom:12px}
+.slider-wrap label{
+  display:flex;justify-content:space-between;align-items:baseline;
+  font-size:10.5px;font-weight:500;color:var(--ink-3);margin-bottom:6px;
+}
+.slider-wrap label span{
+  font-family:var(--ff-mono);font-size:12px;
+  font-weight:500;color:var(--ink);
+}
+input[type=range]{
+  width:100%;height:3px;
+  -webkit-appearance:none;appearance:none;
+  background:var(--ink-5);border-radius:2px;
+  outline:none;cursor:pointer;
+}
+input[type=range]::-webkit-slider-thumb{
+  -webkit-appearance:none;
+  width:14px;height:14px;border-radius:50%;
+  background:var(--navy);border:2px solid var(--white);
+  box-shadow:0 0 0 1px var(--navy);
+}
+
+/* Radio toggle */
+.radio-row{display:flex;gap:6px;margin-bottom:10px}
+.radio-btn{
+  flex:1;padding:6px 0;text-align:center;
+  font-size:11.5px;font-weight:500;
+  border:1px solid var(--ink-5);border-radius:var(--r-sm);
+  color:var(--ink-3);background:var(--white);
+  cursor:pointer;transition:all .12s;
+}
+.radio-btn.active{
+  background:var(--ink);color:var(--white);
+  border-color:var(--ink);
+}
+
+/* Computed margin pill */
+.margin-pill{
+  background:var(--white);border:1px solid var(--ink-5);
+  border-radius:var(--r-sm);padding:8px 12px;
+  display:flex;justify-content:space-between;align-items:center;
+  margin-bottom:10px;
+}
+.margin-pill-lbl{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.7px;color:var(--ink-4)}
+.margin-pill-val{font-family:var(--ff-mono);font-size:17px;font-weight:500}
+
+/* Summary card */
+.sb-summary{
+  background:var(--white);border:1px solid var(--ink-5);
+  border-radius:var(--r-md);padding:12px 14px;margin-top:18px;
+}
+.sb-sum-title{
+  font-size:9.5px;font-weight:600;text-transform:uppercase;
+  letter-spacing:.8px;color:var(--ink-4);margin-bottom:9px;
+}
+.sb-sum-row{
+  display:flex;justify-content:space-between;
+  font-size:11.5px;padding:4px 0;
+  border-bottom:1px solid var(--cream-b);
+}
+.sb-sum-row:last-child{border-bottom:none}
+.sb-sum-lbl{color:var(--ink-3)}
+.sb-sum-val{font-family:var(--ff-mono);font-size:11px;font-weight:500;color:var(--ink)}
+
+/* Example button */
+.btn-example{
+  width:100%;padding:9px 0;margin-top:16px;
+  background:var(--ink);color:var(--cream);
+  border-radius:var(--r-sm);
+  font-size:12.5px;font-weight:500;
+  transition:background .12s,transform .1s;
+  letter-spacing:.01em;
+}
+.btn-example:hover{background:var(--ink-2);transform:translateY(-1px)}
+.btn-reset{
+  width:100%;padding:8px 0;margin-top:6px;
+  background:var(--white);color:var(--ink-3);
+  border:1px solid var(--ink-5);border-radius:var(--r-sm);
+  font-size:12px;font-weight:500;
+  transition:all .12s;
+}
+.btn-reset:hover{border-color:var(--ink-3);color:var(--ink)}
+
+/* Warning / error inline */
+.inline-warn{
+  font-size:11px;color:#92400e;
+  background:#fffbeb;border:1px solid #fde68a;
+  border-radius:5px;padding:6px 9px;margin-top:4px;line-height:1.4;
+}
+.inline-err{
+  font-size:11px;color:#991b1b;
+  background:#fef2f2;border:1px solid #fecaca;
+  border-radius:5px;padding:6px 9px;margin-top:4px;line-height:1.4;
+}
+
+/* ── Main content ── */
+#main{flex:1;overflow-y:auto;display:flex;flex-direction:column}
+#main::-webkit-scrollbar{width:4px}
+#main::-webkit-scrollbar-track{background:transparent}
+#main::-webkit-scrollbar-thumb{background:var(--ink-5);border-radius:2px}
+
+/* Tab bar */
+#tabbar{
+  flex-shrink:0;
+  display:flex;
+  border-bottom:1px solid var(--ink-5);
+  background:rgba(245,242,236,.95);
+  backdrop-filter:blur(8px);
+  position:sticky;top:0;z-index:10;
+  padding:0 28px;
+}
+.tab-btn{
+  padding:13px 0;margin-right:28px;
+  font-size:13px;font-weight:500;
+  color:var(--ink-4);
+  border-bottom:2px solid transparent;
+  margin-bottom:-1px;
+  transition:color .12s,border-color .12s;
+  white-space:nowrap;background:none;
+}
+.tab-btn.active{color:var(--ink);border-bottom-color:var(--ink)}
+.tab-btn:hover:not(.active){color:var(--ink-2)}
+
+/* Tab panels */
+.tab-panel{display:none;padding:28px;animation:fadeIn .22s ease}
+.tab-panel.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+/* Empty state */
+.empty-state{
+  text-align:center;padding:80px 24px;color:var(--ink-4);
+}
+.empty-state-icon{font-size:36px;opacity:.3;margin-bottom:14px}
+.empty-state-title{font-family:var(--ff-head);font-size:18px;color:var(--ink-3);margin-bottom:6px}
+.empty-state-body{font-size:13px;line-height:1.6}
+
+/* Section header inside tab */
+.tab-section-hdr{
+  font-family:var(--ff-mono);
+  font-size:9.5px;letter-spacing:1.5px;text-transform:uppercase;
+  color:var(--ink-4);margin-bottom:14px;
+  padding-bottom:8px;border-bottom:1px solid var(--ink-5);
+}
+
+/* ═══════════════════════════════════════════════════
+   KPI CARDS
+═══════════════════════════════════════════════════ */
+.kpi-grid{
+  display:grid;grid-template-columns:repeat(4,1fr);
+  gap:8px;margin-bottom:20px;
+}
+.kpi-card{
+  background:var(--white);border:1px solid var(--ink-5);
+  border-radius:var(--r-md);padding:14px 16px;
+}
+.kpi-label{
+  font-size:9.5px;font-weight:600;text-transform:uppercase;
+  letter-spacing:.7px;color:var(--ink-4);margin-bottom:8px;
+}
+.kpi-value{
+  font-family:var(--ff-mono);font-size:22px;font-weight:500;
+  letter-spacing:-.5px;line-height:1;color:var(--ink);
+}
+.kpi-sub{font-size:10.5px;color:var(--ink-4);margin-top:4px}
+.kpi-value.up  {color:var(--green)}
+.kpi-value.down{color:var(--red)}
+
+/* ═══════════════════════════════════════════════════
+   COMPARISON BARS
+═══════════════════════════════════════════════════ */
+.bars-wrap{margin-bottom:24px}
+.bar-item{margin-bottom:8px}
+.bar-meta{
+  display:flex;justify-content:space-between;
+  font-size:11.5px;color:var(--ink-3);margin-bottom:4px;
+}
+.bar-meta-val{font-family:var(--ff-mono);font-weight:500;color:var(--ink)}
+.bar-track{
+  background:var(--cream-b);border-radius:4px;height:18px;
+  overflow:hidden;border:1px solid var(--ink-5);
+}
+.bar-fill{
+  height:100%;border-radius:4px;
+  display:flex;align-items:center;padding:0 8px;
+  font-family:var(--ff-mono);font-size:10px;font-weight:500;color:#fff;
+  transition:width .8s cubic-bezier(.4,0,.2,1);
+  white-space:nowrap;
+}
+.bar-fv{background:var(--green)}
+.bar-px{background:var(--navy)}
+.upside-tag{
+  display:inline-flex;align-items:center;
+  padding:4px 12px;border-radius:5px;margin-top:8px;
+  font-family:var(--ff-mono);font-size:12.5px;font-weight:500;
+}
+.upside-tag.up  {background:var(--green-b);color:var(--green);border:1px solid #bbf7d0}
+.upside-tag.down{background:var(--red-b);color:var(--red);border:1px solid #fecaca}
+
+/* ═══════════════════════════════════════════════════
+   CHART CARD
+═══════════════════════════════════════════════════ */
+.chart-card{
+  background:var(--white);border:1px solid var(--ink-5);
+  border-radius:var(--r-lg);padding:20px 20px 12px;
+  margin-bottom:20px;
+}
+.chart-card-title{
+  font-family:var(--ff-head);
+  font-size:15px;font-weight:600;color:var(--ink);margin-bottom:3px;
+}
+.chart-card-sub{font-size:12px;color:var(--ink-4);margin-bottom:16px;line-height:1.4}
+.chart-legend{
+  display:flex;gap:18px;margin-top:10px;flex-wrap:wrap;
+}
+.legend-item{
+  display:flex;align-items:center;gap:6px;
+  font-size:11px;color:var(--ink-3);
+}
+.legend-dot{width:8px;height:8px;border-radius:2px;flex-shrink:0}
+
+/* ═══════════════════════════════════════════════════
+   HINT BOX
+═══════════════════════════════════════════════════ */
+.hint-box{
+  background:var(--cream-b);border-radius:var(--r-sm);
+  padding:11px 13px;border-left:2px solid var(--navy);
+  margin-bottom:14px;
+}
+.hint-title{font-size:11px;font-weight:600;color:var(--ink);margin-bottom:3px}
+.hint-body{font-size:11.5px;color:var(--ink-3);line-height:1.6}
+
+/* ═══════════════════════════════════════════════════
+   VALUATION BRIDGE TABLE
+═══════════════════════════════════════════════════ */
+.bridge{
+  border:1px solid var(--ink-5);border-radius:var(--r-md);
+  overflow:hidden;margin-bottom:20px;
+}
+.bridge-row{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:9px 14px;font-size:12.5px;
+  border-bottom:1px solid var(--cream-b);
+  background:var(--white);
+}
+.bridge-row:nth-child(even){background:#faf9f7}
+.bridge-row:last-child{
+  border-bottom:none;font-weight:600;font-size:13px;
+  background:var(--cream-b);border-top:1px solid var(--ink-5);
+}
+.bridge-lbl{color:var(--ink-3)}
+.bridge-val{font-family:var(--ff-mono);font-size:12px;color:var(--ink)}
+
+/* ═══════════════════════════════════════════════════
+   DATA TABLE
+═══════════════════════════════════════════════════ */
+.data-table{
+  width:100%;border-collapse:collapse;
+  font-size:12px;margin-bottom:12px;
+}
+.data-table th{
+  text-align:left;padding:7px 10px;
+  font-size:9.5px;font-weight:600;text-transform:uppercase;
+  letter-spacing:.7px;color:var(--ink-4);
+  border-bottom:1px solid var(--ink-5);
+  background:var(--cream-b);
+  font-family:var(--ff-mono);
+}
+.data-table td{
+  padding:7px 10px;border-bottom:1px solid var(--cream-b);
+  font-family:var(--ff-mono);font-size:12px;color:var(--ink);
+}
+.data-table tr:last-child td{border-bottom:none}
+.data-table tr:hover td{background:var(--gold-bg,#faf6ee)}
+
+/* ═══════════════════════════════════════════════════
+   IRR HEATMAP
+═══════════════════════════════════════════════════ */
+.heatmap-legend{
+  display:flex;align-items:center;gap:12px;
+  padding:10px 14px;
+  background:var(--white);border:1px solid var(--ink-5);
+  border-radius:var(--r-md);margin-bottom:16px;
+}
+.hm-legend-bar{
+  flex:1;height:8px;border-radius:4px;
+  background:linear-gradient(90deg,
+    #7f1d1d 0%,#dc2626 12%,#fca5a5 26%,
+    #fef9f0 44%,#fef9f0 50%,
+    #dbeafe 62%,#3b82f6 78%,#1e3a8a 100%);
+}
+.hm-legend-end{font-size:11px;font-family:var(--ff-mono);color:var(--ink-3);white-space:nowrap}
+.hm-legend-ticks{
+  display:flex;justify-content:space-between;
+  font-size:9px;color:var(--ink-4);margin-top:2px;
+  font-family:var(--ff-mono);
+}
+.scenario-label{
+  display:inline-flex;align-items:center;gap:5px;
+  padding:3px 10px;border-radius:5px;
+  font-size:11.5px;font-weight:500;margin:12px 0 6px;
+}
+.sc-base{background:#f4f4f1;color:var(--ink-2);border:1px solid var(--ink-5)}
+.sc-bear{background:var(--red-b);color:var(--red);border:1px solid #fecaca}
+.sc-bull{background:var(--green-b);color:var(--green);border:1px solid #bbf7d0}
+
+.heatmap-table{border-collapse:collapse;width:100%;margin-bottom:6px}
+.heatmap-table th{
+  padding:6px 8px;font-size:9.5px;font-weight:600;
+  font-family:var(--ff-mono);color:var(--ink-4);
+  background:var(--cream-b);text-align:center;
+  border:1px solid var(--ink-5);
+}
+.heatmap-table th.row-hdr{text-align:left}
+.heatmap-table td{
+  padding:0;border:1px solid rgba(255,255,255,.4);
+  text-align:center;
+}
+.hm-cell{
+  padding:8px 6px;
+  font-family:var(--ff-mono);font-size:11.5px;font-weight:500;
+  min-width:60px;
+}
+
+/* ═══════════════════════════════════════════════════
+   DOWNLOAD BUTTON
+═══════════════════════════════════════════════════ */
+.btn-download{
+  padding:7px 16px;
+  background:var(--white);border:1px solid var(--ink-5);
+  border-radius:var(--r-sm);font-size:12px;font-weight:500;
+  color:var(--navy);cursor:pointer;
+  transition:all .12s;display:inline-flex;align-items:center;gap:6px;
+}
+.btn-download:hover{background:var(--cream-b);border-color:var(--navy)}
+
+/* ═══════════════════════════════════════════════════
+   TWO-COL LAYOUT INSIDE TAB
+═══════════════════════════════════════════════════ */
+.two-col{display:grid;grid-template-columns:220px 1fr;gap:24px;margin-bottom:24px}
+
+/* ═══════════════════════════════════════════════════
+   MATRIX CONTROLS
+═══════════════════════════════════════════════════ */
+.matrix-controls{
+  display:grid;grid-template-columns:1fr 1fr;gap:20px;
+  background:var(--white);border:1px solid var(--ink-5);
+  border-radius:var(--r-md);padding:16px 18px;margin-bottom:20px;
+}
+.mc-section-lbl{
+  font-size:9.5px;font-weight:600;text-transform:uppercase;
+  letter-spacing:.8px;color:var(--ink-4);margin-bottom:10px;
+}
+.mc-row{display:flex;gap:10px}
+.mc-row .field{flex:1;margin-bottom:8px}
+
+/* ═══════════════════════════════════════════════════
+   COLLAPSIBLE
+═══════════════════════════════════════════════════ */
+.collapsible{
+  border:1px solid var(--ink-5);border-radius:var(--r-md);
+  overflow:hidden;margin-bottom:16px;
+}
+.collapsible-hdr{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:11px 16px;background:var(--white);cursor:pointer;
+  font-size:13px;font-weight:500;color:var(--ink);
+  border-bottom:1px solid transparent;transition:background .1s;
+  user-select:none;
+}
+.collapsible-hdr:hover{background:var(--cream-b)}
+.collapsible-hdr.open{border-bottom-color:var(--ink-5)}
+.collapsible-arrow{
+  font-size:10px;color:var(--ink-4);
+  transition:transform .18s;
+}
+.collapsible-hdr.open .collapsible-arrow{transform:rotate(180deg)}
+.collapsible-body{
+  display:none;padding:16px;background:var(--white);
+}
+.collapsible-body.open{display:block}
+
+/* ═══════════════════════════════════════════════════
+   RESPONSIVE TWEAKS
+═══════════════════════════════════════════════════ */
+@media(max-width:900px){
+  :root{--sidebar-w:260px}
+  .kpi-grid{grid-template-columns:repeat(2,1fr)}
+  .two-col{grid-template-columns:1fr}
+}
+@media(max-width:640px){
+  #sidebar{display:none}
+  :root{--sidebar-w:0px}
+}
+</style>
+</head>
+<body>
+<div id="shell">
+
+<!-- ══════════════════════════════════════════
+     HEADER
+══════════════════════════════════════════ -->
+<header id="header">
+  <a href="index.html" class="h-logo">
+    <div class="h-logo-mark">
+      <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M3 15l4-6 4 4 3-4 3 3" stroke="#f5f2ec" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <span class="h-logo-name">Valuation Studio</span>
+  </a>
+  <div class="h-sep"></div>
+  <div class="h-disclaimer">For informational purposes only — not financial advice. All outputs are illustrative.</div>
+</header>
+
+<!-- ══════════════════════════════════════════
+     BODY
+══════════════════════════════════════════ -->
+<div id="body">
+
+<!-- ══════════════════════════════════════════
+     SIDEBAR
+══════════════════════════════════════════ -->
+<aside id="sidebar">
+
+  <div class="sb-sec-hdr">Company</div>
+
+  <div class="field">
+    <label>Company Name</label>
+    <input type="text" id="inp-company" placeholder="e.g. Netflix (NFLX)"/>
+  </div>
+  <div class="field">
+    <label>Stock Price</label>
+    <input type="text" id="inp-price" placeholder="e.g. 78.00"/>
+  </div>
+
+  <div class="sb-sec-hdr">Financials — LTM (millions)</div>
+
+  <div class="field">
+    <label>Shares Outstanding (M)</label>
+    <input type="text" id="inp-shares" placeholder="e.g. 4317"/>
+  </div>
+  <div class="field">
+    <label>Revenue (M)</label>
+    <input type="text" id="inp-revenue" placeholder="e.g. 45183"/>
+  </div>
+  <div class="field">
+    <label>Free Cash Flow (M)</label>
+    <input type="text" id="inp-fcf" placeholder="e.g. 9461"/>
+  </div>
+  <div class="field">
+    <label>Net Cash / (Debt) (M)</label>
+    <input type="text" id="inp-netcash" placeholder="e.g. -4500"/>
+  </div>
+
+  <div id="margin-pill-wrap" style="display:none">
+    <div class="margin-pill">
+      <span class="margin-pill-lbl">FCF Margin</span>
+      <span class="margin-pill-val" id="margin-pill-val">—</span>
+    </div>
+  </div>
+  <div id="warn-fcf" class="inline-warn" style="display:none">⚠ Negative FCF — results may be N/A without margin improvement.</div>
+  <div id="err-rev" class="inline-err" style="display:none">Revenue must be a positive number.</div>
+
+  <div class="sb-sec-hdr">Projection</div>
+
+  <div class="field">
+    <label>Forecast Horizon (years)</label>
+    <input type="number" id="inp-years" value="8" min="3" max="30" step="1"/>
+  </div>
+
+  <div class="slider-wrap">
+    <label>Revenue Growth (%/yr)<span id="lbl-cagr">10%</span></label>
+    <input type="range" id="sl-cagr" min="-30" max="100" step="1" value="10"/>
+  </div>
+  <div class="slider-wrap">
+    <label>FCF Margin Change (pp/yr)<span id="lbl-dpp">0.0pp</span></label>
+    <input type="range" id="sl-dpp" min="-5" max="5" step="0.1" value="0"/>
+  </div>
+
+  <div class="sb-sec-hdr">Terminal Value</div>
+
+  <div class="radio-row">
+    <button class="radio-btn active" id="rb-tgrowth" onclick="setTerminal('growth')">Terminal Growth</button>
+    <button class="radio-btn" id="rb-tmult" onclick="setTerminal('multiple')">Exit Multiple</button>
+  </div>
+
+  <div id="tgrowth-wrap">
+    <div class="slider-wrap">
+      <label>Terminal Growth (%/yr)<span id="lbl-tg">2.0%</span></label>
+      <input type="range" id="sl-tg" min="-10" max="10" step="0.5" value="2"/>
+    </div>
+  </div>
+  <div id="tmult-wrap" style="display:none">
+    <div class="field">
+      <label>Exit Multiple (× final FCF)</label>
+      <input type="text" id="inp-tmult" placeholder="e.g. 15"/>
+    </div>
+  </div>
+
+  <div id="sb-summary-wrap" style="display:none">
+    <div class="sb-summary">
+      <div class="sb-sum-title">Summary</div>
+      <div class="sb-sum-row"><span class="sb-sum-lbl" id="sum-co">—</span><span class="sb-sum-val" id="sum-px">—</span></div>
+      <div class="sb-sum-row"><span class="sb-sum-lbl">Market Cap</span><span class="sb-sum-val" id="sum-mktcap">—</span></div>
+      <div class="sb-sum-row"><span class="sb-sum-lbl">FCF Margin</span><span class="sb-sum-val" id="sum-margin">—</span></div>
+      <div class="sb-sum-row"><span class="sb-sum-lbl">Growth · Horizon</span><span class="sb-sum-val" id="sum-growth">—</span></div>
+      <div class="sb-sum-row"><span class="sb-sum-lbl">Terminal</span><span class="sb-sum-val" id="sum-terminal">—</span></div>
+    </div>
+  </div>
+
+  <button class="btn-example" id="btn-example" onclick="loadExample()">▶  Load Netflix FY2025 Example</button>
+  <button class="btn-reset" id="btn-reset" style="display:none" onclick="resetInputs()">✕  Reset All Inputs</button>
+
+</aside>
+
+<!-- ══════════════════════════════════════════
+     MAIN
+══════════════════════════════════════════ -->
+<main id="main">
+
+  <!-- Tab bar -->
+  <nav id="tabbar">
+    <button class="tab-btn active" onclick="switchTab('dcf')">Normal DCF — Fair Value</button>
+    <button class="tab-btn" onclick="switchTab('rev')">Reverse DCF — Implied IRR</button>
+    <button class="tab-btn" onclick="switchTab('matrix')">IRR Matrix — Scenario Grid</button>
+  </nav>
+
+  <!-- ── TAB 1: Normal DCF ── -->
+  <div class="tab-panel active" id="tab-dcf">
+
+    <div id="dcf-empty" class="empty-state">
+      <div class="empty-state-icon">📊</div>
+      <div class="empty-state-title">No data yet</div>
+      <div class="empty-state-body">Fill in the sidebar with your company's financials,<br>or click <strong>Load Netflix Example</strong> to get started instantly.</div>
+    </div>
+
+    <div id="dcf-content" style="display:none">
+
+      <div class="two-col">
+        <div>
+          <div class="tab-section-hdr">Discount Rate</div>
+          <div class="slider-wrap">
+            <label>Required Annual Return (%)<span id="lbl-disc">12%</span></label>
+            <input type="range" id="sl-disc" min="1" max="50" step="1" value="12" oninput="onDiscChange()"/>
+          </div>
+          <div class="hint-box">
+            <div class="hint-title">How to choose</div>
+            <div class="hint-body">
+              <strong>8–10%</strong> Aggressive / growth<br>
+              <strong>10–15%</strong> Moderate<br>
+              <strong>15–20%</strong> Conservative / value<br><br>
+              Higher rate → lower fair value → more margin of safety built in.
+            </div>
+          </div>
+        </div>
+        <div>
+          <div class="tab-section-hdr">Result</div>
+          <div class="kpi-grid" id="dcf-kpis"></div>
+          <div class="bars-wrap" id="dcf-bars"></div>
+        </div>
+      </div>
+
+      <!-- Sensitivity Chart -->
+      <div class="chart-card">
+        <div class="chart-card-title">Fair Value vs Discount Rate</div>
+        <div class="chart-card-sub">How the intrinsic value changes as your required return shifts. Green region = stock appears undervalued at that rate.</div>
+        <canvas id="chart-sens" height="220" style="width:100%"></canvas>
+        <div class="chart-legend">
+          <div class="legend-item"><div class="legend-dot" style="background:var(--navy)"></div>Fair value</div>
+          <div class="legend-item"><div class="legend-dot" style="background:var(--ink-4);width:18px;height:2px;border-radius:0"></div>Market price</div>
+          <div class="legend-item"><div class="legend-dot" style="background:rgba(20,83,45,.12)"></div>Undervalued region</div>
+        </div>
+      </div>
+
+      <!-- Forecast table collapsible -->
+      <div class="collapsible">
+        <div class="collapsible-hdr" onclick="toggleCollapse(this)">
+          Year-by-year forecast &amp; valuation bridge
+          <span class="collapsible-arrow">▼</span>
+        </div>
+        <div class="collapsible-body">
+          <div style="overflow-x:auto">
+            <table class="data-table" id="forecast-table"></table>
+          </div>
+          <div id="bridge-wrap"></div>
+          <button class="btn-download" onclick="downloadForecast()">⬇ Download CSV</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ── TAB 2: Reverse DCF ── -->
+  <div class="tab-panel" id="tab-rev">
+
+    <div id="rev-empty" class="empty-state">
+      <div class="empty-state-icon">🔄</div>
+      <div class="empty-state-title">No data yet</div>
+      <div class="empty-state-body">Fill in the sidebar to see the implied return at the current stock price.</div>
+    </div>
+
+    <div id="rev-content" style="display:none">
+      <div class="tab-section-hdr">Implied Return at Current Price</div>
+      <div class="kpi-grid" id="rev-kpis"></div>
+
+      <div class="chart-card">
+        <div class="chart-card-title">Implied IRR vs Stock Price</div>
+        <div class="chart-card-sub">What annual return does each price level imply, given your growth assumptions? Green shading = above 10% hurdle rate.</div>
+        <canvas id="chart-irr" height="220" style="width:100%"></canvas>
+        <div class="chart-legend">
+          <div class="legend-item"><div class="legend-dot" style="background:var(--navy)"></div>Implied IRR</div>
+          <div class="legend-item"><div class="legend-dot" style="background:rgba(20,83,45,.12)"></div>Above 10% hurdle</div>
+          <div class="legend-item"><div class="legend-dot" style="background:var(--ink-4);width:18px;height:2px;border-radius:0"></div>10% hurdle</div>
+        </div>
+      </div>
+
+      <div class="collapsible">
+        <div class="collapsible-hdr" onclick="toggleCollapse(this)">
+          Full price sensitivity table
+          <span class="collapsible-arrow">▼</span>
+        </div>
+        <div class="collapsible-body">
+          <div style="overflow-x:auto">
+            <table class="data-table" id="rev-table"></table>
+          </div>
+          <button class="btn-download" style="margin-top:8px" onclick="downloadRevDCF()">⬇ Download CSV</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── TAB 3: IRR Matrix ── -->
+  <div class="tab-panel" id="tab-matrix">
+
+    <div id="matrix-empty" class="empty-state">
+      <div class="empty-state-icon">🗂️</div>
+      <div class="empty-state-title">No data yet</div>
+      <div class="empty-state-body">Fill in the sidebar to generate the scenario matrix.</div>
+    </div>
+
+    <div id="matrix-content" style="display:none">
+
+      <div class="heatmap-legend">
+        <span class="hm-legend-end" style="color:var(--red)">Low IRR</span>
+        <div style="flex:1">
+          <div class="hm-legend-bar"></div>
+          <div class="hm-legend-ticks"><span>0%</span><span>5%</span><span>10%</span><span>15%</span><span>20%</span><span>25%+</span></div>
+        </div>
+        <span class="hm-legend-end" style="color:#1e3a8a">High IRR</span>
+      </div>
+
+      <div class="matrix-controls" id="matrix-controls">
+        <div>
+          <div class="mc-section-lbl">Rows — Revenue Growth</div>
+          <div class="mc-row">
+            <div class="field"><label>Min (%/yr)</label><input type="number" id="mc-gmin" value="0" step="1" oninput="renderMatrix()"/></div>
+            <div class="field"><label>Max (%/yr)</label><input type="number" id="mc-gmax" value="20" step="1" oninput="renderMatrix()"/></div>
+            <div class="field"><label>Rows</label><input type="number" id="mc-grows" value="6" min="2" max="12" step="1" oninput="renderMatrix()"/></div>
+          </div>
+        </div>
+        <div id="mc-right">
+          <div class="mc-section-lbl" id="mc-col-lbl">Columns — Terminal Growth</div>
+          <div class="mc-row">
+            <div class="field"><label id="mc-min-lbl">Min (%/yr)</label><input type="number" id="mc-tmin" value="0" step="0.5" oninput="renderMatrix()"/></div>
+            <div class="field"><label id="mc-max-lbl">Max (%/yr)</label><input type="number" id="mc-tmax" value="4" step="0.5" oninput="renderMatrix()"/></div>
+            <div class="field"><label>Columns</label><input type="number" id="mc-tcols" value="5" min="2" max="10" step="1" oninput="renderMatrix()"/></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="matrix-tables"></div>
+
+    </div>
+  </div>
+
+</main>
+</div><!-- /body -->
+</div><!-- /shell -->
+
+<script>
+/* ═══════════════════════════════════════════════════════════════
+   DCF ENGINE — pure JS
+═══════════════════════════════════════════════════════════════ */
+
+const NFLX = {
+  company:"Netflix (NFLX)", price:"78", shares:"4317",
+  revenue:"45183", fcf:"9461", netcash:"-4500",
+  cagr:12, dpp:0.0, years:8, termMode:"growth", tg:3.0, tmult:"15"
+};
+
+function pf(s){
+  if(s===null||s===undefined||s==='')return NaN;
+  const n=parseFloat(String(s).replace(/,/g,''));
+  return isNaN(n)?NaN:n;
+}
+
+function linspace(a,b,n){
+  if(n<2)return[a];
+  const arr=[];
+  for(let i=0;i<n;i++)arr.push(a+(b-a)*i/(n-1));
+  return arr;
+}
+
+// Compute year-by-year FCF projections
+function projectFCFs(inp){
+  const rows=[];
+  let rev=inp.revLTM, marg=inp.fcfMargin;
+  for(let y=1;y<=inp.years;y++){
+    rev*=(1+inp.cagr);
+    marg+=inp.dpp;
+    const fcf=rev*marg;
+    const df=1/Math.pow(1+inp.disc,y);
+    rows.push({year:y,rev,marg,fcf,df,discFcf:fcf*df});
+  }
+  return rows;
+}
+
+// Terminal value (present value)
+function terminalPV(inp, lastFCF){
+  let tv;
+  if(inp.termMode==='multiple'){
+    tv=lastFCF*inp.tmult;
+  } else {
+    const gap=Math.max(inp.disc-inp.tg, 0.001);
+    tv=lastFCF*(1+inp.tg)/gap;
+  }
+  return tv/Math.pow(1+inp.disc, inp.years);
+}
+
+// Full fair value per share
+function fairValue(inp){
+  const rows=projectFCFs(inp);
+  const pvFCFs=rows.reduce((s,r)=>s+r.discFcf,0);
+  const lastFCF=rows[rows.length-1].fcf;
+  if(!isFinite(lastFCF)||lastFCF<=0)return{ok:false};
+  const pvTV=terminalPV(inp,lastFCF);
+  const equityPV=pvFCFs+pvTV-inp.netDebt;
+  if(equityPV<=0)return{ok:false,pvFCFs,pvTV,equityPV,lastFCF,rows};
+  const fvps=equityPV/inp.shares;
+  return{ok:true,pvFCFs,pvTV,equityPV,fvps,lastFCF,rows};
+}
+
+// Implied IRR via bisection
+function impliedIRR(inp, price){
+  // We want disc s.t. fvps(disc) = price
+  // Bisect over [0.001, 2.0]
+  const target=price;
+  let lo=0.001, hi=2.0;
+  for(let i=0;i<80;i++){
+    const mid=(lo+hi)/2;
+    const res=fairValue({...inp,disc:mid});
+    if(!res.ok){hi=mid;continue}
+    if(res.fvps>target) lo=mid; else hi=mid;
+    if(hi-lo<1e-7)break;
+  }
+  const mid=(lo+hi)/2;
+  const res=fairValue({...inp,disc:mid});
+  if(!res.ok)return null;
+  // Verify it's reasonable
+  if(Math.abs(res.fvps-target)/target>0.01)return null;
+  return mid;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   STATE
+═══════════════════════════════════════════════════════════════ */
+let termMode='growth';
+let exampleLoaded=false;
+
+function getInputs(){
+  return{
+    company: document.getElementById('inp-company').value.trim(),
+    price:   pf(document.getElementById('inp-price').value),
+    shares:  pf(document.getElementById('inp-shares').value),
+    revLTM:  pf(document.getElementById('inp-revenue').value),
+    fcfLTM:  pf(document.getElementById('inp-fcf').value),
+    netCashRaw: pf(document.getElementById('inp-netcash').value),
+    cagr:    parseInt(document.getElementById('sl-cagr').value)/100,
+    dpp:     parseFloat(document.getElementById('sl-dpp').value)/100,
+    years:   parseInt(document.getElementById('inp-years').value)||8,
+    disc:    parseInt(document.getElementById('sl-disc').value)/100,
+    termMode: termMode,
+    tg:      parseFloat(document.getElementById('sl-tg').value)/100,
+    tmult:   pf(document.getElementById('inp-tmult').value),
+  };
+}
+
+function buildInp(raw){
+  if(!isFinite(raw.revLTM)||raw.revLTM<=0)return null;
+  if(!isFinite(raw.fcfLTM))return null;
+  if(!isFinite(raw.shares)||raw.shares<=0)return null;
+  if(!isFinite(raw.price)||raw.price<=0)return null;
+  const margin=raw.fcfLTM/raw.revLTM;
+  if(!isFinite(margin))return null;
+  const netDebt=isFinite(raw.netCashRaw)?-raw.netCashRaw:0;
+  if(raw.termMode==='multiple'&&(!isFinite(raw.tmult)||raw.tmult<=0))return null;
+  return{
+    company: raw.company,
+    price: raw.price,
+    shares: raw.shares,
+    revLTM: raw.revLTM,
+    fcfMargin: margin,
+    netDebt: netDebt,
+    cagr: raw.cagr,
+    dpp: raw.dpp,
+    years: raw.years,
+    disc: raw.disc,
+    termMode: raw.termMode,
+    tg: raw.tg,
+    tmult: raw.tmult,
+  };
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   SLIDER LABELS
+═══════════════════════════════════════════════════════════════ */
+document.getElementById('sl-cagr').addEventListener('input',function(){
+  document.getElementById('lbl-cagr').textContent=this.value+'%';
+  update();
+});
+document.getElementById('sl-dpp').addEventListener('input',function(){
+  document.getElementById('lbl-dpp').textContent=parseFloat(this.value).toFixed(1)+'pp';
+  update();
+});
+document.getElementById('sl-tg').addEventListener('input',function(){
+  document.getElementById('lbl-tg').textContent=parseFloat(this.value).toFixed(1)+'%';
+  update();
+});
+['inp-company','inp-price','inp-shares','inp-revenue','inp-fcf','inp-netcash',
+ 'inp-years','inp-tmult'].forEach(id=>{
+  const el=document.getElementById(id);
+  if(el)el.addEventListener('input',update);
+});
+
+function onDiscChange(){
+  const v=document.getElementById('sl-disc').value;
+  document.getElementById('lbl-disc').textContent=v+'%';
+  renderDCF();
+}
+
+function setTerminal(mode){
+  termMode=mode;
+  document.getElementById('rb-tgrowth').classList.toggle('active',mode==='growth');
+  document.getElementById('rb-tmult').classList.toggle('active',mode==='multiple');
+  document.getElementById('tgrowth-wrap').style.display=mode==='growth'?'':'none';
+  document.getElementById('tmult-wrap').style.display=mode==='multiple'?'':'none';
+  // Update matrix column labels
+  const isM=mode==='multiple';
+  document.getElementById('mc-col-lbl').textContent=isM?'Columns — Exit Multiple':'Columns — Terminal Growth';
+  document.getElementById('mc-min-lbl').textContent=isM?'Min (×)':'Min (%/yr)';
+  document.getElementById('mc-max-lbl').textContent=isM?'Max (×)':'Max (%/yr)';
+  if(isM){
+    document.getElementById('mc-tmin').value=8;
+    document.getElementById('mc-tmax').value=16;
+  } else {
+    document.getElementById('mc-tmin').value=0;
+    document.getElementById('mc-tmax').value=4;
+  }
+  update();
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   EXAMPLE / RESET
+═══════════════════════════════════════════════════════════════ */
+function loadExample(){
+  document.getElementById('inp-company').value=NFLX.company;
+  document.getElementById('inp-price').value=NFLX.price;
+  document.getElementById('inp-shares').value=NFLX.shares;
+  document.getElementById('inp-revenue').value=NFLX.revenue;
+  document.getElementById('inp-fcf').value=NFLX.fcf;
+  document.getElementById('inp-netcash').value=NFLX.netcash;
+  document.getElementById('sl-cagr').value=NFLX.cagr;
+  document.getElementById('lbl-cagr').textContent=NFLX.cagr+'%';
+  document.getElementById('sl-dpp').value=NFLX.dpp;
+  document.getElementById('lbl-dpp').textContent=NFLX.dpp.toFixed(1)+'pp';
+  document.getElementById('inp-years').value=NFLX.years;
+  setTerminal(NFLX.termMode);
+  document.getElementById('sl-tg').value=NFLX.tg;
+  document.getElementById('lbl-tg').textContent=NFLX.tg.toFixed(1)+'%';
+  document.getElementById('inp-tmult').value=NFLX.tmult;
+  exampleLoaded=true;
+  document.getElementById('btn-reset').style.display='';
+  update();
+}
+
+function resetInputs(){
+  ['inp-company','inp-price','inp-shares','inp-revenue','inp-fcf','inp-netcash','inp-tmult']
+    .forEach(id=>document.getElementById(id).value='');
+  document.getElementById('inp-years').value=8;
+  document.getElementById('sl-cagr').value=10; document.getElementById('lbl-cagr').textContent='10%';
+  document.getElementById('sl-dpp').value=0;   document.getElementById('lbl-dpp').textContent='0.0pp';
+  document.getElementById('sl-tg').value=2;    document.getElementById('lbl-tg').textContent='2.0%';
+  document.getElementById('sl-disc').value=12; document.getElementById('lbl-disc').textContent='12%';
+  setTerminal('growth');
+  exampleLoaded=false;
+  document.getElementById('btn-reset').style.display='none';
+  update();
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   TAB SWITCHING
+═══════════════════════════════════════════════════════════════ */
+let activeTab='dcf';
+function switchTab(t){
+  activeTab=t;
+  document.querySelectorAll('.tab-btn').forEach((b,i)=>{
+    b.classList.toggle('active',['dcf','rev','matrix'][i]===t);
+  });
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('tab-'+t).classList.add('active');
+  update();
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   COLLAPSIBLE
+═══════════════════════════════════════════════════════════════ */
+function toggleCollapse(hdr){
+  hdr.classList.toggle('open');
+  hdr.nextElementSibling.classList.toggle('open');
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   FORMATTING
+═══════════════════════════════════════════════════════════════ */
+function fmt(n,dec=2){
+  if(!isFinite(n))return'—';
+  return n.toLocaleString('en-US',{minimumFractionDigits:dec,maximumFractionDigits:dec});
+}
+function fmtPct(n,dec=1){if(!isFinite(n))return'—';return(n>=0?'+':'')+fmt(n*100,dec)+'%'}
+function fmtPctPlain(n,dec=1){if(!isFinite(n))return'—';return fmt(n*100,dec)+'%'}
+
+/* ═══════════════════════════════════════════════════════════════
+   IRR CELL COLOUR  (diverging at 10% hurdle)
+═══════════════════════════════════════════════════════════════ */
+function irrColor(v){
+  if(!isFinite(v))return{bg:'#f5f2ec',fg:'#a8a29e'};
+  const H=0.10;
+  let r,g,b,fg;
+  if(v<0){
+    const t=Math.min(-v/0.25,1);
+    r=Math.round(252+(127-252)*t);
+    g=Math.round(165+(29-165)*t);
+    b=Math.round(165+(29-165)*t);
+    fg=t>0.5?'#fff':'#7f1d1d';
+  } else if(v<H){
+    const t=v/H;
+    r=Math.round(252+(254-252)*t);
+    g=Math.round(165+(249-165)*t);
+    b=Math.round(165+(240-165)*t);
+    fg='#7f1d1d';
+  } else if(v<0.15){
+    const t=(v-H)/0.05;
+    r=Math.round(254+(219-254)*t);
+    g=Math.round(249+(234-249)*t);
+    b=Math.round(240+(254-240)*t);
+    fg='#1e3a5f';
+  } else {
+    const t=Math.min((v-0.15)/0.15,1);
+    r=Math.round(219+(15-219)*t);
+    g=Math.round(234+(32-234)*t);
+    b=Math.round(254+(80-254)*t);
+    fg=t>0.35?'#fff':'#1e3a5f';
+  }
+  return{bg:`rgb(${r},${g},${b})`,fg};
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   MAIN UPDATE
+═══════════════════════════════════════════════════════════════ */
+function update(){
+  const raw=getInputs();
+
+  // Sidebar validation display
+  const hasFCF=isFinite(raw.fcfLTM);
+  const hasRev=isFinite(raw.revLTM)&&raw.revLTM>0;
+  document.getElementById('warn-fcf').style.display=(hasFCF&&raw.fcfLTM<0)?'':'none';
+  document.getElementById('err-rev').style.display=(raw.price&&raw.shares&&!hasRev)?'':'none';
+
+  // FCF margin pill
+  const showMargin=hasFCF&&hasRev;
+  const margin=showMargin?raw.fcfLTM/raw.revLTM:NaN;
+  document.getElementById('margin-pill-wrap').style.display=showMargin?'':'none';
+  if(showMargin){
+    const mv=document.getElementById('margin-pill-val');
+    mv.textContent=fmt(margin*100,1)+'%';
+    mv.style.color=margin>0?'var(--green)':'var(--red)';
+  }
+
+  // Build inp
+  const inp=buildInp(raw);
+
+  // Sidebar summary
+  const showSum=inp!==null;
+  document.getElementById('sb-summary-wrap').style.display=showSum?'':'none';
+  if(showSum){
+    document.getElementById('sum-co').textContent=inp.company||'—';
+    document.getElementById('sum-px').textContent=fmt(inp.price)+' USD';
+    document.getElementById('sum-mktcap').textContent=fmt(inp.price*inp.shares,0)+'M';
+    document.getElementById('sum-margin').textContent=fmt(inp.fcfMargin*100,1)+'%';
+    document.getElementById('sum-growth').textContent=fmt(inp.cagr*100,0)+'%/yr · '+inp.years+'y';
+    document.getElementById('sum-terminal').textContent=
+      inp.termMode==='multiple'?fmt(inp.tmult,1)+'×':fmt(inp.tg*100,1)+'%/yr';
+  }
+
+  if(activeTab==='dcf')renderDCF(inp);
+  else if(activeTab==='rev')renderRev(inp);
+  else if(activeTab==='matrix')renderMatrix(inp);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   TAB 1 — NORMAL DCF
+═══════════════════════════════════════════════════════════════ */
+let _sensData=[];
+let _forecastRows=[];
+let _bridgeData={};
+
+function renderDCF(inp){
+  if(!inp){inp=buildInp(getInputs())}
+  const show=inp!==null;
+  document.getElementById('dcf-empty').style.display=show?'none':'';
+  document.getElementById('dcf-content').style.display=show?'':'none';
+  if(!show)return;
+
+  const res=fairValue(inp);
+  _forecastRows=res.rows||[];
+  _bridgeData={pvFCFs:res.pvFCFs,pvTV:res.pvTV,equityPV:res.equityPV,netDebt:inp.netDebt,shares:inp.shares};
+
+  // KPIs
+  const kpiEl=document.getElementById('dcf-kpis');
+  if(res.ok){
+    const up=(res.fvps/inp.price-1);
+    kpiEl.innerHTML=`
+      <div class="kpi-card"><div class="kpi-label">Fair Value / Share</div>
+        <div class="kpi-value">${fmt(res.fvps)}</div><div class="kpi-sub">USD</div></div>
+      <div class="kpi-card"><div class="kpi-label">Current Price</div>
+        <div class="kpi-value">${fmt(inp.price)}</div><div class="kpi-sub">USD</div></div>
+      <div class="kpi-card"><div class="kpi-label">Implied Upside</div>
+        <div class="kpi-value ${up>=0?'up':'down'}">${up>=0?'+':''}${fmt(up*100,1)}%</div>
+        <div class="kpi-sub">vs current price</div></div>
+      <div class="kpi-card"><div class="kpi-label">Discount Rate</div>
+        <div class="kpi-value">${fmt(inp.disc*100,0)}%</div><div class="kpi-sub">required return</div></div>`;
+
+    // Bars
+    const mx=Math.max(res.fvps,inp.price);
+    const fw=Math.max(res.fvps/mx*100,6);
+    const pw=Math.max(inp.price/mx*100,6);
+    const upTag=up>=0?'up':'down';
+    document.getElementById('dcf-bars').innerHTML=`
+      <div class="bar-item">
+        <div class="bar-meta"><span>Fair Value / Share</span><span class="bar-meta-val">${fmt(res.fvps)} USD</span></div>
+        <div class="bar-track"><div class="bar-fill bar-fv" style="width:${fw.toFixed(1)}%">${fmt(res.fvps)}</div></div>
+      </div>
+      <div class="bar-item">
+        <div class="bar-meta"><span>Market Price</span><span class="bar-meta-val">${fmt(inp.price)} USD</span></div>
+        <div class="bar-track"><div class="bar-fill bar-px" style="width:${pw.toFixed(1)}%">${fmt(inp.price)}</div></div>
+      </div>
+      <span class="upside-tag ${upTag}">${up>=0?'+':''}${fmt(up*100,1)}% implied upside / downside</span>`;
+  } else {
+    kpiEl.innerHTML=`<div class="kpi-card" style="grid-column:1/-1;text-align:center;color:var(--ink-3);font-size:13px;padding:20px">
+      ⚠ N/A — equity PV ≤ 0 or final-year FCF ≤ 0.<br>Try a lower discount rate, higher growth, or improved margins.</div>`;
+    document.getElementById('dcf-bars').innerHTML='';
+  }
+
+  // Sensitivity data
+  _sensData=[];
+  for(let rr=5;rr<=30;rr++){
+    const r2=fairValue({...inp,disc:rr/100});
+    _sensData.push({rate:rr,fv:r2.ok?r2.fvps:null});
+  }
+  drawSensChart(inp.price,inp.disc*100);
+
+  // Forecast table
+  renderForecastTable(inp);
+  renderBridge(inp,res);
+}
+
+function drawSensChart(price,selectedRate){
+  const canvas=document.getElementById('chart-sens');
+  const ctx=canvas.getContext('2d');
+  const dpr=window.devicePixelRatio||1;
+  const W=canvas.offsetWidth, H=220;
+  canvas.width=W*dpr; canvas.height=H*dpr;
+  ctx.scale(dpr,dpr);
+
+  const PAD={t:12,r:20,b:36,l:56};
+  const cw=W-PAD.l-PAD.r, ch=H-PAD.t-PAD.b;
+
+  const valid=_sensData.filter(d=>d.fv!==null);
+  if(valid.length<2){ctx.clearRect(0,0,W,H);return;}
+
+  const rates=valid.map(d=>d.rate);
+  const fvs=valid.map(d=>d.fv);
+  const minFV=Math.min(...fvs,price)*0.92;
+  const maxFV=Math.max(...fvs,price)*1.05;
+  const minR=5, maxR=30;
+
+  function xp(r){return PAD.l+((r-minR)/(maxR-minR))*cw}
+  function yp(v){return PAD.t+ch-(v-minFV)/(maxFV-minFV)*ch}
+
+  // Grid
+  ctx.strokeStyle='#ede9e0'; ctx.lineWidth=1;
+  for(let v=0;v<=4;v++){
+    const y=PAD.t+v*(ch/4);
+    ctx.beginPath();ctx.moveTo(PAD.l,y);ctx.lineTo(PAD.l+cw,y);ctx.stroke();
+    const val=minFV+(maxFV-minFV)*(1-v/4);
+    ctx.fillStyle='#a8a29e';ctx.font='10px DM Mono';ctx.textAlign='right';
+    ctx.fillText(fmt(val,0),PAD.l-6,y+3);
+  }
+  for(let r=5;r<=30;r+=5){
+    const x=xp(r);
+    ctx.beginPath();ctx.moveTo(x,PAD.t);ctx.lineTo(x,PAD.t+ch);ctx.stroke();
+    ctx.fillStyle='#a8a29e';ctx.font='10px DM Mono';ctx.textAlign='center';
+    ctx.fillText(r+'%',x,PAD.t+ch+16);
+  }
+
+  // Above-hurdle shade
+  const above=valid.filter(d=>d.fv>=price);
+  if(above.length>0){
+    ctx.beginPath();
+    const py=yp(price);
+    ctx.moveTo(xp(above[0].rate),py);
+    above.forEach(d=>ctx.lineTo(xp(d.rate),yp(d.fv)));
+    const last=above[above.length-1];
+    ctx.lineTo(xp(last.rate),py);
+    ctx.closePath();
+    ctx.fillStyle='rgba(20,83,45,0.08)';
+    ctx.fill();
+  }
+
+  // Price line
+  const py=yp(price);
+  ctx.setLineDash([4,4]);ctx.strokeStyle='#a8a29e';ctx.lineWidth=1;
+  ctx.beginPath();ctx.moveTo(PAD.l,py);ctx.lineTo(PAD.l+cw,py);ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.fillStyle='#a8a29e';ctx.font='10px DM Sans';ctx.textAlign='left';
+  ctx.fillText('Market price  '+fmt(price),PAD.l+4,py-6);
+
+  // FV line
+  ctx.strokeStyle='#1e3a5f';ctx.lineWidth=2;ctx.lineJoin='round';
+  ctx.beginPath();
+  valid.forEach((d,i)=>{
+    if(i===0)ctx.moveTo(xp(d.rate),yp(d.fv));
+    else ctx.lineTo(xp(d.rate),yp(d.fv));
+  });
+  ctx.stroke();
+
+  // Selected rate dot
+  const selD=valid.find(d=>d.rate===Math.round(selectedRate));
+  if(selD){
+    ctx.beginPath();
+    ctx.arc(xp(selD.rate),yp(selD.fv),5,0,Math.PI*2);
+    ctx.fillStyle='#1e3a5f';ctx.fill();
+    ctx.strokeStyle='#fff';ctx.lineWidth=1.5;ctx.stroke();
+  }
+
+  // Axes labels
+  ctx.fillStyle='#78716c';ctx.font='11px DM Sans';ctx.textAlign='center';
+  ctx.fillText('Discount Rate (%)',PAD.l+cw/2,H-4);
+}
+
+function renderForecastTable(inp){
+  const t=document.getElementById('forecast-table');
+  if(!_forecastRows.length){t.innerHTML='';return;}
+  let html=`<thead><tr>
+    <th>Year</th><th>Revenue (M)</th><th>FCF Margin</th>
+    <th>FCF (M)</th><th>Disc. Factor</th><th>Disc. FCF (M)</th>
+  </tr></thead><tbody>`;
+  _forecastRows.forEach(r=>{
+    html+=`<tr>
+      <td>${r.year}</td>
+      <td>${fmt(r.rev,0)}</td>
+      <td>${fmtPctPlain(r.marg,2)}</td>
+      <td>${fmt(r.fcf,0)}</td>
+      <td>${fmt(r.df,4)}</td>
+      <td>${fmt(r.discFcf,0)}</td>
+    </tr>`;
+  });
+  html+='</tbody>';
+  t.innerHTML=html;
+}
+
+function renderBridge(inp,res){
+  const el=document.getElementById('bridge-wrap');
+  if(!res.ok){el.innerHTML='';return;}
+  el.innerHTML=`<div class="bridge" style="margin-top:14px">
+    <div class="bridge-row"><span class="bridge-lbl">PV of FCFs (Yrs 1–${inp.years})</span><span class="bridge-val">${fmt(res.pvFCFs,0)} M</span></div>
+    <div class="bridge-row"><span class="bridge-lbl">PV of Terminal Value</span><span class="bridge-val">${fmt(res.pvTV,0)} M</span></div>
+    <div class="bridge-row"><span class="bridge-lbl">Less: Net Debt</span><span class="bridge-val">(${fmt(inp.netDebt,0)} M)</span></div>
+    <div class="bridge-row"><span class="bridge-lbl">Equity Present Value</span><span class="bridge-val">${fmt(res.equityPV,0)} M</span></div>
+    <div class="bridge-row"><span class="bridge-lbl">÷ Shares Outstanding</span><span class="bridge-val">${fmt(inp.shares,0)} M</span></div>
+    <div class="bridge-row"><span class="bridge-lbl">= Fair Value per Share</span><span class="bridge-val">${fmt(res.fvps,2)} USD</span></div>
+  </div>`;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   TAB 2 — REVERSE DCF
+═══════════════════════════════════════════════════════════════ */
+let _revData=[];
+
+function renderRev(inp){
+  if(!inp){inp=buildInp(getInputs())}
+  const show=inp!==null;
+  document.getElementById('rev-empty').style.display=show?'none':'';
+  document.getElementById('rev-content').style.display=show?'':'none';
+  if(!show)return;
+
+  const irr=impliedIRR(inp,inp.price);
+
+  // KPIs
+  const kpiEl=document.getElementById('rev-kpis');
+  if(irr!==null){
+    const irrCls=irr>=0.10?'up':(irr<0.06?'down':'');
+    const termStr=inp.termMode==='multiple'?fmt(inp.tmult,1)+'×':fmt(inp.tg*100,1)+'%/yr';
+    kpiEl.innerHTML=`
+      <div class="kpi-card"><div class="kpi-label">Implied IRR</div>
+        <div class="kpi-value ${irrCls}">${fmt(irr*100,2)}%</div>
+        <div class="kpi-sub">expected annual return</div></div>
+      <div class="kpi-card"><div class="kpi-label">Stock Price</div>
+        <div class="kpi-value">${fmt(inp.price)}</div><div class="kpi-sub">USD</div></div>
+      <div class="kpi-card"><div class="kpi-label">Revenue Growth</div>
+        <div class="kpi-value">${fmt(inp.cagr*100,0)}%/yr</div>
+        <div class="kpi-sub">${inp.years} year horizon</div></div>
+      <div class="kpi-card"><div class="kpi-label">Terminal</div>
+        <div class="kpi-value">${termStr}</div>
+        <div class="kpi-sub">${inp.termMode==='multiple'?'exit multiple':'Gordon growth'}</div></div>`;
+  } else {
+    kpiEl.innerHTML=`<div class="kpi-card" style="grid-column:1/-1;text-align:center;color:var(--ink-3);font-size:13px;padding:20px">
+      ⚠ N/A — could not solve for IRR. Adjust growth, margins or terminal assumptions.</div>`;
+  }
+
+  // Build curve data ±60% of current price
+  const pMin=inp.price*0.35, pMax=inp.price*1.65;
+  _revData=[];
+  for(let i=0;i<=50;i++){
+    const p=pMin+(pMax-pMin)*i/50;
+    const r=impliedIRR(inp,p);
+    if(r!==null)_revData.push({price:p,irr:r});
+  }
+  drawIRRChart(inp.price,irr);
+
+  // Table
+  renderRevTable(inp);
+}
+
+function drawIRRChart(curPrice,curIRR){
+  const canvas=document.getElementById('chart-irr');
+  const ctx=canvas.getContext('2d');
+  const dpr=window.devicePixelRatio||1;
+  const W=canvas.offsetWidth, H=220;
+  canvas.width=W*dpr; canvas.height=H*dpr;
+  ctx.scale(dpr,dpr);
+
+  const PAD={t:12,r:20,b:36,l:52};
+  const cw=W-PAD.l-PAD.r, ch=H-PAD.t-PAD.b;
+
+  if(_revData.length<2){return;}
+  const prices=_revData.map(d=>d.price);
+  const irrs=_revData.map(d=>d.irr*100);
+  const minP=Math.min(...prices), maxP=Math.max(...prices);
+  const minI=Math.min(...irrs,-5)*1.05, maxI=Math.max(...irrs,25)*1.05;
+
+  function xp(p){return PAD.l+(p-minP)/(maxP-minP)*cw}
+  function yp(v){return PAD.t+ch-(v-minI)/(maxI-minI)*ch}
+
+  // Grid
+  ctx.strokeStyle='#ede9e0';ctx.lineWidth=1;
+  for(let i=0;i<=4;i++){
+    const y=PAD.t+i*(ch/4);
+    const val=minI+(maxI-minI)*(1-i/4);
+    ctx.beginPath();ctx.moveTo(PAD.l,y);ctx.lineTo(PAD.l+cw,y);ctx.stroke();
+    ctx.fillStyle='#a8a29e';ctx.font='10px DM Mono';ctx.textAlign='right';
+    ctx.fillText(fmt(val,0)+'%',PAD.l-5,y+3);
+  }
+  for(let i=0;i<=4;i++){
+    const x=PAD.l+i*(cw/4);
+    ctx.beginPath();ctx.moveTo(x,PAD.t);ctx.lineTo(x,PAD.t+ch);ctx.stroke();
+    const pv=minP+(maxP-minP)*i/4;
+    ctx.fillStyle='#a8a29e';ctx.font='10px DM Mono';ctx.textAlign='center';
+    ctx.fillText(fmt(pv,0),x,PAD.t+ch+16);
+  }
+
+  // Above-hurdle shade
+  const HURDLE=10;
+  const aH=_revData.filter(d=>d.irr*100>=HURDLE);
+  if(aH.length>0){
+    const hy=yp(HURDLE);
+    ctx.beginPath();
+    ctx.moveTo(xp(aH[0].price),hy);
+    aH.forEach(d=>ctx.lineTo(xp(d.price),yp(d.irr*100)));
+    ctx.lineTo(xp(aH[aH.length-1].price),hy);
+    ctx.closePath();
+    ctx.fillStyle='rgba(20,83,45,0.08)';ctx.fill();
+  }
+
+  // Zero line
+  if(minI<0&&maxI>0){
+    const zy=yp(0);
+    ctx.strokeStyle='#d6d3cd';ctx.lineWidth=1;ctx.setLineDash([]);
+    ctx.beginPath();ctx.moveTo(PAD.l,zy);ctx.lineTo(PAD.l+cw,zy);ctx.stroke();
+  }
+
+  // 10% hurdle
+  const hly=yp(HURDLE);
+  ctx.setLineDash([4,4]);ctx.strokeStyle='#a8a29e';ctx.lineWidth=1;
+  ctx.beginPath();ctx.moveTo(PAD.l,hly);ctx.lineTo(PAD.l+cw,hly);ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.fillStyle='#a8a29e';ctx.font='10px DM Sans';ctx.textAlign='left';
+  ctx.fillText('10% hurdle',PAD.l+4,hly-5);
+
+  // IRR curve
+  ctx.strokeStyle='#1e3a5f';ctx.lineWidth=2;ctx.lineJoin='round';
+  ctx.beginPath();
+  _revData.forEach((d,i)=>{
+    if(i===0)ctx.moveTo(xp(d.price),yp(d.irr*100));
+    else ctx.lineTo(xp(d.price),yp(d.irr*100));
+  });
+  ctx.stroke();
+
+  // Current price dot
+  if(curIRR!==null){
+    const cx=xp(curPrice), cy=yp(curIRR*100);
+    ctx.beginPath();ctx.arc(cx,cy,5,0,Math.PI*2);
+    ctx.fillStyle='#1e3a5f';ctx.fill();
+    ctx.strokeStyle='#fff';ctx.lineWidth=1.5;ctx.stroke();
+    ctx.fillStyle='#1e3a5f';ctx.font='bold 11px DM Mono';ctx.textAlign='center';
+    ctx.fillText(fmt(curIRR*100,1)+'%',cx,cy-10);
+  }
+
+  ctx.fillStyle='#78716c';ctx.font='11px DM Sans';ctx.textAlign='center';
+  ctx.fillText('Stock Price (USD)',PAD.l+cw/2,H-4);
+}
+
+function renderRevTable(inp){
+  const t=document.getElementById('rev-table');
+  const steps=11;
+  const half=Math.floor(steps/2);
+  const prices=[];
+  for(let i=-half;i<=half;i++){
+    const p=inp.price*(1+0.1*i);
+    if(p>0)prices.push(p);
+  }
+  let html=`<thead><tr>
+    <th>Price (USD)</th><th>vs Current</th><th>Implied IRR</th>
+  </tr></thead><tbody>`;
+  prices.forEach(p=>{
+    const r=impliedIRR(inp,p);
+    const vs=(p/inp.price-1);
+    const isCur=Math.abs(p-inp.price)<0.01;
+    const {bg,fg}=r!==null?irrColor(r):{bg:'#f5f2ec',fg:'#a8a29e'};
+    html+=`<tr ${isCur?'style="font-weight:700"':''}>
+      <td>${fmt(p,2)}</td>
+      <td>${fmtPct(vs)}</td>
+      <td style="background:${bg};color:${fg};text-align:center">${r!==null?fmt(r*100,2)+'%':'—'}</td>
+    </tr>`;
+  });
+  html+='</tbody>';
+  t.innerHTML=html;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   TAB 3 — IRR MATRIX
+═══════════════════════════════════════════════════════════════ */
+function renderMatrix(inp){
+  if(!inp){inp=buildInp(getInputs())}
+  const show=inp!==null;
+  document.getElementById('matrix-empty').style.display=show?'none':'';
+  document.getElementById('matrix-content').style.display=show?'':'none';
+  if(!show)return;
+
+  const isM=inp.termMode==='multiple';
+  const gMin=parseFloat(document.getElementById('mc-gmin').value)||0;
+  const gMax=parseFloat(document.getElementById('mc-gmax').value)||20;
+  const gRows=Math.max(2,Math.min(12,parseInt(document.getElementById('mc-grows').value)||6));
+  const tMin=parseFloat(document.getElementById('mc-tmin').value)||(isM?8:0);
+  const tMax=parseFloat(document.getElementById('mc-tmax').value)||(isM?16:4);
+  const tCols=Math.max(2,Math.min(10,parseInt(document.getElementById('mc-tcols').value)||5));
+
+  const growths=linspace(gMin/100,gMax/100,gRows);
+  const terminals=linspace(isM?tMin:tMin/100,isM?tMax:tMax/100,tCols);
+
+  const scenarios=[
+    {label:'Bear — margin −1pp/yr',cls:'sc-bear',icon:'▼',dpp:-0.01},
+    {label:'Base',cls:'sc-base',icon:'●',dpp:0},
+    {label:'Bull — margin +1pp/yr',cls:'sc-bull',icon:'▲',dpp:+0.01},
+  ];
+
+  let html='';
+  scenarios.forEach(sc=>{
+    html+=`<div class="scenario-label ${sc.cls}">${sc.icon} ${sc.label}</div>`;
+    html+=`<div style="overflow-x:auto;margin-bottom:8px"><table class="heatmap-table">`;
+    // Header row
+    html+=`<thead><tr><th class="row-hdr">Growth \\ Terminal →</th>`;
+    terminals.forEach(tv=>{
+      const lbl=isM?fmt(tv,1)+'×':fmt(tv*100,1)+'%';
+      html+=`<th>${lbl}</th>`;
+    });
+    html+=`</tr></thead><tbody>`;
+
+    growths.forEach(g=>{
+      html+=`<tr><th class="row-hdr" style="background:var(--cream-b);text-align:left">${fmt(g*100,1)}%</th>`;
+      terminals.forEach(tv=>{
+        const ci={...inp,cagr:g,dpp:inp.dpp+sc.dpp};
+        if(isM){ci.termMode='multiple';ci.tmult=tv;}
+        else{ci.termMode='growth';ci.tg=tv;}
+        // Check last FCF
+        let lastFCF=ci.revLTM*Math.pow(1+ci.cagr,ci.years)*(ci.fcfMargin+ci.dpp*ci.years);
+        if(!isFinite(lastFCF)||lastFCF<=0){
+          html+=`<td><div class="hm-cell" style="background:#f5f2ec;color:#a8a29e">—</div></td>`;
+          return;
+        }
+        const irr=impliedIRR(ci,ci.price);
+        if(irr===null){
+          html+=`<td><div class="hm-cell" style="background:#f5f2ec;color:#a8a29e">—</div></td>`;
+          return;
+        }
+        const {bg,fg}=irrColor(irr);
+        html+=`<td><div class="hm-cell" style="background:${bg};color:${fg}">${fmt(irr*100,1)}%</div></td>`;
+      });
+      html+=`</tr>`;
+    });
+    html+=`</tbody></table></div>`;
+    html+=`<button class="btn-download" onclick="downloadMatrix(${JSON.stringify(sc.label)})">⬇ Download ${sc.label} CSV</button>`;
+    html+=`<div style="height:8px"></div>`;
+  });
+
+  document.getElementById('matrix-tables').innerHTML=html;
+  window._matrixState={inp,growths,terminals,scenarios,isM};
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   CSV DOWNLOADS
+═══════════════════════════════════════════════════════════════ */
+function downloadCSV(filename,rows){
+  const csv=rows.map(r=>r.map(c=>`"${c}"`).join(',')).join('\n');
+  const a=document.createElement('a');
+  a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv);
+  a.download=filename; a.click();
+}
+
+function downloadForecast(){
+  const rows=[['Year','Revenue (M)','FCF Margin','FCF (M)','Disc. Factor','Disc. FCF (M)']];
+  _forecastRows.forEach(r=>{
+    rows.push([r.year,fmt(r.rev,0),fmtPctPlain(r.marg,2),fmt(r.fcf,0),fmt(r.df,4),fmt(r.discFcf,0)]);
+  });
+  downloadCSV('forecast.csv',rows);
+}
+
+function downloadRevDCF(){
+  const inp=buildInp(getInputs());
+  if(!inp)return;
+  const rows=[['Price (USD)','vs Current','Implied IRR']];
+  const half=5;
+  for(let i=-half;i<=half;i++){
+    const p=inp.price*(1+0.1*i);
+    if(p<=0)continue;
+    const r=impliedIRR(inp,p);
+    rows.push([fmt(p,2),fmtPct(p/inp.price-1),r!==null?fmt(r*100,2)+'%':'—']);
+  }
+  downloadCSV('reverse_dcf.csv',rows);
+}
+
+function downloadMatrix(scLabel){
+  if(!window._matrixState)return;
+  const {inp,growths,terminals,scenarios,isM}=window._matrixState;
+  const sc=scenarios.find(s=>s.label===scLabel);
+  if(!sc)return;
+  const hdr=['Growth \\ Terminal'].concat(terminals.map(tv=>isM?fmt(tv,1)+'×':fmt(tv*100,1)+'%'));
+  const rows=[hdr];
+  growths.forEach(g=>{
+    const row=[fmt(g*100,1)+'%'];
+    terminals.forEach(tv=>{
+      const ci={...inp,cagr:g,dpp:inp.dpp+sc.dpp};
+      if(isM){ci.termMode='multiple';ci.tmult=tv;}else{ci.termMode='growth';ci.tg=tv;}
+      const irr=impliedIRR(ci,ci.price);
+      row.push(irr!==null?fmt(irr*100,2)+'%':'—');
+    });
+    rows.push(row);
+  });
+  downloadCSV(`irr_matrix_${sc.label.split(' ')[0].toLowerCase()}.csv`,rows);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   RESIZE — redraw charts on window resize
+═══════════════════════════════════════════════════════════════ */
+let _resizeTimer;
+window.addEventListener('resize',()=>{
+  clearTimeout(_resizeTimer);
+  _resizeTimer=setTimeout(()=>{
+    const inp=buildInp(getInputs());
+    if(!inp)return;
+    if(activeTab==='dcf'){
+      drawSensChart(inp.price,inp.disc*100);
+    } else if(activeTab==='rev'){
+      const irr=impliedIRR(inp,inp.price);
+      drawIRRChart(inp.price,irr);
+    }
+  },100);
+});
+
+/* Initial render */
+update();
+</script>
+</body>
+</html>
