@@ -129,6 +129,7 @@ a{color:inherit;text-decoration:none}
 .h-btn-group .h-btn:last-child{border-right:none}
 .h-btn-save{color:var(--ink-3)}
 .h-btn-save:hover{color:var(--gold)!important}
+.h-btn-icon{} /* always visible */
 .h-note{font-size:11px;color:var(--ink-5);white-space:nowrap;font-family:var(--ff-mono);letter-spacing:.2px}
 #dark-btn{width:28px;height:28px;padding:0;border-radius:6px;font-size:13px;display:flex;align-items:center;justify-content:center;border:1px solid var(--border);background:var(--surface);box-shadow:var(--shadow);color:var(--ink-4)}
 #dark-btn:hover{color:var(--ink)}
@@ -640,6 +641,7 @@ input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.15)}
 [data-theme="dark"] .sc-tag-bull{color:var(--green)}
 
 .hm-tbl{border-collapse:collapse;width:100%;margin-bottom:6px}
+.hm-tbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;margin-bottom:6px}
 .hm-tbl th{padding:6px 8px;font-size:9.5px;font-weight:600;font-family:var(--ff-mono);color:var(--ink-5);background:var(--surface-2);text-align:center;border:1px solid var(--border)}
 .hm-tbl th.rh{text-align:left;min-width:70px}
 .hm-tbl td{padding:0;border:1px solid rgba(26,24,20,.04);text-align:center}
@@ -682,19 +684,29 @@ input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.15)}
 
 #mobile-bar{
   display:none;position:fixed;bottom:0;left:0;right:0;z-index:60;
-  background:rgba(244,240,232,.93);backdrop-filter:blur(20px);
-  border-top:1px solid var(--border);padding:10px 16px 14px;
+  background:rgba(244,240,232,.95);backdrop-filter:blur(20px);
+  -webkit-backdrop-filter:blur(20px);
+  border-top:1px solid var(--border);
+  padding:10px 16px max(14px, env(safe-area-inset-bottom));
 }
-[data-theme="dark"] #mobile-bar{background:rgba(15,14,12,.93)}
-.mb-row{display:flex;align-items:center;gap:10px}
+[data-theme="dark"] #mobile-bar{background:rgba(15,14,12,.95)}
+.mb-row{display:flex;align-items:center;gap:8px}
 .mb-lbl{font-size:10px;font-weight:500;color:var(--ink-5);margin-bottom:1px;font-family:var(--ff-mono);text-transform:uppercase;letter-spacing:.5px}
-.mb-val{font-family:var(--ff-head);font-size:18px;font-weight:700;color:var(--ink)}
-.mb-div{width:1px;height:30px;background:var(--border)}
+.mb-val{font-family:var(--ff-head);font-size:17px;font-weight:700;color:var(--ink)}
+.mb-div{width:1px;height:28px;background:var(--border);flex-shrink:0}
 .mb-badge{font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;font-family:var(--ff-mono)}
 .mb-badge.good{background:var(--green-bg);color:var(--green-dk)}
 .mb-badge.bad{background:var(--red-bg);color:var(--red-dk)}
 [data-theme="dark"] .mb-badge.good{color:var(--green)}
 [data-theme="dark"] .mb-badge.bad{color:var(--red)}
+.mb-action-btn{
+  width:32px;height:32px;border-radius:8px;flex-shrink:0;
+  background:var(--surface-2);border:1px solid var(--border);
+  font-size:14px;display:flex;align-items:center;justify-content:center;
+  color:var(--ink-4);transition:all .1s;cursor:pointer;
+}
+.mb-action-btn:hover{color:var(--ink);background:var(--surface)}
+.mb-action-save:hover{color:var(--gold)!important}
 
 #overlay{display:none;position:fixed;inset:0;background:rgba(26,24,20,.4);z-index:40;backdrop-filter:blur(4px)}
 
@@ -723,29 +735,51 @@ input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.15)}
 
 
 @media(max-width:900px){.result-hero{grid-template-columns:1fr;gap:12px}.rh-left{padding-right:0;border-right:none;border-bottom:1px solid var(--border-2);padding-bottom:12px}.rh-right{padding-left:0}}
+
 @media(max-width:700px){
-  :root{--sidebar-w:272px}
-  #sidebar{position:fixed;top:var(--header-h);left:0;bottom:0;z-index:45;transform:translateX(-100%)}
+  :root{--sidebar-w:88vw}
+  #sidebar{position:fixed;top:var(--header-h);left:0;bottom:0;z-index:45;transform:translateX(-100%);width:var(--sidebar-w);max-width:320px}
   #sidebar.open{transform:translateX(0)}
   #overlay{display:block;opacity:0;pointer-events:none;transition:opacity .2s}
   #overlay.show{opacity:1;pointer-events:auto}
   #menu-btn{display:inline-flex}
   .h-note{display:none}
+  .h-btn#meth-btn{display:none}
+  .h-btn-group .h-btn{padding:0 9px}
+  .h-btn-group .h-btn .h-btn-text{display:none}
+  .h-btn-group .h-btn .h-btn-icon{display:inline}
   .tab-panel{padding:12px}
-  #main{width:100%;padding-bottom:72px}
-  #mobile-bar{display:block}
+  #main{width:100%;padding-bottom:calc(80px + env(safe-area-inset-bottom,16px))}
+  #mobile-bar{display:block;padding-bottom:calc(12px + env(safe-area-inset-bottom,0px))}
+  .irc-top{flex-direction:column;gap:14px}
+  .irc-num-block{padding-right:0;border-right:none;padding-bottom:14px;border-bottom:1px solid var(--border-2)}
+  .irc-num{font-size:44px}
+  .irc-verdict{padding-left:0}
+  .irc-inputs{grid-template-columns:1fr 1fr}
   .mc-ctrl{grid-template-columns:1fr}
-  .irr-hero{flex-direction:column}
-  .irr-context{border-left:none;border-top:1px solid var(--border-2);padding-left:0;padding-top:14px}
   .sc-cols{grid-template-columns:1fr}
+  .stat-row{grid-template-columns:1fr}
+  .rpc-top{flex-direction:column;gap:8px}
+  .rpc-price-display{text-align:left}
+  .rpc-result{flex-wrap:wrap}
+  .rpc-result-item{min-width:80px}
+  .chart-card-sub{font-size:11px}
+  .disc-hint{grid-template-columns:1fr 1fr}
 }
+
 @media(max-width:480px){
-  #tabbar{padding:0 12px}
-  .tab-btn{margin-right:10px;font-size:11.5px}
-  /* Swap to short label on narrow screens */
-  .tab-btn[data-short]::before{content:attr(data-short)}
-  .tab-btn[data-short]{font-size:0} /* hide original text */
-  .tab-btn[data-short]::before{font-size:11.5px}
+  #tabbar{padding:0 10px}
+  .tab-btn{margin-right:12px;font-size:12px;padding:12px 0}
+  .tab-btn[data-short]::before{content:attr(data-short);font-size:12px}
+  .tab-btn[data-short]{font-size:0}
+  .tab-btn[data-short]::before{font-size:12px}
+  #sidebar{padding:12px 12px 40px}
+  .field input[type=text],.field input[type=number],.field select{font-size:16px}
+  .h-name{font-size:14px}
+  .h-mark{width:24px;height:24px}
+  .irr-result-card{padding:14px}
+  .irc-num{font-size:40px}
+  .hm-tbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
 }
 </style>
 </head>
@@ -764,8 +798,8 @@ input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.15)}
   <button id="dark-btn" onclick="toggleDark()" title="Dark mode">🌙</button>
   <button class="h-btn" onclick="showMethodology()" id="meth-btn">How it works</button>
   <div class="h-btn-group">
-    <button class="h-btn" onclick="shareURL()" title="Copy a shareable link with all your current inputs">⬆ Share</button>
-    <button class="h-btn h-btn-save" onclick="saveReport()" title="Download a self-contained valuation report as an HTML file — open in browser and print to PDF">⬇ Save Report</button>
+    <button class="h-btn" onclick="shareURL()" title="Copy a shareable link with all your current inputs"><span class="h-btn-icon">⬆</span><span class="h-btn-text"> Share</span></button>
+    <button class="h-btn h-btn-save" onclick="saveReport()" title="Download a self-contained valuation report — open in browser and print to PDF"><span class="h-btn-icon">⬇</span><span class="h-btn-text"> Save Report</span></button>
   </div>
   <div class="h-note">Not financial advice</div>
 </header>
@@ -1229,7 +1263,9 @@ input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.15)}
     <div class="mb-div"></div>
     <div><div class="mb-lbl">Price</div><div class="mb-val" id="mb-px">—</div></div>
     <div class="mb-div"></div>
-    <div id="mb-badge-wrap"></div>
+    <div id="mb-badge-wrap" style="flex:1"></div>
+    <button class="mb-action-btn" onclick="shareURL()" title="Share">⬆</button>
+    <button class="mb-action-btn mb-action-save" onclick="saveReport()" title="Save Report">⬇</button>
   </div>
 </div>
 
@@ -2193,11 +2229,12 @@ function renderRev(inp){
       </div></div>`;
   }
 
-  // ── Init price slider
-  const pMin=inp.price*.4,pMax=inp.price*1.6;
+  // ── Init price slider — range: 10% to 300% of current price (-90% to +200%)
+  const pMin=inp.price*.10,pMax=inp.price*3.0;
+  const defaultSliderVal=Math.round((inp.price-pMin)/(pMax-pMin)*100); // ~31%
   const sl=document.getElementById('rev-sl-price');
-  sl.value=50;
-  sl.style.background=`linear-gradient(90deg,var(--blue) 50%,var(--border) 50%)`;
+  sl.value=defaultSliderVal;
+  sl.style.background=`linear-gradient(90deg,var(--blue) ${defaultSliderVal}%,var(--border) ${defaultSliderVal}%)`;
   document.getElementById('rev-price-display').textContent=fmt(inp.price,2);
   document.getElementById('rev-price-ccy').textContent=inp.pccy;
   document.getElementById('rev-price-min').textContent=fmt(pMin,0);
@@ -2210,7 +2247,7 @@ function renderRev(inp){
 
   // ── Chart data
   _revData=[];
-  for(let i=0;i<=60;i++){const p=pMin+(pMax-pMin)*i/60;const r=impliedIRR(inp,p);if(r!==null)_revData.push({price:p,irr:r})}
+  for(let i=0;i<=80;i++){const p=pMin+(pMax-pMin)*i/80;const r=impliedIRR(inp,p);if(r!==null)_revData.push({price:p,irr:r})}
   drawIRRChart(inp.price,irr,inp.disc,null);
   renderRevTable(inp);
 }
@@ -2224,7 +2261,7 @@ let _irrDragPrice=null; // kept for chart compatibility
 function onRevPriceChange(sliderVal){
   const inp=buildInp(getInputs());
   if(!inp)return;
-  const pMin=inp.price*.4,pMax=inp.price*1.6;
+  const pMin=inp.price*.10,pMax=inp.price*3.0;
   const price=pMin+(pMax-pMin)*(sliderVal/100);
   _revExplorePrice=price;
   _irrDragPrice=price;
@@ -2259,9 +2296,11 @@ function resetRevPrice(){
   _revExplorePrice=null;_irrDragPrice=null;
   const inp=buildInp(getInputs());
   if(!inp)return;
+  const pMin=inp.price*.10,pMax=inp.price*3.0;
+  const defaultSliderVal=Math.round((inp.price-pMin)/(pMax-pMin)*100);
   const sl=document.getElementById('rev-sl-price');
-  sl.value=50;
-  sl.style.background=`linear-gradient(90deg,var(--blue) 50%,var(--border) 50%)`;
+  sl.value=defaultSliderVal;
+  sl.style.background=`linear-gradient(90deg,var(--blue) ${defaultSliderVal}%,var(--border) ${defaultSliderVal}%)`;
   document.getElementById('rev-price-display').textContent=fmt(inp.price,2);
   document.getElementById('rpc-result-row').style.display='none';
   drawIRRChart(inp.price,impliedIRR(inp,inp.price),inp.disc,null);
@@ -2295,7 +2334,7 @@ function initIRRDrag(){
     const inp=buildInp(getInputs());
     if(!inp)return;
     // Map the point back to slider 0-100
-    const pMin=inp.price*.4,pMax=inp.price*1.6;
+    const pMin=inp.price*.10,pMax=inp.price*3.0;
     const sliderVal=Math.round(Math.max(0,Math.min(100,(pt.price-pMin)/(pMax-pMin)*100)));
     const sl=document.getElementById('rev-sl-price');
     if(sl){sl.value=sliderVal;}
@@ -2587,7 +2626,7 @@ function renderMatrix(inp){
   let html='';
   scenarios.forEach(sc=>{
     html+=`<div class="sc-tag sc-tag-${sc.key}">${sc.label} — ${sc.desc}</div>`;
-    html+=`<div style="overflow-x:auto;margin-bottom:6px"><table class="hm-tbl">`;
+    html+=`<div class="hm-tbl-wrap" style="margin-bottom:6px"><table class="hm-tbl">`;
     html+=`<thead><tr><th class="rh">Growth ↓ / Terminal →</th>`;
     terminals.forEach(tv=>html+=`<th>${isM?fmt(tv,1)+'×':fmt(tv*100,1)+'%'}</th>`);
     html+=`</tr></thead><tbody>`;
