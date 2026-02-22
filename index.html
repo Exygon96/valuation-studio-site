@@ -3,255 +3,496 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-  <title>Valuation Studio — Institutional-grade DCF analysis</title>
-  <meta name="description" content="Professional DCF valuation tools for serious investors. Normal DCF, Reverse DCF, and IRR Scenario Matrix in one place."/>
+  <title>Valuation Studio — Intrinsic value, calculated properly.</title>
+  <meta name="description" content="Professional DCF valuation tools. Fair value, implied return, and scenario analysis for serious investors."/>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+  <!-- Prevent flash of wrong theme -->
+  <script>if(localStorage.getItem('vs-theme')==='dark')document.documentElement.setAttribute('data-theme','dark')</script>
   <style>
     :root {
-      --bg:        #f7f5f0;
-      --bg-mid:    #ede9e1;
-      --bg-deep:   #e4dfd4;
-      --surface:   #ffffff;
-      --border:    #dbd6ce;
-      --ink:       #18181b;
-      --ink-mid:   #52525b;
-      --ink-light: #a1a1aa;
-      --ink-faint: #d4d4d8;
-      --accent:    #2563eb;
-      --accent-b:  #1d4ed8;
-      --accent-bg: #eff6ff;
-      --gold:      #b45309;
-      --up:        #16a34a;
-      --dn:        #dc2626;
-      --ff-head: 'Playfair Display', Georgia, serif;
-      --ff-body: 'DM Sans', system-ui, sans-serif;
-      --ff-mono: 'DM Mono', 'Courier New', monospace;
+      /* Old New York silver-gelatin palette */
+      --ink:        #1a1814;
+      --ink-2:      #2e2b26;
+      --ink-3:      #4a4640;
+      --ink-4:      #8a857c;
+      --ink-5:      #b8b3aa;
+      --ink-6:      #d8d3ca;
+
+      --paper:      #f4f0e8;
+      --paper-2:    #ede8de;
+      --paper-3:    #e4ddd0;
+      --paper-4:    #d8d0c4;
+
+      --gold:       #b07d2e;
+      --gold-lt:    #c8952a;
+      --gold-bg:    #f7eed8;
+
+      --silver:     #7a7870;
+      --sepia:      #8b7355;
+
+      --blue:       #1a3a5c;
+      --blue-lt:    #2d5a8e;
+      --blue-bg:    #e8eef5;
+
+      --up:         #1a5c32;
+      --dn:         #7a1a1a;
+
+      --ff-head:    'Cormorant Garamond', Georgia, serif;
+      --ff-body:    'DM Sans', system-ui, sans-serif;
+      --ff-mono:    'DM Mono', monospace;
+
+      --r:          10px;
+      --shadow:     0 1px 3px rgba(26,24,20,.08), 0 1px 2px rgba(26,24,20,.05);
+      --shadow-md:  0 4px 20px rgba(26,24,20,.1);
+      --shadow-lg:  0 12px 48px rgba(26,24,20,.14);
     }
+
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html { scroll-behavior: smooth; }
     body {
       font-family: var(--ff-body);
-      background: var(--bg);
+      background: var(--paper);
       color: var(--ink);
       line-height: 1.6;
       -webkit-font-smoothing: antialiased;
       overflow-x: hidden;
     }
-    body::before {
+
+    /* Grain overlay */
+    body::after {
       content: '';
       position: fixed; inset: 0;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
-      pointer-events: none; z-index: 0; opacity: 0.5;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none; z-index: 999; opacity: 0.6; mix-blend-mode: multiply;
     }
-    .container { max-width: 1080px; margin: 0 auto; padding: 0 2rem; position: relative; z-index: 1; }
+
+    .container { max-width: 1100px; margin: 0 auto; padding: 0 2rem; position: relative; z-index: 1; }
 
     /* ── NAV ── */
     nav {
       position: sticky; top: 0; z-index: 100;
-      background: rgba(247,245,240,.92);
-      backdrop-filter: blur(16px) saturate(1.4);
-      border-bottom: 1px solid var(--border);
+      background: rgba(244,240,232,.94);
+      backdrop-filter: blur(20px) saturate(1.8);
+      border-bottom: 1px solid var(--paper-4);
     }
     .nav-inner {
-      max-width: 1080px; margin: 0 auto; padding: 0 2rem;
-      height: 56px; display: flex; align-items: center; justify-content: space-between;
+      max-width: 1100px; margin: 0 auto; padding: 0 2rem;
+      height: 58px; display: flex; align-items: center; justify-content: space-between;
     }
-    .nav-logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
-    .nav-logo-mark {
-      width: 28px; height: 28px; border-radius: 7px;
-      background: linear-gradient(135deg, var(--accent) 0%, #1d4ed8 100%);
+    .nav-logo { display: flex; align-items: center; gap: 11px; text-decoration: none; }
+    .nav-mark {
+      width: 30px; height: 30px; border-radius: 8px;
+      background: var(--ink);
       display: flex; align-items: center; justify-content: center;
-      box-shadow: 0 2px 6px rgba(37,99,235,.25);
+      box-shadow: 0 2px 6px rgba(26,24,20,.2);
     }
-    .nav-logo-mark svg { width: 15px; height: 15px; }
-    .nav-logo-text { font-family: var(--ff-head); font-size: 15px; font-weight: 600; color: var(--ink); letter-spacing: -.2px; }
+    .nav-mark svg { width: 16px; height: 16px; }
+    .nav-name {
+      font-family: var(--ff-head); font-size: 17px; font-weight: 600;
+      color: var(--ink); letter-spacing: -.2px;
+    }
+    .nav-links { display: flex; align-items: center; gap: 28px; }
+    .nav-link {
+      font-size: 13px; font-weight: 400; color: var(--ink-4);
+      text-decoration: none; letter-spacing: .1px;
+      transition: color .15s;
+    }
+    .nav-link:hover { color: var(--ink); }
     .nav-cta {
       display: inline-flex; align-items: center; gap: 7px;
-      background: var(--accent); color: #fff;
+      background: var(--ink); color: var(--paper);
       font-size: 13px; font-weight: 500;
-      padding: 7px 18px; border-radius: 6px; text-decoration: none;
-      transition: all .15s ease;
-      box-shadow: 0 2px 8px rgba(37,99,235,.25);
+      padding: 8px 20px; border-radius: 6px; text-decoration: none;
+      transition: all .15s; letter-spacing: .1px;
+      box-shadow: 0 2px 8px rgba(26,24,20,.2);
     }
-    .nav-cta:hover { background: var(--accent-b); transform: translateY(-1px); box-shadow: 0 4px 14px rgba(37,99,235,.35); }
+    .nav-cta:hover { background: var(--ink-2); transform: translateY(-1px); box-shadow: 0 4px 14px rgba(26,24,20,.25); }
 
     /* ── HERO ── */
-    .hero { padding: 88px 0 80px; position: relative; overflow: hidden; }
+    .hero {
+      padding: 100px 0 90px;
+      border-bottom: 1px solid var(--paper-4);
+      position: relative; overflow: hidden;
+    }
+
+    /* decorative ruled lines background */
+    .hero::before {
+      content: '';
+      position: absolute; inset: 0;
+      background-image: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 39px,
+        rgba(26,24,20,.04) 39px,
+        rgba(26,24,20,.04) 40px
+      );
+      pointer-events: none;
+    }
+
+    .hero-inner { display: grid; grid-template-columns: 1fr 420px; gap: 80px; align-items: start; }
+
     .hero-eyebrow {
-      display: inline-flex; align-items: center; gap: 8px;
-      font-family: var(--ff-mono); font-size: 11px; font-weight: 500;
-      letter-spacing: 1.6px; text-transform: uppercase; color: var(--gold); margin-bottom: 22px;
+      display: inline-flex; align-items: center; gap: 10px;
+      font-family: var(--ff-mono); font-size: 10.5px; font-weight: 500;
+      letter-spacing: 2px; text-transform: uppercase;
+      color: var(--gold); margin-bottom: 24px;
     }
-    .hero-eyebrow-line { width: 24px; height: 1px; background: var(--gold); }
-    .hero-headline {
+    .eyebrow-rule { width: 28px; height: 1px; background: var(--gold); }
+
+    h1.hero-headline {
       font-family: var(--ff-head);
-      font-size: clamp(40px, 5.5vw, 66px);
+      font-size: clamp(48px, 5.8vw, 76px);
       font-weight: 700; color: var(--ink);
-      letter-spacing: -1.5px; line-height: 1.06;
-      margin-bottom: 24px; max-width: 720px;
+      letter-spacing: -2px; line-height: 1.0;
+      margin-bottom: 28px;
     }
-    .hero-headline em { font-style: italic; color: var(--accent); }
+    h1.hero-headline em { font-style: italic; color: var(--sepia); }
+
     .hero-body {
-      font-size: 17px; color: var(--ink-mid); line-height: 1.7;
-      max-width: 500px; font-weight: 300; margin-bottom: 36px;
+      font-size: 17px; color: var(--ink-3); line-height: 1.75;
+      font-weight: 300; margin-bottom: 40px; max-width: 480px;
     }
-    .hero-actions { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+
+    .hero-actions { display: flex; align-items: center; gap: 14px; margin-bottom: 48px; flex-wrap: wrap; }
+
     .btn-primary {
       display: inline-flex; align-items: center; gap: 9px;
-      background: var(--accent); color: #fff;
-      font-size: 14px; font-weight: 500; padding: 13px 28px; border-radius: 8px;
-      text-decoration: none; transition: all .18s ease; white-space: nowrap;
-      box-shadow: 0 2px 10px rgba(37,99,235,.28);
+      background: var(--ink); color: var(--paper);
+      font-size: 14px; font-weight: 500; padding: 14px 32px; border-radius: 8px;
+      text-decoration: none; transition: all .18s;
+      box-shadow: 0 2px 12px rgba(26,24,20,.25);
     }
-    .btn-primary:hover { background: var(--accent-b); transform: translateY(-2px); box-shadow: 0 6px 20px rgba(37,99,235,.38); }
-    .btn-ghost {
+    .btn-primary:hover { background: var(--ink-2); transform: translateY(-2px); box-shadow: 0 6px 24px rgba(26,24,20,.3); }
+
+    .btn-outline {
       display: inline-flex; align-items: center; gap: 7px;
-      background: transparent; color: var(--ink-mid);
-      font-size: 14px; font-weight: 400; padding: 13px 20px; border-radius: 8px;
-      text-decoration: none; border: 1px solid var(--border); transition: all .15s ease; white-space: nowrap;
+      background: transparent; color: var(--ink-3);
+      font-size: 14px; font-weight: 400; padding: 14px 24px; border-radius: 8px;
+      text-decoration: none; border: 1px solid var(--paper-4); transition: all .15s;
     }
-    .btn-ghost:hover { border-color: var(--ink-light); color: var(--ink); background: var(--bg-mid); }
-    .hero-legal { margin-top: 20px; font-size: 11px; color: var(--ink-light); }
+    .btn-outline:hover { border-color: var(--ink-5); color: var(--ink); background: var(--paper-2); }
 
-    /* Hero ticker pills */
-    .hero-tickers {
-      display: flex; gap: 7px; flex-wrap: wrap; margin-top: 28px;
+    .hero-disclaimer { font-size: 11px; color: var(--ink-5); font-family: var(--ff-mono); letter-spacing: .3px; }
+
+    /* Hero right — floating card */
+    .hero-card {
+      background: var(--paper-2); border: 1px solid var(--paper-4);
+      border-radius: 14px; overflow: hidden;
+      box-shadow: var(--shadow-lg);
+      position: relative; top: 0;
     }
-    .hero-ticker {
-      display: inline-flex; flex-direction: column; align-items: center;
+    .hc-header {
+      padding: 16px 20px; border-bottom: 1px solid var(--paper-3);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .hc-title { font-family: var(--ff-head); font-size: 15px; font-weight: 600; color: var(--ink); }
+    .hc-badge {
+      display: inline-flex; align-items: center; gap: 5px;
+      font-family: var(--ff-mono); font-size: 9.5px; font-weight: 500;
+      padding: 3px 9px; border-radius: 20px; letter-spacing: .5px;
+      background: var(--paper-3); color: var(--ink-4); text-transform: uppercase;
+    }
+    .hc-body { padding: 16px 20px; }
+    .hc-row {
+      display: flex; justify-content: space-between; align-items: baseline;
+      padding: 6px 0; border-bottom: 1px solid var(--paper-3); font-size: 12.5px;
+    }
+    .hc-row:last-of-type { border-bottom: none; }
+    .hc-lbl { color: var(--ink-4); }
+    .hc-val { font-family: var(--ff-mono); font-size: 12px; font-weight: 500; color: var(--ink); }
+    .hc-val.pos { color: var(--up); }
+    .hc-val.neg { color: var(--dn); }
+    .hc-divider { height: 1px; background: var(--paper-3); margin: 4px 0; }
+    .hc-result {
+      margin-top: 16px; padding: 14px 16px;
+      background: var(--paper); border-radius: 8px;
+      border: 1px solid var(--paper-3);
+    }
+    .hcr-lbl { font-size: 10.5px; font-weight: 500; color: var(--ink-5); text-transform: uppercase; letter-spacing: .8px; margin-bottom: 10px; font-family: var(--ff-mono); }
+    /* New gauge styles */
+    .hcr-gauge { }
+    .hcr-g-labels { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 10px; }
+    .hcr-g-fv, .hcr-g-px { }
+    .hcr-g-name { font-size: 9.5px; color: var(--ink-5); font-family: var(--ff-mono); text-transform: uppercase; letter-spacing: .4px; margin-bottom: 2px; }
+    .hcr-g-val-fv { font-family: var(--ff-mono); font-size: 13px; font-weight: 600; color: var(--ink-4); font-style: italic; }
+    .hcr-g-val-mkt { font-family: var(--ff-mono); font-size: 15px; font-weight: 600; color: var(--ink); text-align: right; }
+    .hcr-g-sub { font-size: 9px; color: var(--ink-5); margin-top: 2px; }
+    .hcr-g-track {
+      height: 5px; background: var(--paper-3); border-radius: 3px;
+      position: relative; margin: 2px 0 10px;
+    }
+    .hcr-g-pin {
+      position: absolute; top: -5px; transform: translateX(-50%);
+      width: 0; height: 0;
+    }
+    .hcr-g-pin::before {
+      content: ''; position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+      width: 2px; height: 15px; background: var(--ink-3); border-radius: 1px;
+    }
+    .hcr-g-pin::after {
+      content: 'Market'; position: absolute; top: 16px; left: 50%; transform: translateX(-50%);
+      font-family: var(--ff-mono); font-size: 8.5px; color: var(--ink-5); white-space: nowrap;
+    }
+    .hcr-g-note { font-size: 10px; color: var(--ink-5); font-family: var(--ff-mono); font-style: italic; text-align: center; margin-top: 4px; }
+    /* Keep old classes for compat */
+    .hcr-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+    .hcr-row:last-child { margin-bottom: 0; }
+    .hcr-name { font-size: 12px; color: var(--ink-3); }
+    .bar-wrap { flex: 1; height: 6px; background: var(--paper-3); border-radius: 3px; margin: 0 10px; overflow: hidden; }
+    .bar-fill { height: 100%; border-radius: 3px; }
+    .hcr-val { font-family: var(--ff-mono); font-size: 11px; font-weight: 500; color: var(--ink); min-width: 44px; text-align: right; }
+
+    /* Heatmap mini */
+    .hc-hm { margin-top: 12px; }
+    .hc-hm-label { font-size: 10px; color: var(--ink-5); font-family: var(--ff-mono); text-transform: uppercase; letter-spacing: .8px; margin-bottom: 6px; }
+    .hm-grid { display: grid; grid-template-columns: repeat(5,1fr); gap: 2px; }
+    .hm-c {
+      padding: 5px 2px; border-radius: 3px; text-align: center;
+      font-family: var(--ff-mono); font-size: 9.5px; font-weight: 500;
+    }
+
+    /* ── TICKER STRIP ── */
+    .ticker-strip {
+      padding: 20px 0;
+      border-bottom: 1px solid var(--paper-4);
+    }
+    .ticker-row {
+      display: flex; align-items: center; justify-content: space-between; gap: 24px; flex-wrap: wrap;
+    }
+    .ticker-left {
+      display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+    }
+    .ticker-label {
+      font-family: var(--ff-mono); font-size: 9.5px; font-weight: 600;
+      text-transform: uppercase; letter-spacing: 1px; color: var(--ink-5);
+      white-space: nowrap;
+    }
+    .ticker-pills { display: flex; gap: 6px; flex-wrap: wrap; }
+    .ticker-pill {
+      display: inline-flex; align-items: center; justify-content: center;
       padding: 6px 14px; border-radius: 7px;
-      background: var(--surface); border: 1px solid var(--border);
-      text-decoration: none;
-      box-shadow: 0 1px 3px rgba(0,0,0,.06);
-      transition: all .14s;
+      background: var(--paper-2); border: 1px solid var(--paper-4);
+      text-decoration: none; transition: all .14s;
+      box-shadow: var(--shadow);
     }
-    .hero-ticker:hover { border-color: var(--accent); background: var(--accent-bg); transform: translateY(-2px); box-shadow: 0 4px 10px rgba(37,99,235,.15); }
-    .ht-name { font-family: var(--ff-mono); font-size: 12px; font-weight: 600; color: var(--ink); }
-    .ht-label { font-size: 9.5px; color: var(--ink-light); margin-top: 1px; }
+    .ticker-pill:hover {
+      border-color: var(--ink-5); background: var(--paper);
+      transform: translateY(-1px); box-shadow: var(--shadow-md);
+    }
+    .tp-sym { font-family: var(--ff-mono); font-size: 12px; font-weight: 500; color: var(--ink-2); letter-spacing: .3px; }
 
-    /* Hero bg */
-    .hero-numbers {
-      position: absolute; right: 0; top: 60px;
-      opacity: .06; pointer-events: none;
-      font-family: var(--ff-mono); font-size: 11px; color: var(--ink);
-      text-align: right; line-height: 2.2;
+    /* Provenance card */
+    .ticker-right { flex-shrink: 0; }
+    .provenance-card {
+      display: flex; align-items: stretch; gap: 0;
+      background: var(--paper-2); border: 1px solid var(--paper-4);
+      border-radius: 10px; overflow: hidden;
+    }
+    .prov-item {
+      display: flex; align-items: center; gap: 9px;
+      padding: 10px 16px;
+    }
+    .prov-icon { font-size: 14px; flex-shrink: 0; opacity: .75; }
+    .prov-title { font-family: var(--ff-mono); font-size: 9px; font-weight: 600; text-transform: uppercase; letter-spacing: .7px; color: var(--ink-4); margin-bottom: 2px; }
+    .prov-body { font-family: var(--ff-mono); font-size: 11px; font-weight: 500; color: var(--ink-2); }
+    .prov-divider { width: 1px; background: var(--paper-4); align-self: stretch; }
+
+    .ticker-data-note { display: none; }
+    .data-source-note { display: none; } /* hidden — replaced by provenance-card */
+
+    @media(max-width: 780px) {
+      .ticker-row { flex-direction: column; align-items: flex-start; gap: 14px; }
+      .provenance-card { flex-wrap: wrap; }
     }
 
-    /* ── STATS BAR ── */
-    .stats-bar { padding: 32px 0; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
-    .stats-inner { display: grid; grid-template-columns: repeat(4,1fr); }
-    .stat { padding: 0 0 0 32px; border-left: 1px solid var(--border); }
-    .stat:first-child { padding-left: 0; border-left: none; }
-    .stat-value { font-family: var(--ff-head); font-size: 30px; font-weight: 500; color: var(--ink); letter-spacing: -.5px; line-height: 1; margin-bottom: 5px; }
-    .stat-label { font-size: 12px; color: var(--ink-light); }
-
-    /* ── SECTION SHARED ── */
-    .section { padding: 80px 0; }
-    .section-label { font-family: var(--ff-mono); font-size: 10.5px; letter-spacing: 1.8px; text-transform: uppercase; color: var(--gold); margin-bottom: 14px; }
-    .section-title { font-family: var(--ff-head); font-size: clamp(28px, 3.5vw, 40px); font-weight: 600; color: var(--ink); letter-spacing: -.8px; line-height: 1.15; margin-bottom: 14px; max-width: 520px; }
-    .section-body { font-size: 16px; color: var(--ink-mid); font-weight: 300; line-height: 1.7; max-width: 480px; margin-bottom: 40px; }
+    /* ── STATS ── */
+    .stats-section {
+      padding: 56px 0;
+      border-bottom: 1px solid var(--paper-4);
+    }
+    .stats-grid { display: grid; grid-template-columns: repeat(4,1fr); }
+    .stat-item { padding: 0 0 0 36px; border-left: 1px solid var(--paper-4); }
+    .stat-item:first-child { padding-left: 0; border-left: none; }
+    .stat-num {
+      font-family: var(--ff-head); font-size: 40px; font-weight: 600;
+      color: var(--ink); letter-spacing: -1px; line-height: 1; margin-bottom: 6px;
+    }
+    .stat-lbl { font-size: 12px; color: var(--ink-4); letter-spacing: .2px; }
 
     /* ── TOOLS ── */
-    .tools-header { margin-bottom: 48px; }
-    .tools-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 2px; background: var(--border); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; }
-    .tool-card { background: var(--surface); padding: 28px 24px; transition: background .15s; }
-    .tool-card:hover { background: #fdfcf9; }
-    .tool-num { font-family: var(--ff-mono); font-size: 11px; color: var(--accent); letter-spacing: 1px; margin-bottom: 14px; }
-    .tool-title { font-family: var(--ff-head); font-size: 19px; font-weight: 600; color: var(--ink); letter-spacing: -.3px; margin-bottom: 10px; }
-    .tool-desc { font-size: 13.5px; color: var(--ink-mid); line-height: 1.6; margin-bottom: 16px; }
-    .tool-detail { font-family: var(--ff-mono); font-size: 11px; color: var(--ink-light); line-height: 2.2; border-top: 1px solid var(--bg-deep); padding-top: 14px; }
+    .tools-section { padding: 96px 0; border-bottom: 1px solid var(--paper-4); }
+    .section-eyebrow {
+      font-family: var(--ff-mono); font-size: 10px; letter-spacing: 2px;
+      text-transform: uppercase; color: var(--gold); margin-bottom: 14px;
+    }
+    .section-title {
+      font-family: var(--ff-head); font-size: clamp(32px,3.8vw,46px);
+      font-weight: 600; color: var(--ink); letter-spacing: -1px;
+      line-height: 1.12; margin-bottom: 14px; max-width: 540px;
+    }
+    .section-body {
+      font-size: 16px; color: var(--ink-3); font-weight: 300;
+      line-height: 1.75; max-width: 520px; margin-bottom: 56px;
+    }
 
-    /* ── FEATURES STRIP ── */
+    .tools-grid {
+      display: grid; grid-template-columns: repeat(3,1fr);
+      border: 1px solid var(--paper-4); border-radius: 14px; overflow: hidden;
+    }
+    .tool-card {
+      padding: 32px 28px; border-right: 1px solid var(--paper-4);
+      background: var(--paper); transition: background .15s;
+      position: relative;
+    }
+    .tool-card:last-child { border-right: none; }
+    .tool-card:hover { background: var(--paper-2); }
+    .tool-num {
+      font-family: var(--ff-mono); font-size: 10px; color: var(--gold);
+      letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 16px;
+    }
+    .tool-title {
+      font-family: var(--ff-head); font-size: 22px; font-weight: 600;
+      color: var(--ink); letter-spacing: -.3px; margin-bottom: 12px; line-height: 1.2;
+    }
+    .tool-desc {
+      font-size: 13.5px; color: var(--ink-3); line-height: 1.65; margin-bottom: 20px;
+    }
+    .tool-detail {
+      font-family: var(--ff-mono); font-size: 11px; color: var(--ink-5);
+      line-height: 2.3; border-top: 1px solid var(--paper-3); padding-top: 16px;
+    }
+    .tool-detail span { color: var(--gold); }
+
+    /* ── FEATURES ── */
     .features-strip {
-      display: grid; grid-template-columns: repeat(4,1fr); gap: 2px;
-      background: var(--border); border: 1px solid var(--border); border-radius: 12px;
-      overflow: hidden; margin-top: 20px;
+      display: grid; grid-template-columns: repeat(4,1fr);
+      border: 1px solid var(--paper-4); border-radius: 12px; overflow: hidden;
+      margin-top: 16px;
     }
     .feat-cell {
-      background: var(--accent-bg); padding: 18px 20px;
-      transition: background .15s;
+      padding: 22px 22px; border-right: 1px solid var(--paper-4);
+      background: var(--paper-2); transition: background .15s;
     }
-    .feat-cell:hover { background: #dbeafe; }
-    .feat-icon { font-size: 20px; margin-bottom: 8px; }
-    .feat-title { font-size: 13px; font-weight: 600; color: var(--ink); margin-bottom: 4px; }
-    .feat-body { font-size: 12px; color: var(--ink-mid); line-height: 1.5; }
+    .feat-cell:last-child { border-right: none; }
+    .feat-cell:hover { background: var(--paper-3); }
+    .feat-icon { font-size: 18px; margin-bottom: 10px; }
+    .feat-title { font-size: 13px; font-weight: 600; color: var(--ink); margin-bottom: 5px; }
+    .feat-body { font-size: 12px; color: var(--ink-4); line-height: 1.55; }
 
-    /* ── EXAMPLE ── */
-    .example-section { padding: 80px 0; background: var(--bg-mid); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
-    .example-grid { display: grid; grid-template-columns: 420px 1fr; gap: 64px; align-items: center; }
-    .example-card {
-      background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
-      overflow: hidden; box-shadow: 0 8px 32px rgba(0,0,0,.08);
+    /* ── HOW IT WORKS ── */
+    .how-section { padding: 96px 0; border-bottom: 1px solid var(--paper-4); }
+    .steps-row { display: grid; grid-template-columns: repeat(3,1fr); gap: 56px; margin-top: 56px; }
+    .step-num {
+      font-family: var(--ff-head); font-size: 52px; font-weight: 600;
+      color: var(--paper-3); line-height: 1; margin-bottom: 20px;
     }
-    .example-card-header { display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; border-bottom: 1px solid var(--bg-deep); }
-    .example-card-title { font-family: var(--ff-head); font-size: 15px; font-weight: 600; color: var(--ink); }
-    .example-live-dot { display: flex; align-items: center; gap: 6px; font-family: var(--ff-mono); font-size: 10px; color: var(--ink-light); letter-spacing: .5px; }
-    .dot-pulse { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); animation: pulse 2s ease-in-out infinite; }
-    @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(1.15)} }
-    .example-card-body { padding: 18px 20px; }
-    .example-row { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid var(--bg-mid); font-size: 12.5px; }
-    .example-row:last-of-type { border-bottom: none; }
-    .example-row-label { color: var(--ink-mid); }
-    .example-row-value { font-family: var(--ff-mono); font-size: 12px; font-weight: 500; color: var(--ink); }
-    .example-row-value.positive { color: var(--up); }
-    .example-row-value.negative { color: var(--dn); }
-    .example-result-bar { margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--bg-deep); }
-    .bar-label { display: flex; justify-content: space-between; font-size: 11.5px; color: var(--ink-mid); margin-bottom: 4px; }
-    .bar-track { background: var(--bg-mid); border-radius: 4px; height: 16px; overflow: hidden; margin-bottom: 8px; }
-    .bar-fill { height: 100%; border-radius: 4px; }
-    .bar-fill-fv { background: linear-gradient(90deg, var(--up), #15803d); }
-    .bar-fill-px { background: linear-gradient(90deg, var(--accent), var(--accent-b)); }
-    .heatmap-preview { display: grid; grid-template-columns: repeat(5,1fr); gap: 3px; margin-top: 10px; }
-    .hm-cell { padding: 6px 4px; border-radius: 4px; text-align: center; font-family: var(--ff-mono); font-size: 10px; font-weight: 500; }
-
-    .example-feature-list { list-style: none; display: flex; flex-direction: column; gap: 20px; }
-    .example-feature { display: flex; gap: 14px; align-items: flex-start; }
-    .feature-icon-wrap { font-size: 18px; flex-shrink: 0; margin-top: 2px; }
-    .feature-text-title { font-size: 14px; font-weight: 600; color: var(--ink); margin-bottom: 3px; }
-    .feature-text-body { font-size: 13px; color: var(--ink-mid); line-height: 1.6; }
-
-    /* ── STEPS ── */
-    .steps-section { padding: 80px 0; }
-    .steps-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 40px; margin-top: 48px; }
-    .step-num { font-family: var(--ff-mono); font-size: 36px; font-weight: 500; color: var(--ink-faint); line-height: 1; margin-bottom: 18px; }
-    .step-title { font-family: var(--ff-head); font-size: 18px; font-weight: 600; color: var(--ink); margin-bottom: 10px; }
-    .step-body { font-size: 13.5px; color: var(--ink-mid); line-height: 1.7; margin-bottom: 12px; }
-    .step-note { font-family: var(--ff-mono); font-size: 10.5px; color: var(--ink-light); letter-spacing: .3px; }
+    .step-rule { width: 32px; height: 2px; background: var(--gold); margin-bottom: 20px; }
+    .step-title { font-family: var(--ff-head); font-size: 20px; font-weight: 600; color: var(--ink); margin-bottom: 10px; }
+    .step-body { font-size: 13.5px; color: var(--ink-3); line-height: 1.7; }
+    .step-note { font-family: var(--ff-mono); font-size: 10.5px; color: var(--ink-5); letter-spacing: .3px; margin-top: 14px; }
 
     /* ── CTA ── */
-    .cta-section { padding: 96px 0; text-align: center; border-top: 1px solid var(--border); }
-    .cta-headline { font-family: var(--ff-head); font-size: clamp(36px,4.5vw,56px); font-weight: 700; color: var(--ink); letter-spacing: -1.2px; line-height: 1.1; margin-bottom: 18px; }
-    .cta-headline em { font-style: italic; color: var(--accent); }
-    .cta-body { font-size: 17px; color: var(--ink-mid); font-weight: 300; margin-bottom: 36px; }
+    .cta-section { padding: 112px 0; text-align: center; }
+    .cta-rule { width: 40px; height: 1px; background: var(--gold); margin: 0 auto 24px; }
+    .cta-headline {
+      font-family: var(--ff-head); font-size: clamp(42px,5vw,64px);
+      font-weight: 700; color: var(--ink); letter-spacing: -1.5px;
+      line-height: 1.05; margin-bottom: 20px;
+    }
+    .cta-headline em { font-style: italic; color: var(--sepia); }
+    .cta-body { font-size: 17px; color: var(--ink-3); font-weight: 300; margin-bottom: 40px; }
+    .cta-disclaimer { margin-top: 20px; font-size: 11px; color: var(--ink-5); font-family: var(--ff-mono); letter-spacing: .3px; }
 
     /* ── FOOTER ── */
-    footer { border-top: 1px solid var(--border); padding: 28px 0; }
-    .footer-inner { max-width: 1080px; margin: 0 auto; padding: 0 2rem; display: flex; justify-content: space-between; align-items: center; gap: 24px; flex-wrap: wrap; }
-    .footer-brand { font-family: var(--ff-head); font-size: 14px; color: var(--ink-mid); }
-    .footer-legal { font-size: 11px; color: var(--ink-light); line-height: 1.5; max-width: 600px; }
+    footer { border-top: 1px solid var(--paper-4); padding: 32px 0; }
+    .footer-inner {
+      max-width: 1100px; margin: 0 auto; padding: 0 2rem;
+      display: flex; justify-content: space-between; align-items: center; gap: 24px; flex-wrap: wrap;
+    }
+    .footer-brand { font-family: var(--ff-head); font-size: 14px; color: var(--ink-4); }
+    .footer-legal { font-size: 11px; color: var(--ink-5); line-height: 1.6; max-width: 560px; font-family: var(--ff-mono); letter-spacing: .2px; }
 
     /* ── ANIMATIONS ── */
-    .fade-up { opacity: 0; transform: translateY(20px); animation: fadeUp .7s cubic-bezier(.4,0,.2,1) forwards; }
-    .d1{animation-delay:.05s}.d2{animation-delay:.15s}.d3{animation-delay:.25s}.d4{animation-delay:.35s}
+    .fade-up { opacity: 0; transform: translateY(24px); animation: fadeUp .8s cubic-bezier(.4,0,.2,1) forwards; }
+    .d1{animation-delay:.06s}.d2{animation-delay:.18s}.d3{animation-delay:.3s}.d4{animation-delay:.42s}.d5{animation-delay:.54s}
     @keyframes fadeUp { to { opacity:1; transform:translateY(0); } }
 
+    /* scroll reveal */
+    .reveal { opacity: 0; transform: translateY(20px); transition: opacity .7s ease, transform .7s ease; }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+
     /* ── RESPONSIVE ── */
-    @media(max-width: 900px) {
+    @media(max-width:1000px) {
+      .hero-inner { grid-template-columns: 1fr; gap: 48px; }
+      .hero-card { max-width: 460px; }
+    }
+    @media(max-width:800px) {
       .tools-grid { grid-template-columns: 1fr; }
+      .tool-card { border-right: none; border-bottom: 1px solid var(--paper-4); }
+      .tool-card:last-child { border-bottom: none; }
       .features-strip { grid-template-columns: 1fr 1fr; }
-      .example-grid { grid-template-columns: 1fr; }
-      .steps-grid { grid-template-columns: 1fr; }
-      .stats-inner { grid-template-columns: repeat(2,1fr); gap: 20px; }
-      .stat { border-left: none; padding-left: 0; border-top: 1px solid var(--border); padding-top: 20px; }
-      .stat:first-child { border-top: none; padding-top: 0; }
+      .stats-grid { grid-template-columns: 1fr 1fr; gap: 24px; }
+      .stat-item { border-left: none; padding-left: 0; border-top: 1px solid var(--paper-4); padding-top: 24px; }
+      .stat-item:first-child, .stat-item:nth-child(2) { border-top: none; padding-top: 0; }
+      .steps-row { grid-template-columns: 1fr; gap: 40px; }
+      .nav-links { display: none; }
     }
-    @media(max-width: 600px) {
-      .hero { padding: 56px 0 48px; }
-      .hero-numbers { display: none; }
+    @media(max-width:560px) {
+      .hero { padding: 64px 0 56px; }
       .features-strip { grid-template-columns: 1fr; }
+      .feat-cell { border-right: none; border-bottom: 1px solid var(--paper-4); }
+      .feat-cell:last-child { border-bottom: none; }
     }
+    /* ── Dark mode ── */
+    [data-theme="dark"] {
+      --ink:     #f0ece4;
+      --ink-2:   #ddd8d0;
+      --ink-3:   #b8b3aa;
+      --ink-4:   #7a7570;
+      --ink-5:   #52504c;
+      --ink-6:   #3a3835;
+      --paper:   #0f0e0c;
+      --paper-2: #1a1814;
+      --paper-3: #242220;
+      --paper-4: #302e2b;
+      --gold:    #c8952a;
+      --gold-bg: #1a1200;
+      --blue:    #4a8cc8;
+      --blue-bg: #0a1520;
+      --up:      #3a9c5a;
+      --dn:      #c04040;
+    }
+    [data-theme="dark"] body { background: var(--paper); color: var(--ink); }
+    [data-theme="dark"] nav { background: rgba(15,14,12,.92); border-bottom-color: var(--paper-4); }
+    [data-theme="dark"] .nav-logo, [data-theme="dark"] .nav-link { color: var(--ink-3); }
+    [data-theme="dark"] .nav-link:hover { color: var(--ink); }
+    [data-theme="dark"] footer { border-top-color: var(--paper-4); }
+    [data-theme="dark"] .footer-brand, [data-theme="dark"] .footer-legal { color: var(--ink-4); }
+    [data-theme="dark"] .stats-section { border-color: var(--paper-4); }
+    [data-theme="dark"] .stat-item { border-color: var(--paper-4); }
+    [data-theme="dark"] .ticker-strip, [data-theme="dark"] .ticker-pill,
+    [data-theme="dark"] .provenance-card { background: var(--paper-2); border-color: var(--paper-4); }
+    [data-theme="dark"] .prov-divider { background: var(--paper-4); }
+    [data-theme="dark"] .tools-section { background: var(--paper); }
+    [data-theme="dark"] .tool-card { background: var(--paper-2); border-color: var(--paper-4); }
+    [data-theme="dark"] .tool-card:hover { background: var(--paper-3); }
+    [data-theme="dark"] .feat-cell { background: var(--paper-2); border-color: var(--paper-4); }
+    [data-theme="dark"] .hero-card, [data-theme="dark"] .hc-row { background: var(--paper-2); border-color: var(--paper-4); }
+    [data-theme="dark"] .step-card { background: var(--paper-2); border-color: var(--paper-4); }
+    [data-theme="dark"] .cta-section { border-color: var(--paper-4); }
+
+    /* Dark toggle button in nav */
+    .nav-dark-btn {
+      width: 30px; height: 30px; border-radius: 7px;
+      background: var(--paper-2); border: 1px solid var(--paper-4);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px; cursor: pointer; transition: all .15s;
+      margin-right: 8px; flex-shrink: 0;
+    }
+    .nav-dark-btn:hover { background: var(--paper-3); }
+
   </style>
 </head>
 <body>
@@ -260,14 +501,20 @@
 <nav>
   <div class="nav-inner">
     <a href="/" class="nav-logo">
-      <div class="nav-logo-mark">
-        <svg viewBox="0 0 20 20" fill="none"><path d="M3 15l4-6 4 4 3-4 3 3" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <div class="nav-mark">
+        <svg viewBox="0 0 20 20" fill="none"><path d="M3 15l4-6 4 4 3-4 3 3" stroke="#f4f0e8" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </div>
-      <span class="nav-logo-text">Valuation Studio</span>
+      <span class="nav-name">Valuation Studio</span>
     </a>
+    <div class="nav-links">
+      <a href="#tools" class="nav-link">Tools</a>
+      <a href="#example" class="nav-link">Example</a>
+      <a href="#how" class="nav-link">How it works</a>
+    </div>
+    <button class="nav-dark-btn" id="idx-dark-btn" onclick="toggleIdxDark()" title="Toggle dark mode">🌙</button>
     <a href="app.html" class="nav-cta">
       Open App
-      <svg viewBox="0 0 16 16" fill="none" width="12" height="12"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <svg viewBox="0 0 14 14" fill="none" width="11" height="11"><path d="M2.5 7h9M8 3.5L11.5 7 8 10.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
     </a>
   </div>
 </nav>
@@ -275,250 +522,252 @@
 <!-- HERO -->
 <section class="hero">
   <div class="container">
-    <div class="hero-eyebrow fade-up d1">
-      <span class="hero-eyebrow-line"></span>
-      Valuation Studio
+    <div class="hero-inner">
+      <div class="hero-left">
+        <div class="hero-eyebrow fade-up d1">
+          <span class="eyebrow-rule"></span>
+          Valuation Studio
+        </div>
+        <h1 class="hero-headline fade-up d2">
+          Intrinsic value,<br><em>calculated</em><br>properly.
+        </h1>
+        <p class="hero-body fade-up d3">
+          Three professional DCF tools in one place — pre-loaded with Apple, Nvidia, Microsoft, and more. Fair value, implied return, and full scenario analysis. No spreadsheet needed.
+        </p>
+        <div class="hero-actions fade-up d4">
+          <a href="app.html" class="btn-primary">
+            Open the App — Free
+            <svg viewBox="0 0 14 14" fill="none" width="13" height="13"><path d="M2.5 7h9M8 3.5L11.5 7 8 10.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </a>
+          <a href="#tools" class="btn-outline">See the tools</a>
+        </div>
+        <p class="hero-disclaimer fade-up d5">For informational purposes only — not financial advice.</p>
+      </div>
+
+      <div class="hero-right fade-up d3">
+        <div class="hero-card">
+          <div class="hc-header">
+            <div class="hc-title">Netflix (NFLX) — FY2025</div>
+            <div class="hc-badge">Example</div>
+          </div>
+          <div class="hc-body">
+            <div class="hc-row"><span class="hc-lbl">Revenue (LTM)</span><span class="hc-val">$45,183M</span></div>
+            <div class="hc-row"><span class="hc-lbl">Free Cash Flow</span><span class="hc-val pos">$9,461M</span></div>
+            <div class="hc-row"><span class="hc-lbl">FCF Margin</span><span class="hc-val pos">20.9%</span></div>
+            <div class="hc-row"><span class="hc-lbl">Net Debt</span><span class="hc-val neg">$4,500M</span></div>
+            <div class="hc-row"><span class="hc-lbl">Growth (8yr)</span><span class="hc-val">+12% / yr</span></div>
+            <div class="hc-row"><span class="hc-lbl">Market Price</span><span class="hc-val">$78.67</span></div>
+            <div class="hc-result">
+              <div class="hcr-lbl">Scenario grid preview — implied annual returns</div>
+              <div style="font-size:11px;color:var(--ink-4);margin-bottom:10px;line-height:1.5">Bear · Base · Bull scenarios across growth and terminal value assumptions.</div>
+              <div class="hm-grid">
+                <div class="hm-c" style="background:#fca5a5;color:#7f1d1d">5.2%</div>
+                <div class="hm-c" style="background:#fdd8b8;color:#78350f">7.1%</div>
+                <div class="hm-c" style="background:#fef9ee;color:#92400e">9.4%</div>
+                <div class="hm-c" style="background:#d1e8f0;color:#1a3a5c">11.8%</div>
+                <div class="hm-c" style="background:#93c5fd;color:#1e3a8a">14.2%</div>
+                <div class="hm-c" style="background:#fca5a5;color:#7f1d1d">6.1%</div>
+                <div class="hm-c" style="background:#fef9ee;color:#92400e">8.9%</div>
+                <div class="hm-c" style="background:#d1e8f0;color:#1a3a5c">11.2%</div>
+                <div class="hm-c" style="background:#93c5fd;color:#1e3a8a">13.5%</div>
+                <div class="hm-c" style="background:#3b82f6;color:#fff">16.1%</div>
+                <div class="hm-c" style="background:#fdd8b8;color:#78350f">7.8%</div>
+                <div class="hm-c" style="background:#fef9ee;color:#92400e">10.3%</div>
+                <div class="hm-c" style="background:#d1e8f0;color:#1a3a5c">12.7%</div>
+                <div class="hm-c" style="background:#3b82f6;color:#fff">15.2%</div>
+                <div class="hm-c" style="background:#1e3a8a;color:#fff">18.0%</div>
+              </div>
+              <div style="margin-top:12px;font-size:10.5px;color:var(--ink-5);font-family:var(--ff-mono);font-style:italic;text-align:center">Open the app to calculate with your own assumptions →</div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
-    <h1 class="hero-headline fade-up d2">
-      Intrinsic value,<br><em>calculated properly.</em>
-    </h1>
-    <p class="hero-body fade-up d3">
-      Three professional DCF tools in one place — pre-loaded with Apple, Nvidia, Microsoft and more. Fair value, implied return, and full scenario analysis without a spreadsheet.
-    </p>
-    <div class="hero-actions fade-up d4">
-      <a href="app.html" class="btn-primary">
-        <svg viewBox="0 0 16 16" fill="none" width="14" height="14"><path d="M8 3v10M4 9l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        Open the App — Free
-      </a>
-      <a href="#tools" class="btn-ghost">See the tools ↓</a>
-    </div>
-    <div class="hero-tickers fade-up d4">
-      <a href="app.html" class="hero-ticker"><span class="ht-name">AAPL</span><span class="ht-label">Sep '25</span></a>
-      <a href="app.html" class="hero-ticker"><span class="ht-name">MSFT</span><span class="ht-label">Jun '25</span></a>
-      <a href="app.html" class="hero-ticker"><span class="ht-name">NVDA</span><span class="ht-label">Jan '25</span></a>
-      <a href="app.html" class="hero-ticker"><span class="ht-name">META</span><span class="ht-label">Dec '24</span></a>
-      <a href="app.html" class="hero-ticker"><span class="ht-name">TSLA</span><span class="ht-label">Dec '25</span></a>
-      <a href="app.html" class="hero-ticker"><span class="ht-name">NFLX</span><span class="ht-label">Dec '25</span></a>
-    </div>
-    <p class="hero-legal fade-up d4" style="margin-top:24px">For informational purposes only — not financial or investment advice.</p>
-  </div>
-  <div class="hero-numbers" aria-hidden="true">
-    FCF × (1+g) / (r−g)<br>
-    PV = Σ FCFₜ / (1+r)ᵗ<br>
-    EV = PV(FCFs) + PV(TV)<br>
-    TV = FCF×(1+g) / (r−g)<br>
-    IRR: NPV = 0<br>
-    Equity = EV − Net Debt<br>
-    FV/sh = Equity / Shares<br>
   </div>
 </section>
 
-<!-- STATS -->
-<div class="stats-bar">
+<!-- TICKER STRIP -->
+<div class="ticker-strip">
   <div class="container">
-    <div class="stats-inner">
-      <div class="stat"><div class="stat-value">3</div><div class="stat-label">Valuation tools</div></div>
-      <div class="stat"><div class="stat-value">6</div><div class="stat-label">Pre-loaded companies</div></div>
-      <div class="stat"><div class="stat-value">100%</div><div class="stat-label">Free, forever</div></div>
-      <div class="stat"><div class="stat-value">∞</div><div class="stat-label">Scenarios to run</div></div>
+    <div class="ticker-row">
+      <div class="ticker-left">
+        <span class="ticker-label">Pre-loaded</span>
+        <div class="ticker-pills">
+          <a href="app.html" class="ticker-pill"><span class="tp-sym">AAPL</span></a>
+          <a href="app.html" class="ticker-pill"><span class="tp-sym">MSFT</span></a>
+          <a href="app.html" class="ticker-pill"><span class="tp-sym">NVDA</span></a>
+          <a href="app.html" class="ticker-pill"><span class="tp-sym">META</span></a>
+          <a href="app.html" class="ticker-pill"><span class="tp-sym">TSLA</span></a>
+          <a href="app.html" class="ticker-pill"><span class="tp-sym">NFLX</span></a>
+        </div>
+      </div>
+      <div class="ticker-right">
+        <div class="provenance-card">
+          <div class="prov-item">
+            <div class="prov-icon">📄</div>
+            <div>
+              <div class="prov-title">Financials</div>
+              <div class="prov-body">Most recent annual report</div>
+            </div>
+          </div>
+          <div class="prov-divider"></div>
+          <div class="prov-item">
+            <div class="prov-icon">📅</div>
+            <div>
+              <div class="prov-title">Prices verified</div>
+              <div class="prov-body">February 2026</div>
+            </div>
+          </div>
+          <div class="prov-divider"></div>
+          <div class="prov-item">
+            <div class="prov-icon">⚠️</div>
+            <div>
+              <div class="prov-title">Always confirm</div>
+              <div class="prov-body">Before any decision</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- STATS -->
+<div class="stats-section reveal">
+  <div class="container">
+    <div class="stats-grid">
+      <div class="stat-item">
+        <div class="stat-num">3</div>
+        <div class="stat-lbl">Valuation tools</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num">6</div>
+        <div class="stat-lbl">Pre-loaded companies</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num">100%</div>
+        <div class="stat-lbl">Free, no account needed</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num">∞</div>
+        <div class="stat-lbl">Scenarios to explore</div>
+      </div>
     </div>
   </div>
 </div>
 
 <!-- TOOLS -->
-<section class="section" id="tools">
+<section class="tools-section reveal" id="tools">
   <div class="container">
-    <div class="tools-header">
-      <div class="section-label">The Tools</div>
-      <h2 class="section-title">Everything you need to value a stock properly.</h2>
-      <p class="section-body">No simplified formulas. No hidden assumptions. All three tools share the same discounted cash flow engine, with full transparency into every calculation.</p>
-    </div>
+    <div class="section-eyebrow">The Three Tools</div>
+    <h2 class="section-title">Everything you need to value a stock properly.</h2>
+    <p class="section-body">No black boxes. No simplified formulas. All three tools share the same discounted cash flow engine — with full transparency into every calculation.</p>
+
     <div class="tools-grid">
       <div class="tool-card">
         <div class="tool-num">01 — Normal DCF</div>
         <div class="tool-title">Fair Value per Share</div>
         <div class="tool-desc">Project free cash flow at your assumed growth rate, discount it back at your required return, add the terminal value. Outputs a fair value per share — colour-coded against the market price.</div>
         <div class="tool-detail">
-          → Gordon Growth or Exit Multiple TV<br>
-          → Colour-coded upside / downside KPIs<br>
-          → Sensitivity chart across discount rates<br>
-          → Valuation bridge · Year-by-year forecast<br>
-          → CSV export
+          <span>→</span> Gordon Growth or Exit Multiple terminal value<br>
+          <span>→</span> Sensitivity chart across every discount rate<br>
+          <span>→</span> Full year-by-year forecast table<br>
+          <span>→</span> Valuation bridge breakdown<br>
+          <span>→</span> CSV export
         </div>
       </div>
       <div class="tool-card">
         <div class="tool-num">02 — Reverse DCF</div>
         <div class="tool-title">Implied Return</div>
-        <div class="tool-desc">Flip the model. Instead of asking what the company is worth, ask: what return does the current stock price imply? Instantly see whether the market price is pricing in a fair deal.</div>
+        <div class="tool-desc">Flip the model. Instead of asking what the company is worth, ask what return the current stock price implies. Compare to your own required return — you decide what's attractive.</div>
         <div class="tool-detail">
-          → Implied IRR vs 10% hurdle rate<br>
-          → IRR curve across ±60% price range<br>
-          → Hurdle-relative column in sensitivity table<br>
-          → CSV export
+          <span>→</span> Implied IRR across ±65% price range<br>
+          <span>→</span> Your required return as the reference line<br>
+          <span>→</span> Sensitivity table at different prices<br>
+          <span>→</span> CSV export
         </div>
       </div>
       <div class="tool-card">
         <div class="tool-num">03 — IRR Matrix</div>
         <div class="tool-title">Scenario Grid</div>
-        <div class="tool-desc">Run the Reverse DCF across every combination of revenue growth and terminal assumption — in Bear, Base, and Bull margin scenarios. A full map of returns in one table.</div>
+        <div class="tool-desc">Run the Reverse DCF across every combination of revenue growth and terminal assumption — in Bear, Base, and Bull margin scenarios simultaneously. View as a heatmap table or a line chart.</div>
         <div class="tool-detail">
-          → Bear / Base / Bull comparison strip<br>
-          → Fully customisable grid dimensions<br>
-          → Diverging colour scale at 10% hurdle<br>
-          → Hurdle line label on matrix<br>
-          → CSV export per scenario
+          <span>→</span> Bear / Base / Bull side-by-side<br>
+          <span>→</span> Median return summary strip<br>
+          <span>→</span> Customisable grid dimensions<br>
+          <span>→</span> Heatmap or chart view<br>
+          <span>→</span> CSV export per scenario
         </div>
       </div>
     </div>
 
-    <!-- Features strip -->
     <div class="features-strip">
       <div class="feat-cell">
         <div class="feat-icon">⬆</div>
         <div class="feat-title">Share any valuation</div>
-        <div class="feat-body">Every input encoded in a URL. Copy, share, and anyone lands on your exact analysis.</div>
+        <div class="feat-body">All inputs encoded in a URL. Copy, share — anyone lands on your exact analysis.</div>
       </div>
       <div class="feat-cell">
         <div class="feat-icon">💱</div>
-        <div class="feat-title">Currency converter</div>
+        <div class="feat-title">Multi-currency</div>
         <div class="feat-body">Financials in JPY, price in USD? Set an FX rate and fair value converts automatically.</div>
       </div>
       <div class="feat-cell">
         <div class="feat-icon">🌙</div>
         <div class="feat-title">Dark mode</div>
-        <div class="feat-body">Toggle between light and dark. Preference saved so it's ready next time you open the app.</div>
+        <div class="feat-body">Toggle between light and dark. Preference saved across sessions.</div>
       </div>
       <div class="feat-cell">
         <div class="feat-icon">📱</div>
         <div class="feat-title">Mobile ready</div>
-        <div class="feat-body">Full sidebar accessible on any device. Sticky fair value bar keeps results in view while you scroll.</div>
+        <div class="feat-body">Full access on any device. Sticky fair value bar keeps results visible while you scroll.</div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- EXAMPLE -->
-<section class="example-section" id="example">
+<!-- HOW IT WORKS -->
+<section class="how-section reveal" id="how">
   <div class="container">
-    <div class="example-grid">
-      <div class="example-card">
-        <div class="example-card-header">
-          <div class="example-card-title">Netflix (NFLX) — FY2025</div>
-          <div class="example-live-dot"><div class="dot-pulse"></div>Example</div>
-        </div>
-        <div class="example-card-body">
-          <div class="example-row"><span class="example-row-label">Revenue (LTM)</span><span class="example-row-value">$45,183M</span></div>
-          <div class="example-row"><span class="example-row-label">Free Cash Flow</span><span class="example-row-value positive">$9,461M</span></div>
-          <div class="example-row"><span class="example-row-label">FCF Margin</span><span class="example-row-value positive">20.9%</span></div>
-          <div class="example-row"><span class="example-row-label">Net Debt</span><span class="example-row-value negative">$4,500M</span></div>
-          <div class="example-row"><span class="example-row-label">Shares Outstanding</span><span class="example-row-value">4,317M</span></div>
-          <div class="example-row"><span class="example-row-label">Growth Assumption</span><span class="example-row-value">+12%/yr · 8 years</span></div>
-          <div class="example-row"><span class="example-row-label">Current Price</span><span class="example-row-value">$78.00</span></div>
-          <div class="example-result-bar">
-            <div class="bar-label"><span>Fair Value (at 12% disc. rate)</span><span style="font-family:var(--ff-mono);font-weight:500">Open app →</span></div>
-            <div class="bar-track"><div class="bar-fill bar-fill-fv" style="width:65%"></div></div>
-            <div class="bar-label"><span>Market Price</span><span style="font-family:var(--ff-mono);font-weight:500">$78.00</span></div>
-            <div class="bar-track"><div class="bar-fill bar-fill-px" style="width:78%"></div></div>
-            <p style="font-size:11px;color:var(--ink-light);margin-top:8px;font-family:var(--ff-mono)">Load in app to see live fair value at your discount rate</p>
-          </div>
-          <div style="margin-top:18px;padding-top:14px;border-top:1px solid var(--bg-deep)">
-            <div style="font-size:10.5px;color:var(--ink-light);font-family:var(--ff-mono);margin-bottom:8px;letter-spacing:.5px;text-transform:uppercase">IRR Matrix preview</div>
-            <div class="heatmap-preview">
-              <div class="hm-cell" style="background:#fca5a5;color:#7f1d1d">5.2%</div>
-              <div class="hm-cell" style="background:#fdd8b8;color:#78350f">7.1%</div>
-              <div class="hm-cell" style="background:#fef3e2;color:#92400e">9.4%</div>
-              <div class="hm-cell" style="background:#dbeafe;color:#1e3a8a">11.8%</div>
-              <div class="hm-cell" style="background:#93c5fd;color:#1e3a8a">14.2%</div>
-              <div class="hm-cell" style="background:#fca5a5;color:#7f1d1d">6.1%</div>
-              <div class="hm-cell" style="background:#fef3e2;color:#92400e">8.9%</div>
-              <div class="hm-cell" style="background:#dbeafe;color:#1e3a8a">11.2%</div>
-              <div class="hm-cell" style="background:#93c5fd;color:#1e3a8a">13.5%</div>
-              <div class="hm-cell" style="background:#3b82f6;color:#fff">16.1%</div>
-              <div class="hm-cell" style="background:#fdd8b8;color:#78350f">7.8%</div>
-              <div class="hm-cell" style="background:#fef3e2;color:#92400e">10.3%</div>
-              <div class="hm-cell" style="background:#dbeafe;color:#1e3a8a">12.7%</div>
-              <div class="hm-cell" style="background:#3b82f6;color:#fff">15.2%</div>
-              <div class="hm-cell" style="background:#1e3a8a;color:#fff">18.0%</div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="example-text">
-        <div class="section-label">Six Companies Pre-loaded</div>
-        <h2 class="section-title">Pick any company and start instantly.</h2>
-        <p class="section-body">Apple, Microsoft, Nvidia, Meta, Tesla, and Netflix are ready to go. Click a ticker in the sidebar — every field populates immediately with real data from the latest annual report.</p>
-        <ul class="example-feature-list">
-          <li class="example-feature">
-            <div class="feature-icon-wrap">📥</div>
-            <div>
-              <div class="feature-text-title">One-click presets</div>
-              <div class="feature-text-body">Click any ticker pill — AAPL, MSFT, NVDA, META, TSLA, or NFLX — and all fields load the correct data instantly. Data freshness shown on each pill.</div>
-            </div>
-          </li>
-          <li class="example-feature">
-            <div class="feature-icon-wrap">🎚️</div>
-            <div>
-              <div class="feature-text-title">Fully adjustable</div>
-              <div class="feature-text-body">Change any assumption at any time. Sliders and inputs update every chart and table live — no recalculate button.</div>
-            </div>
-          </li>
-          <li class="example-feature">
-            <div class="feature-icon-wrap">⬇️</div>
-            <div>
-              <div class="feature-text-title">Export everything</div>
-              <div class="feature-text-body">Every table — forecast, IRR matrix, sensitivity — downloads as a clean CSV for Excel or Sheets.</div>
-            </div>
-          </li>
-        </ul>
-        <div style="margin-top:32px">
-          <a href="app.html" class="btn-primary">
-            <svg viewBox="0 0 16 16" fill="none" width="14" height="14"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            Open Valuation Studio
-          </a>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- STEPS -->
-<section class="steps-section">
-  <div class="container">
-    <div class="section-label">How it works</div>
-    <h2 class="section-title">From zero to insight in three steps.</h2>
-    <div class="steps-grid">
+    <div class="section-eyebrow">How it works</div>
+    <h2 class="section-title">From zero to insight in minutes.</h2>
+    <div class="steps-row">
       <div class="step">
         <div class="step-num">01</div>
+        <div class="step-rule"></div>
         <div class="step-title">Pick a company or enter your own</div>
-        <div class="step-body">Choose from six pre-loaded companies — AAPL, MSFT, NVDA, META, TSLA, or NFLX — or fill the sidebar with any stock's financials. Click a ticker pill and every field loads instantly.</div>
-        <div class="step-note">All monetary values in millions · Shares in millions</div>
+        <div class="step-body">Choose from six pre-loaded companies or enter any stock's financials manually. All values in millions. Future cash flows are projected year by year, then discounted back using your required return. Terminal value uses either a Gordon Growth rate or an Exit Multiple.</div>
+        <div class="step-note">Revenue · FCF · net cash · shares outstanding</div>
       </div>
       <div class="step">
         <div class="step-num">02</div>
-        <div class="step-title">Explore all three tabs</div>
-        <div class="step-body">Normal DCF gives you a fair value per share. Reverse DCF tells you what return the current price implies. The IRR Matrix maps every combination across Bear, Base, and Bull scenarios.</div>
-        <div class="step-note">Results update instantly as you adjust any input</div>
+        <div class="step-rule"></div>
+        <div class="step-title">Adjust your assumptions</div>
+        <div class="step-body">Set your growth rate, margin assumptions, years to forecast, and terminal value method. Sliders update every chart live. Your required return (or WACC) is entirely your own choice.</div>
+        <div class="step-note">Gordon Growth or Exit Multiple terminal value</div>
       </div>
       <div class="step">
         <div class="step-num">03</div>
-        <div class="step-title">Share, adjust, and export</div>
-        <div class="step-body">Share your exact analysis via URL. Export any table as CSV. Toggle dark mode for late-night sessions. Come back with your inputs already saved in the link.</div>
-        <div class="step-note">Gordon Growth or Exit Multiple terminal value</div>
+        <div class="step-rule"></div>
+        <div class="step-title">Explore all three tabs</div>
+        <div class="step-body">Fair Value gives a price target. Implied Return tells you what annual return the current price is pricing in. The Scenario Grid maps every combination of growth and terminal value across Bear, Base, and Bull — all at once.</div>
+        <div class="step-note">Share via URL · Export CSV · Dark mode</div>
       </div>
     </div>
   </div>
 </section>
 
 <!-- CTA -->
-<section class="cta-section">
-  <div class="container">
+<section class="cta-section reveal">
+  <div class="container" style="text-align:center">
+    <div class="cta-rule"></div>
     <h2 class="cta-headline">What's the stock<br>actually <em>worth?</em></h2>
     <p class="cta-body">Open the app, enter your assumptions, and find out in under a minute.</p>
-    <a href="app.html" class="btn-primary" style="margin:0 auto;display:inline-flex">
-      <svg viewBox="0 0 16 16" fill="none" width="14" height="14"><path d="M8 3v10M4 9l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <a href="app.html" class="btn-primary" style="display:inline-flex;margin:0 auto">
       Open Valuation Studio — Free
+      <svg viewBox="0 0 14 14" fill="none" width="13" height="13"><path d="M2.5 7h9M8 3.5L11.5 7 8 10.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
     </a>
+    <p class="cta-disclaimer">For informational purposes only — not financial or investment advice.</p>
   </div>
 </section>
 
@@ -526,9 +775,32 @@
 <footer>
   <div class="footer-inner">
     <div class="footer-brand">Valuation Studio</div>
-    <div class="footer-legal">For informational purposes only — not financial or investment advice. All outputs are illustrative. Users are solely responsible for their own investment decisions.</div>
+    <div class="footer-legal">For informational purposes only — not financial or investment advice. All outputs are illustrative. Users are solely responsible for their own investment decisions. Pre-loaded data may not reflect the latest filings.</div>
   </div>
 </footer>
 
+<script>
+  // Restore dark mode from app
+  (function(){
+    const t=localStorage.getItem('vs-theme');
+    if(t){document.documentElement.setAttribute('data-theme',t);}
+    const btn=document.getElementById('idx-dark-btn');
+    if(btn)btn.textContent=(localStorage.getItem('vs-theme')==='dark')?'☀️':'🌙';
+  })();
+
+  function toggleIdxDark(){
+    const isDark=document.documentElement.getAttribute('data-theme')==='dark';
+    const next=isDark?'light':'dark';
+    document.documentElement.setAttribute('data-theme',next);
+    localStorage.setItem('vs-theme',next);
+    document.getElementById('idx-dark-btn').textContent=next==='dark'?'☀️':'🌙';
+  }
+
+  // Scroll reveal
+  const obs = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if(e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); } });
+  }, { threshold: 0.1 });
+  document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+</script>
 </body>
 </html>
