@@ -509,8 +509,8 @@ input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.15)}
 [data-theme="dark"] .irc-num.good{color:var(--green)}
 [data-theme="dark"] .irc-num.bad{color:var(--red)}
 .irc-verdict{padding-left:20px;flex:1}
-.irc-verdict-main{font-family:var(--ff-head);font-size:18px;font-weight:600;color:var(--ink);margin-bottom:6px;line-height:1.2;letter-spacing:-.3px}
-.irc-verdict-body{font-size:12px;color:var(--ink-4);line-height:1.6;margin-bottom:12px}
+.irc-verdict-main{font-family:var(--ff-head);font-size:17px;font-weight:600;color:var(--ink);margin-bottom:8px;line-height:1.25;letter-spacing:-.2px}
+.irc-verdict-body{font-size:12.5px;color:var(--ink-4);line-height:1.7}
 .irc-vs-badge{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:20px;font-family:var(--ff-mono);font-size:11.5px;font-weight:600}
 .irc-vs-badge.good{background:var(--green-bg);color:var(--green-dk)}
 .irc-vs-badge.bad{background:var(--red-bg);color:var(--red-dk)}
@@ -1585,10 +1585,11 @@ function saveReport(){
     return h;
   }
 
-  // SVG number line: map fair value and price onto a shared scale
+  // SVG number line — wider viewBox for bigger, more legible visual
   const lineMin=res.ok?Math.min(res.fvps,inp.price)*0.88:inp.price*0.88;
   const lineMax=res.ok?Math.max(res.fvps,inp.price)*1.12:inp.price*1.12;
-  const toX=(v)=>Math.round(16+(v-lineMin)/(lineMax-lineMin)*228); // 0–260 range, 16px margin each side
+  // 0–480 horizontal range with 24px margins each side → 432px usable
+  const toX=(v)=>Math.round(24+(v-lineMin)/(lineMax-lineMin)*432);
   const fvX=res.ok?toX(res.fvps):0;
   const pxX=toX(inp.price);
 
@@ -1597,9 +1598,15 @@ function saveReport(){
   const fvDisplay=res.ok?fmt(res.fvps):'N/A';
   const upDisplay=up!==null?`${up>=0?'+':''}${fmt(up*100,1)}%`:'N/A';
   const irrDisplay=irr!==null?`${fmt(irr*100,1)}%`:'N/A';
-  const irrColor=irr!==null?(irr>=0.10?'#1a5c32':'#7a1a1a'):'#8a857c';
-  const irrBg=irr!==null?(irr>=0.10?'#edf7f0':'#fdf0f0'):'#f5f3ee';
-  const irrVerdict=irr!==null?(irr>=0.10?'Above the 10% hurdle':'Below the 10% hurdle'):'Could not solve';
+  // IRR: always neutral — no green/red judgement
+  const irrNumColor='#1a1814';
+  const irrBg='#f0ede6';
+  const irrFactLine1=irr!==null
+    ?`At the current price of ${fmt(inp.price,2)} ${inp.pccy}, these assumptions imply an annual return of ${fmt(irr*100,1)}%.`
+    :'No valid implied return could be solved at this price and these assumptions.';
+  const irrFactLine2=irr!==null
+    ?`This is the discount rate at which the present value of projected cash flows equals the market price.`
+    :'';
 
   const html=`<!DOCTYPE html>
 <html lang="en">
@@ -1625,25 +1632,40 @@ function saveReport(){
   .inp-item{background:#ede8de;border-radius:8px;padding:11px 13px}
   .inp-lbl{font-size:9.5px;color:#8a857c;margin-bottom:3px;text-transform:uppercase;letter-spacing:.4px}
   .inp-val{font-family:'DM Mono',monospace;font-size:13px;font-weight:500;color:#1a1814}
-  /* Visual cards row */
-  .visual-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:28px}
-  .vis-card{border-radius:12px;padding:22px 24px;border:1px solid #d8d3ca}
-  .vis-label{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1.4px;text-transform:uppercase;color:#8a857c;margin-bottom:14px}
+  /* Visual cards — stacked full-width */
+  .visual-row{display:flex;flex-direction:column;gap:16px;margin-bottom:28px}
+  .vis-card{border-radius:14px;padding:28px 32px;border:1px solid #d8d3ca}
+  .vis-label{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1.4px;text-transform:uppercase;color:#8a857c;margin-bottom:16px}
   /* Fair value card */
-  .fv-number{font-family:'Cormorant Garamond',serif;font-size:48px;font-weight:700;letter-spacing:-2px;line-height:1;margin-bottom:3px}
-  .fv-currency{font-family:'DM Mono',monospace;font-size:12px;color:#8a857c;margin-bottom:22px}
-  .fv-line-svg{width:100%;overflow:visible;display:block;margin-bottom:16px}
-  .fv-badge{display:inline-flex;align-items:center;gap:5px;padding:5px 12px;border-radius:20px;font-family:'DM Mono',monospace;font-size:11px;font-weight:500}
-  /* IRR gauge card */
-  .irr-gauge-wrap{display:flex;flex-direction:column;align-items:center;padding:4px 0 0}
-  .irr-svg{width:140px;height:80px;overflow:visible}
-  .irr-number{font-family:'Cormorant Garamond',serif;font-size:40px;font-weight:700;letter-spacing:-1.5px;line-height:1;text-align:center;margin-top:10px}
-  .irr-verdict{font-size:11px;color:#8a857c;text-align:center;margin-top:5px;font-family:'DM Mono',monospace;letter-spacing:.2px}
+  .fv-top{display:flex;align-items:baseline;gap:10px;margin-bottom:6px}
+  .fv-number{font-family:'Cormorant Garamond',serif;font-size:64px;font-weight:700;letter-spacing:-2.5px;line-height:1}
+  .fv-currency{font-family:'DM Mono',monospace;font-size:13px;color:#8a857c;margin-bottom:28px}
+  .fv-line-svg{width:100%;overflow:visible;display:block;margin-bottom:20px}
+  .fv-badge{display:inline-flex;align-items:center;gap:5px;padding:6px 14px;border-radius:20px;font-family:'DM Mono',monospace;font-size:12px;font-weight:500}
+  /* IRR card — horizontal layout: big number left, description right */
+  .irr-row{display:flex;align-items:center;gap:0}
+  .irr-left{flex-shrink:0;padding-right:28px;border-right:1px solid #d8d3ca;min-width:130px}
+  .irr-num-lbl{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:1px;text-transform:uppercase;color:#8a857c;margin-bottom:6px}
+  .irr-big{font-family:'Cormorant Garamond',serif;font-size:64px;font-weight:700;letter-spacing:-2.5px;line-height:1;color:#1a1814}
+  .irr-right{flex:1;padding-left:28px}
+  .irr-desc-head{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:600;color:#1a1814;line-height:1.25;margin-bottom:10px;letter-spacing:-.2px}
+  .irr-desc-body{font-size:12.5px;color:#6a6560;line-height:1.7;font-weight:300}
   /* Scenario grid */
   .grid-note{font-size:11px;color:#8a857c;font-family:'DM Mono',monospace;margin-bottom:10px}
   table{width:100%;border-collapse:collapse}
   /* Disclaimer */
   .disclaimer{margin-top:36px;padding-top:16px;border-top:1px solid #d8d3ca;font-size:10px;color:#b8b3aa;line-height:1.7;font-family:'DM Mono',monospace}
+  @media(max-width:600px){
+    .page{padding:28px 20px 48px}
+    .vis-card{padding:22px 20px}
+    .fv-number{font-size:52px}
+    .irr-big{font-size:52px}
+    .irr-row{flex-direction:column;align-items:flex-start;gap:16px}
+    .irr-left{border-right:none;border-bottom:1px solid #d8d3ca;padding-right:0;padding-bottom:16px;width:100%}
+    .irr-right{padding-left:0}
+    .co-name{font-size:32px}
+    .inputs-grid{grid-template-columns:1fr 1fr}
+  }
   @media print{body,html{background:#fff!important}.page{padding:32px 32px 48px;background:#fff!important}}
 </style>
 </head>
@@ -1668,29 +1690,29 @@ function saveReport(){
       <div class="vis-label">Fair Value per Share</div>
       ${res.ok?`
       <div class="fv-number" style="color:${goodColor}">${fvDisplay}</div>
-      <div class="fv-currency">${inp.pccy}</div>
-      <svg class="fv-line-svg" viewBox="0 0 260 72" height="72">
+      <div class="fv-currency">${inp.pccy} · at ${fmt(inp.disc*100,0)}% required return</div>
+      <svg class="fv-line-svg" viewBox="0 0 480 100" height="100">
         <!-- baseline rule -->
-        <line x1="16" y1="36" x2="244" y2="36" stroke="#d8d3ca" stroke-width="1.5"/>
-        <!-- gap fill between the two points -->
-        <line x1="${Math.min(fvX,pxX)}" y1="36" x2="${Math.max(fvX,pxX)}" y2="36"
-              stroke="${goodColor}" stroke-width="2" opacity="0.35"/>
-        <!-- Fair value dot + label -->
-        <circle cx="${fvX}" cy="36" r="5" fill="${goodColor}"/>
-        <text x="${fvX}" y="20" font-size="9" font-family="monospace" fill="${goodColor}"
-              text-anchor="middle" font-weight="600">Fair value</text>
-        <text x="${fvX}" y="11" font-size="8" font-family="monospace" fill="${goodColor}"
-              text-anchor="middle">${fvDisplay}</text>
-        <!-- Market price dot + label -->
-        <circle cx="${pxX}" cy="36" r="5" fill="#4a4640"/>
-        <text x="${pxX}" y="56" font-size="9" font-family="monospace" fill="#8a857c"
+        <line x1="24" y1="50" x2="456" y2="50" stroke="#d8d3ca" stroke-width="2"/>
+        <!-- coloured gap between the two dots -->
+        <line x1="${Math.min(fvX,pxX)}" y1="50" x2="${Math.max(fvX,pxX)}" y2="50"
+              stroke="${goodColor}" stroke-width="3" opacity="0.3"/>
+        <!-- Fair value dot -->
+        <circle cx="${fvX}" cy="50" r="7" fill="${goodColor}"/>
+        <text x="${fvX}" y="30" font-size="11" font-family="monospace" fill="${goodColor}"
+              text-anchor="middle" font-weight="700">${fvDisplay}</text>
+        <text x="${fvX}" y="18" font-size="9" font-family="monospace" fill="${goodColor}"
+              text-anchor="middle" opacity="0.75">Fair value</text>
+        <!-- Market price dot -->
+        <circle cx="${pxX}" cy="50" r="7" fill="#4a4640"/>
+        <text x="${pxX}" y="73" font-size="11" font-family="monospace" fill="#4a4640"
+              text-anchor="middle" font-weight="700">${fmt(inp.price)}</text>
+        <text x="${pxX}" y="85" font-size="9" font-family="monospace" fill="#8a857c"
               text-anchor="middle">Market price</text>
-        <text x="${pxX}" y="67" font-size="8" font-family="monospace" fill="#8a857c"
-              text-anchor="middle">${fmt(inp.price)}</text>
-        <!-- Delta label at midpoint -->
-        <text x="${Math.round((fvX+pxX)/2)}" y="${up>=0?29:45}" font-size="8"
+        <!-- Delta label at midpoint, above or below line -->
+        <text x="${Math.round((fvX+pxX)/2)}" y="${up>=0?40:65}" font-size="10"
               font-family="monospace" fill="${goodColor}" text-anchor="middle"
-              font-weight="600">${upDisplay}</text>
+              font-weight="700">${upDisplay}</text>
       </svg>
       <div class="fv-badge" style="background:${up>=0?'rgba(45,106,79,.12)':'rgba(155,34,38,.1)'};color:${goodColor}">
         ${up>=0?'▲':'▼'} ${upDisplay} implied ${up>=0?'upside':'downside'}
@@ -1701,31 +1723,18 @@ function saveReport(){
     <!-- Implied Return Card -->
     <div class="vis-card" style="background:${irrBg}">
       <div class="vis-label">Implied Annual Return</div>
-      ${irr!==null?(()=>{
-        const irrDeg=Math.min(Math.max(irr*100/25*180,0),180);
-        const r=54,cx=70,cy=70;
-        const arcRad=(180-irrDeg)*Math.PI/180;
-        const ax=cx+r*Math.cos(arcRad),ay=cy-r*Math.sin(arcRad);
-        const arcPath=`M ${cx-r} ${cy} A ${r} ${r} 0 0 1 ${ax} ${ay}`;
-        const hDeg=0.10/0.25*180;
-        const hRad=(180-hDeg)*Math.PI/180;
-        const hx=cx+r*Math.cos(hRad),hy=cy-r*Math.sin(hRad);
-        const hox=cx+(r+10)*Math.cos(hRad),hoy=cy-(r+10)*Math.sin(hRad);
-        const htx=cx+(r+19)*Math.cos(hRad),hty=cy-(r+19)*Math.sin(hRad);
-        return`
-      <div class="irr-gauge-wrap">
-        <svg class="irr-svg" viewBox="0 0 140 80">
-          <path d="M 16 70 A 54 54 0 0 1 124 70" fill="none" stroke="#d8d3ca" stroke-width="7" stroke-linecap="round"/>
-          <path d="${arcPath}" fill="none" stroke="${irrColor}" stroke-width="7" stroke-linecap="round"/>
-          <line x1="${hx}" y1="${hy}" x2="${hox}" y2="${hoy}" stroke="#8a857c" stroke-width="1.5" stroke-linecap="round"/>
-          <text x="${htx}" y="${hty+2.5}" font-size="7" font-family="monospace" fill="#8a857c" text-anchor="middle">10%</text>
-          <text x="14" y="82" font-size="8" font-family="monospace" fill="#b8b3aa">0%</text>
-          <text x="110" y="82" font-size="8" font-family="monospace" fill="#b8b3aa">25%</text>
-        </svg>
-        <div class="irr-number" style="color:${irrColor}">${irrDisplay}</div>
-        <div class="irr-verdict">${irrVerdict}</div>
-      </div>`;
-      })():`<div style="color:#8a857c;font-size:13px;margin-top:8px">Could not solve at this price.</div>`}
+      ${irr!==null?`
+      <div class="irr-row">
+        <div class="irr-left">
+          <div class="irr-num-lbl">per year</div>
+          <div class="irr-big">${irrDisplay}</div>
+        </div>
+        <div class="irr-right">
+          <div class="irr-desc-head">The return implied by the market price</div>
+          <div class="irr-desc-body">${irrFactLine1}<br><br>${irrFactLine2}</div>
+        </div>
+      </div>
+      `:`<div style="color:#8a857c;font-size:13px;margin-top:8px">Could not solve at this price.</div>`}
     </div>
   </div>
 
@@ -2181,22 +2190,24 @@ function renderRev(inp){
   if(irr!==null){
     const irrPct=irr*100;
     const diff=irrPct-reqReturn;
-    const good=diff>=0;
-    const verdict=good?'Price implies an attractive return':'Price implies a lower return than your target';
-    const detail=good
-      ?`The implied ${fmt(irrPct,1)}% annual return is ${fmt(diff,1)}pp above your ${fmt(reqReturn,0)}% required return.`
-      :`The implied ${fmt(irrPct,1)}% annual return falls ${fmt(Math.abs(diff),1)}pp below your ${fmt(reqReturn,0)}% required return.`;
+    const diffAbs=fmt(Math.abs(diff),1);
+    // Neutral headline — factual, not opinionated
+    const headline='What the market price implies';
+    // Two calm factual sentences
+    const line1=`At the current price, these growth and terminal assumptions produce an implied annual return of ${fmt(irrPct,1)}%.`;
+    const line2=diff>=0
+      ?`That is ${fmt(diff,1)}pp above your ${fmt(reqReturn,0)}% required return on the Fair Value tab.`
+      :`That is ${diffAbs}pp below your ${fmt(reqReturn,0)}% required return on the Fair Value tab.`;
     hero.innerHTML=`
       <div class="irr-result-card">
         <div class="irc-top">
           <div class="irc-num-block">
             <div class="irc-num-lbl">Implied return / yr</div>
-            <div class="irc-num ${good?'good':'bad'}">${fmt(irrPct,1)}%</div>
+            <div class="irc-num" style="color:var(--ink)">${fmt(irrPct,1)}%</div>
           </div>
           <div class="irc-verdict">
-            <div class="irc-verdict-main">${verdict}</div>
-            <div class="irc-verdict-body">${detail}</div>
-            <div class="irc-vs-badge ${good?'good':'bad'}">${good?'▲':'▼'} ${diff>=0?'+':''}${fmt(diff,1)}pp vs ${fmt(reqReturn,0)}% required return</div>
+            <div class="irc-verdict-main">${headline}</div>
+            <div class="irc-verdict-body">${line1} ${line2}</div>
           </div>
         </div>
         <div class="irc-inputs">
