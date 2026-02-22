@@ -1549,24 +1549,30 @@ function saveReport(){
     return h;
   }
 
-  // Forecast table rows
-  const rows=res.ok?res.rows:[];
-  let forecastRows='';
-  rows.forEach(r=>{
-    forecastRows+=`<tr>
-      <td style="padding:5px 10px;border-bottom:1px solid #e0dbd0;font-family:monospace;font-size:11px">Y${r.year}</td>
-      <td style="padding:5px 10px;border-bottom:1px solid #e0dbd0;font-family:monospace;font-size:11px;text-align:right">${fmt(r.rev,0)}</td>
-      <td style="padding:5px 10px;border-bottom:1px solid #e0dbd0;font-family:monospace;font-size:11px;text-align:right">${fmt(r.marg*100,1)}%</td>
-      <td style="padding:5px 10px;border-bottom:1px solid #e0dbd0;font-family:monospace;font-size:11px;text-align:right">${fmt(r.fcf,0)}</td>
-      <td style="padding:5px 10px;border-bottom:1px solid #e0dbd0;font-family:monospace;font-size:11px;text-align:right">${fmt(r.discFcf,0)}</td>
-    </tr>`;
-  });
+  // Compute bar widths for fair value visual
+  const barMax=res.ok?Math.max(res.fvps,inp.price)*1.15:inp.price*1.15;
+  const fvBarW=res.ok?Math.round(Math.min(res.fvps/barMax*100,100)):0;
+  const pxBarW=Math.round(Math.min(inp.price/barMax*100,100));
+  // IRR gauge: map 0–25% to 0–180 degrees
+  const irrDeg=irr!==null?Math.min(Math.max(irr*100/25*180,0),180):null;
+  const irrGaugePath=(deg)=>{
+    const r=54,cx=70,cy=70;
+    const rad=(180-deg)*Math.PI/180;
+    const x=cx+r*Math.cos(rad),y=cy-r*Math.sin(rad);
+    return`M ${cx-r} ${cy} A ${r} ${r} 0 0 1 ${x} ${y}`;
+  };
+  const hurdleDeg=0.10/0.25*180; // 10% hurdle = 72deg
+  const hurdleRad=(180-hurdleDeg)*Math.PI/180;
+  const hx=70+54*Math.cos(hurdleRad),hy=70-54*Math.sin(hurdleRad);
 
   const goodColor=up!==null&&up>=0?'#1a5c32':'#7a1a1a';
+  const goodBg=up!==null&&up>=0?'#edf7f0':'#fdf0f0';
   const fvDisplay=res.ok?fmt(res.fvps):'N/A';
   const upDisplay=up!==null?`${up>=0?'+':''}${fmt(up*100,1)}%`:'N/A';
   const irrDisplay=irr!==null?`${fmt(irr*100,1)}%`:'N/A';
   const irrColor=irr!==null?(irr>=0.10?'#1a5c32':'#7a1a1a'):'#8a857c';
+  const irrBg=irr!==null?(irr>=0.10?'#edf7f0':'#fdf0f0'):'#f5f3ee';
+  const irrVerdict=irr!==null?(irr>=0.10?'Above your required return':'Below your required return'):'Could not solve';
 
   const html=`<!DOCTYPE html>
 <html lang="en">
@@ -1579,38 +1585,42 @@ function saveReport(){
   *{box-sizing:border-box;margin:0;padding:0}
   body{font-family:'DM Sans',sans-serif;background:#f4f0e8;color:#1a1814;font-size:13px;line-height:1.5;-webkit-print-color-adjust:exact;print-color-adjust:exact}
   .page{max-width:800px;margin:0 auto;padding:48px 48px 64px;background:#f4f0e8}
-  /* Header */
-  .report-header{display:flex;justify-content:space-between;align-items:flex-start;padding-bottom:20px;border-bottom:2px solid #1a1814;margin-bottom:28px}
+  .report-header{display:flex;justify-content:space-between;align-items:flex-start;padding-bottom:18px;border-bottom:2px solid #1a1814;margin-bottom:28px}
   .rh-brand{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:#8a857c}
   .rh-date{font-family:'DM Mono',monospace;font-size:10px;color:#8a857c;text-align:right}
-  .report-co{margin-bottom:28px}
-  .co-name{font-family:'Cormorant Garamond',serif;font-size:38px;font-weight:700;letter-spacing:-1px;line-height:1;color:#1a1814;margin-bottom:6px}
-  .co-sub{font-size:12px;color:#8a857c;font-family:'DM Mono',monospace;letter-spacing:.3px}
-  /* Key metrics row */
-  .metrics-row{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:#d8d3ca;border:1px solid #d8d3ca;border-radius:10px;overflow:hidden;margin-bottom:28px}
-  .metric{background:#f4f0e8;padding:16px 18px}
-  .metric-lbl{font-size:10px;font-weight:500;color:#8a857c;text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px}
-  .metric-val{font-family:'Cormorant Garamond',serif;font-size:30px;font-weight:600;letter-spacing:-.5px;line-height:1;color:#1a1814}
-  .metric-sub{font-size:10px;color:#8a857c;margin-top:4px;font-family:'DM Mono',monospace}
-  /* Inputs */
+  .report-co{margin-bottom:32px}
+  .co-name{font-family:'Cormorant Garamond',serif;font-size:40px;font-weight:700;letter-spacing:-1px;line-height:1;color:#1a1814;margin-bottom:7px}
+  .co-sub{font-size:11.5px;color:#8a857c;font-family:'DM Mono',monospace;letter-spacing:.2px}
   .section{margin-bottom:28px}
-  .section-title{font-family:'DM Mono',monospace;font-size:10px;font-weight:500;letter-spacing:1.5px;text-transform:uppercase;color:#b07d2e;margin-bottom:12px;padding-bottom:6px;border-bottom:1px solid #d8d3ca}
+  .section-title{font-family:'DM Mono',monospace;font-size:10px;font-weight:500;letter-spacing:1.5px;text-transform:uppercase;color:#b07d2e;margin-bottom:14px;padding-bottom:6px;border-bottom:1px solid #d8d3ca}
+  /* Inputs grid */
   .inputs-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
-  .inp-item{background:#ede8de;border-radius:7px;padding:10px 12px}
+  .inp-item{background:#ede8de;border-radius:8px;padding:11px 13px}
   .inp-lbl{font-size:9.5px;color:#8a857c;margin-bottom:3px;text-transform:uppercase;letter-spacing:.4px}
   .inp-val{font-family:'DM Mono',monospace;font-size:13px;font-weight:500;color:#1a1814}
-  /* Bridge */
-  .bridge{background:#ede8de;border-radius:8px;overflow:hidden;margin-bottom:20px}
-  .bridge-row{display:flex;justify-content:space-between;padding:8px 14px;border-bottom:1px solid #d8d3ca;font-size:12px}
-  .bridge-row:last-child{border-bottom:none;font-weight:600;background:#e4ddd0}
-  .br-l{color:#4a4640}.br-r{font-family:'DM Mono',monospace;color:#1a1814}
-  /* Tables */
+  /* Visual cards row */
+  .visual-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:28px}
+  .vis-card{border-radius:12px;padding:22px 24px;border:1px solid #d8d3ca}
+  .vis-label{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1.4px;text-transform:uppercase;color:#8a857c;margin-bottom:14px}
+  /* Fair value card */
+  .fv-number{font-family:'Cormorant Garamond',serif;font-size:48px;font-weight:700;letter-spacing:-2px;line-height:1;margin-bottom:3px}
+  .fv-currency{font-family:'DM Mono',monospace;font-size:12px;color:#8a857c;margin-bottom:18px}
+  .fv-bar-wrap{margin-bottom:10px}
+  .fv-bar-label{display:flex;justify-content:space-between;font-size:10px;color:#8a857c;font-family:'DM Mono',monospace;margin-bottom:4px}
+  .fv-bar-track{background:#d8d3ca;border-radius:3px;height:8px;overflow:hidden}
+  .fv-bar-fill{height:100%;border-radius:3px;transition:width .3s}
+  .fv-badge{display:inline-flex;align-items:center;gap:5px;padding:5px 12px;border-radius:20px;font-family:'DM Mono',monospace;font-size:11px;font-weight:500;margin-top:14px}
+  /* IRR gauge card */
+  .irr-gauge-wrap{display:flex;flex-direction:column;align-items:center;padding:4px 0 0}
+  .irr-svg{width:140px;height:80px;overflow:visible}
+  .irr-number{font-family:'Cormorant Garamond',serif;font-size:40px;font-weight:700;letter-spacing:-1.5px;line-height:1;text-align:center;margin-top:10px}
+  .irr-verdict{font-size:11px;color:#8a857c;text-align:center;margin-top:5px;font-family:'DM Mono',monospace;letter-spacing:.2px}
+  /* Scenario grid */
+  .grid-note{font-size:11px;color:#8a857c;font-family:'DM Mono',monospace;margin-bottom:10px}
   table{width:100%;border-collapse:collapse}
-  .tbl-head th{text-align:left;padding:6px 10px;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:#8a857c;background:#f5f3ee;border-bottom:1px solid #d8d3ca;font-family:'DM Mono',monospace}
   /* Disclaimer */
-  .disclaimer{margin-top:36px;padding-top:16px;border-top:1px solid #d8d3ca;font-size:10px;color:#b8b3aa;line-height:1.6;font-family:'DM Mono',monospace}
-  /* Print */
-  @media print{body{background:#fff}.page{padding:32px 32px 48px;background:#fff}}
+  .disclaimer{margin-top:36px;padding-top:16px;border-top:1px solid #d8d3ca;font-size:10px;color:#b8b3aa;line-height:1.7;font-family:'DM Mono',monospace}
+  @media print{body,html{background:#fff!important}.page{padding:32px 32px 48px;background:#fff!important}}
 </style>
 </head>
 <body>
@@ -1623,72 +1633,82 @@ function saveReport(){
 
   <div class="report-co">
     <div class="co-name">${inp.company||'Unnamed Company'}</div>
-    <div class="co-sub">DCF Valuation · ${termStr} · ${inp.years}-year forecast · Required return ${fmt(inp.disc*100,0)}%</div>
+    <div class="co-sub">${termStr} · ${inp.years}-year forecast · Required return ${fmt(inp.disc*100,0)}% · ${date}</div>
   </div>
 
-  <div class="metrics-row">
-    <div class="metric">
-      <div class="metric-lbl">Fair Value / Share</div>
-      <div class="metric-val" style="color:${goodColor}">${fvDisplay}</div>
-      <div class="metric-sub">${inp.pccy}</div>
+  <!-- VISUAL CARDS -->
+  <div class="visual-row">
+
+    <!-- Fair Value Card -->
+    <div class="vis-card" style="background:${goodBg}">
+      <div class="vis-label">Fair Value per Share</div>
+      ${res.ok?`
+      <div class="fv-number" style="color:${goodColor}">${fvDisplay}</div>
+      <div class="fv-currency">${inp.pccy}</div>
+      <div class="fv-bar-wrap">
+        <div class="fv-bar-label"><span>Fair value</span><span>${fvDisplay}</span></div>
+        <div class="fv-bar-track"><div class="fv-bar-fill" style="width:${fvBarW}%;background:${up>=0?'#2d6a4f':'#9b2226'}"></div></div>
+      </div>
+      <div class="fv-bar-wrap">
+        <div class="fv-bar-label"><span>Market price</span><span>${fmt(inp.price)}</span></div>
+        <div class="fv-bar-track"><div class="fv-bar-fill" style="width:${pxBarW}%;background:#4a4640"></div></div>
+      </div>
+      <div class="fv-badge" style="background:${up>=0?'rgba(45,106,79,.12)':'rgba(155,34,38,.1)'};color:${goodColor}">
+        ${up>=0?'▲':'▼'} ${upDisplay} implied ${up>=0?'upside':'downside'}
+      </div>
+      `:`<div style="color:#8a857c;font-size:13px;margin-top:8px">Could not calculate at these inputs.</div>`}
     </div>
-    <div class="metric">
-      <div class="metric-lbl">vs Market Price</div>
-      <div class="metric-val" style="color:${goodColor}">${upDisplay}</div>
-      <div class="metric-sub">${fmt(inp.price)} ${inp.pccy} market price</div>
-    </div>
-    <div class="metric">
-      <div class="metric-lbl">Implied Return</div>
-      <div class="metric-val" style="color:${irrColor}">${irrDisplay}</div>
-      <div class="metric-sub">annual, at market price</div>
+
+    <!-- Implied Return Card -->
+    <div class="vis-card" style="background:${irrBg}">
+      <div class="vis-label">Implied Annual Return</div>
+      ${irr!==null?`
+      <div class="irr-gauge-wrap">
+        <svg class="irr-svg" viewBox="0 0 140 80">
+          <!-- track -->
+          <path d="M 16 70 A 54 54 0 0 1 124 70" fill="none" stroke="#d8d3ca" stroke-width="7" stroke-linecap="round"/>
+          <!-- filled arc -->
+          <path d="${irrGaugePath(irrDeg)}" fill="none" stroke="${irrColor}" stroke-width="7" stroke-linecap="round"/>
+          <!-- hurdle tick -->
+          <line x1="${hx}" y1="${hy}" x2="${70+(54+10)*Math.cos(hurdleRad)}" y2="${70-(54+10)*Math.sin(hurdleRad)}" stroke="#8a857c" stroke-width="1.5" stroke-linecap="round"/>
+          <text x="${70+(54+18)*Math.cos(hurdleRad)}" y="${70-(54+18)*Math.sin(hurdleRad)}" font-size="7" font-family="monospace" fill="#8a857c" text-anchor="middle">10%</text>
+          <!-- labels -->
+          <text x="14" y="82" font-size="8" font-family="monospace" fill="#b8b3aa">0%</text>
+          <text x="110" y="82" font-size="8" font-family="monospace" fill="#b8b3aa">25%</text>
+        </svg>
+        <div class="irr-number" style="color:${irrColor}">${irrDisplay}</div>
+        <div class="irr-verdict">${irrVerdict}</div>
+      </div>
+      `:`<div style="color:#8a857c;font-size:13px;margin-top:8px">Could not solve at this price.</div>`}
     </div>
   </div>
 
+  <!-- INPUTS -->
   <div class="section">
     <div class="section-title">Inputs &amp; Assumptions</div>
     <div class="inputs-grid">
-      <div class="inp-item"><div class="inp-lbl">Revenue (LTM)</div><div class="inp-val">${fmt(inp.revLTM,0)} M ${inp.fccy}</div></div>
-      <div class="inp-item"><div class="inp-lbl">Free Cash Flow</div><div class="inp-val">${fmt(inp.fcfLTM,0)} M ${inp.fccy}</div></div>
+      <div class="inp-item"><div class="inp-lbl">Revenue (LTM)</div><div class="inp-val">${fmt(inp.revLTM,0)} M</div></div>
+      <div class="inp-item"><div class="inp-lbl">Free Cash Flow</div><div class="inp-val">${fmt(inp.fcfLTM,0)} M</div></div>
       <div class="inp-item"><div class="inp-lbl">FCF Margin</div><div class="inp-val">${fmt(inp.fcfMargin*100,1)}%</div></div>
-      <div class="inp-item"><div class="inp-lbl">Net Cash / (Debt)</div><div class="inp-val">${fmt(-inp.netDebt,0)} M ${inp.fccy}</div></div>
+      <div class="inp-item"><div class="inp-lbl">Net Cash / (Debt)</div><div class="inp-val">${fmt(-inp.netDebt,0)} M</div></div>
       <div class="inp-item"><div class="inp-lbl">Shares Outstanding</div><div class="inp-val">${fmt(inp.shares,0)} M</div></div>
       <div class="inp-item"><div class="inp-lbl">Stock Price</div><div class="inp-val">${fmt(inp.price,2)} ${inp.pccy}</div></div>
       <div class="inp-item"><div class="inp-lbl">Revenue Growth / yr</div><div class="inp-val">${fmt(inp.cagr*100,1)}%</div></div>
-      <div class="inp-item"><div class="inp-lbl">Margin Change / yr</div><div class="inp-val">${fmt(inp.dpp*100,1)}pp</div></div>
+      <div class="inp-item"><div class="inp-lbl">Margin Change / yr</div><div class="inp-val">${fmt(inp.dpp*100,1)} pp</div></div>
       <div class="inp-item"><div class="inp-lbl">Terminal Value</div><div class="inp-val">${termStr}</div></div>
     </div>
   </div>
 
-  ${res.ok?`
+  <!-- SCENARIO GRID -->
   <div class="section">
-    <div class="section-title">Valuation Bridge</div>
-    <div class="bridge">
-      <div class="bridge-row"><span class="br-l">PV of forecast cash flows</span><span class="br-r">${fmt(res.pvFCFs,0)} M</span></div>
-      <div class="bridge-row"><span class="br-l">PV of terminal value</span><span class="br-r">${fmt(res.pvTV,0)} M</span></div>
-      <div class="bridge-row"><span class="br-l">Less net debt</span><span class="br-r">(${fmt(inp.netDebt,0)} M)</span></div>
-      <div class="bridge-row"><span class="br-l">Total equity value</span><span class="br-r">${fmt(res.equityPV,0)} M</span></div>
-      <div class="bridge-row"><span class="br-l">÷ Shares outstanding</span><span class="br-r">${fmt(inp.shares,0)} M</span></div>
-      <div class="bridge-row"><span class="br-l">Fair value per share</span><span class="br-r">${fmt(res.fvps,2)} ${inp.pccy}</span></div>
-    </div>
-  </div>
-
-  <div class="section">
-    <div class="section-title">Year-by-Year Forecast</div>
-    <table>
-      <thead class="tbl-head"><tr><th>Year</th><th>Revenue (M)</th><th>Margin</th><th>FCF (M)</th><th>PV today (M)</th></tr></thead>
-      <tbody>${forecastRows}</tbody>
-    </table>
-  </div>`:''}
-
-  <div class="section">
-    <div class="section-title">Implied Return — Scenario Grid (Base margins)</div>
+    <div class="section-title">Scenario Grid — Implied Returns (Base margins)</div>
+    <div class="grid-note">Revenue growth × ${isM?'exit multiple':'terminal growth rate'} — colour scale: red &lt; 8% · amber 8–10% · green &gt; 10%</div>
     <table><tbody>${gridHTML(0)}</tbody></table>
   </div>
 
   <div class="disclaimer">
-    Generated by Valuation Studio on ${date}. All figures for informational purposes only — not financial or investment advice.
-    Inputs reflect user-entered assumptions which may differ from actual reported figures.
-    Past growth is not indicative of future results. Always verify data from primary sources before making any investment decision.
+    Generated by Valuation Studio on ${date}. For informational purposes only — not financial or investment advice.<br>
+    Inputs reflect user-entered assumptions and may differ from actual reported financials. Always verify from primary sources before making any investment decision.
   </div>
 
 </div>
