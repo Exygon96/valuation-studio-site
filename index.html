@@ -1,0 +1,911 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Valuation Studio — Institutional-grade DCF analysis</title>
+  <meta name="description" content="Professional DCF valuation tools for serious investors. Normal DCF, Reverse DCF, and IRR Scenario Matrix in one place." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ─────────────────────────────────────────────
+       DESIGN TOKENS
+       Palette: warm cream paper, deep ink, single
+       gold accent — editorial financial publication
+    ───────────────────────────────────────────── */
+    :root {
+      --cream:      #f5f2ec;
+      --cream-mid:  #ede9e0;
+      --cream-deep: #e4dfd3;
+      --ink:        #1c1917;
+      --ink-mid:    #57534e;
+      --ink-light:  #a8a29e;
+      --ink-faint:  #d6d3cd;
+      --gold:       #92713a;
+      --gold-light: #b8924d;
+      --gold-bg:    #faf6ee;
+      --white:      #ffffff;
+      --green-dark: #14532d;
+      --red-dark:   #7f1d1d;
+
+      --font-display: 'Playfair Display', Georgia, serif;
+      --font-sans:    'DM Sans', system-ui, sans-serif;
+      --font-mono:    'DM Mono', 'Courier New', monospace;
+
+      --radius-sm:  6px;
+      --radius-md:  12px;
+      --radius-lg:  20px;
+
+      --shadow-sm:  0 1px 3px rgba(28,25,23,.06), 0 1px 2px rgba(28,25,23,.04);
+      --shadow-md:  0 4px 16px rgba(28,25,23,.08), 0 2px 4px rgba(28,25,23,.04);
+      --shadow-lg:  0 20px 60px rgba(28,25,23,.12), 0 4px 12px rgba(28,25,23,.06);
+    }
+
+    /* ─────────────────────────────────────────────
+       RESET & BASE
+    ───────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: var(--font-sans);
+      background: var(--cream);
+      color: var(--ink);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+
+    /* Subtle grain texture overlay */
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+      pointer-events: none; z-index: 0; opacity: 0.6;
+    }
+
+    /* ─────────────────────────────────────────────
+       LAYOUT PRIMITIVES
+    ───────────────────────────────────────────── */
+    .container {
+      max-width: 1080px;
+      margin: 0 auto;
+      padding: 0 2rem;
+    }
+
+    /* ─────────────────────────────────────────────
+       NAVIGATION
+    ───────────────────────────────────────────── */
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(245,242,236,.88);
+      backdrop-filter: blur(16px) saturate(1.4);
+      -webkit-backdrop-filter: blur(16px) saturate(1.4);
+      border-bottom: 1px solid var(--ink-faint);
+    }
+    .nav-inner {
+      max-width: 1080px; margin: 0 auto; padding: 0 2rem;
+      height: 56px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .nav-logo {
+      display: flex; align-items: center; gap: 10px;
+      text-decoration: none;
+    }
+    .nav-logo-mark {
+      width: 28px; height: 28px; border-radius: 7px;
+      background: var(--ink);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .nav-logo-mark svg { width: 15px; height: 15px; fill: var(--cream); }
+    .nav-logo-text {
+      font-family: var(--font-display);
+      font-size: 15px; font-weight: 600;
+      color: var(--ink); letter-spacing: -.2px;
+    }
+    .nav-cta {
+      display: inline-flex; align-items: center; gap: 7px;
+      background: var(--ink); color: var(--cream);
+      font-family: var(--font-sans);
+      font-size: 13px; font-weight: 500;
+      padding: 7px 18px; border-radius: 6px;
+      text-decoration: none;
+      transition: background .15s, transform .1s;
+      border: none; cursor: pointer;
+    }
+    .nav-cta:hover { background: #2c2825; transform: translateY(-1px); }
+    .nav-cta svg { width: 13px; height: 13px; fill: currentColor; }
+
+    /* ─────────────────────────────────────────────
+       HERO
+    ───────────────────────────────────────────── */
+    .hero {
+      padding: 80px 0 72px;
+      position: relative;
+    }
+    .hero-eyebrow {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-family: var(--font-mono);
+      font-size: 11px; font-weight: 500;
+      letter-spacing: 1.6px; text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 22px;
+    }
+    .hero-eyebrow-line {
+      width: 24px; height: 1px; background: var(--gold);
+    }
+    .hero-headline {
+      font-family: var(--font-display);
+      font-size: clamp(42px, 5.5vw, 68px);
+      font-weight: 700;
+      color: var(--ink);
+      letter-spacing: -1.5px;
+      line-height: 1.06;
+      margin-bottom: 24px;
+      max-width: 720px;
+    }
+    .hero-headline em {
+      font-style: italic;
+      color: var(--gold);
+    }
+    .hero-body {
+      font-size: 17px; color: var(--ink-mid);
+      line-height: 1.7; max-width: 520px;
+      font-weight: 300; margin-bottom: 36px;
+    }
+    .hero-actions {
+      display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+    }
+    .btn-primary {
+      display: inline-flex; align-items: center; gap: 9px;
+      background: var(--ink); color: var(--cream);
+      font-family: var(--font-sans);
+      font-size: 14px; font-weight: 500;
+      padding: 13px 28px; border-radius: 8px;
+      text-decoration: none;
+      transition: all .18s ease;
+      box-shadow: var(--shadow-sm);
+      white-space: nowrap;
+    }
+    .btn-primary:hover {
+      background: #2c2825;
+      box-shadow: var(--shadow-md);
+      transform: translateY(-2px);
+    }
+    .btn-primary svg { width: 15px; height: 15px; fill: currentColor; }
+
+    .btn-ghost {
+      display: inline-flex; align-items: center; gap: 7px;
+      background: transparent; color: var(--ink-mid);
+      font-family: var(--font-sans);
+      font-size: 14px; font-weight: 400;
+      padding: 13px 20px; border-radius: 8px;
+      text-decoration: none;
+      border: 1px solid var(--ink-faint);
+      transition: all .15s ease;
+      white-space: nowrap;
+    }
+    .btn-ghost:hover {
+      border-color: var(--ink-mid);
+      color: var(--ink);
+      background: rgba(28,25,23,.03);
+    }
+
+    .hero-legal {
+      margin-top: 20px;
+      font-size: 11px; color: var(--ink-light);
+      line-height: 1.5;
+    }
+
+    /* Hero decorative numbers */
+    .hero-numbers {
+      position: absolute; right: 0; top: 60px;
+      display: flex; flex-direction: column; gap: 2px;
+      opacity: .12; pointer-events: none;
+      font-family: var(--font-mono);
+      font-size: 11px; color: var(--ink);
+      text-align: right;
+      line-height: 1.8;
+    }
+
+    /* ─────────────────────────────────────────────
+       DIVIDER
+    ───────────────────────────────────────────── */
+    .divider {
+      border: none;
+      border-top: 1px solid var(--ink-faint);
+      margin: 0;
+    }
+
+    /* ─────────────────────────────────────────────
+       STATS BAR
+    ───────────────────────────────────────────── */
+    .stats-bar {
+      padding: 32px 0;
+      border-bottom: 1px solid var(--ink-faint);
+    }
+    .stats-inner {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0;
+    }
+    .stat {
+      padding: 0 0 0 32px;
+      border-left: 1px solid var(--ink-faint);
+    }
+    .stat:first-child { padding-left: 0; border-left: none; }
+    .stat-value {
+      font-family: var(--font-display);
+      font-size: 30px; font-weight: 500;
+      color: var(--ink); letter-spacing: -.5px;
+      line-height: 1; margin-bottom: 5px;
+    }
+    .stat-label {
+      font-size: 12px; color: var(--ink-light);
+      font-weight: 400; letter-spacing: .01em;
+    }
+
+    /* ─────────────────────────────────────────────
+       TOOLS SECTION
+    ───────────────────────────────────────────── */
+    .section { padding: 80px 0; }
+    .section-label {
+      font-family: var(--font-mono);
+      font-size: 10.5px; letter-spacing: 1.8px; text-transform: uppercase;
+      color: var(--gold); margin-bottom: 14px;
+    }
+    .section-title {
+      font-family: var(--font-display);
+      font-size: clamp(28px, 3.5vw, 40px);
+      font-weight: 600; color: var(--ink);
+      letter-spacing: -.8px; line-height: 1.15;
+      margin-bottom: 14px; max-width: 520px;
+    }
+    .section-body {
+      font-size: 15px; color: var(--ink-mid);
+      line-height: 1.7; max-width: 480px;
+      font-weight: 300;
+    }
+
+    /* Tool cards */
+    .tools-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1px;
+      background: var(--ink-faint);
+      border: 1px solid var(--ink-faint);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      margin-top: 52px;
+    }
+    .tool-card {
+      background: var(--white);
+      padding: 32px 28px;
+      transition: background .15s;
+      position: relative;
+    }
+    .tool-card::after {
+      content: '';
+      position: absolute; bottom: 0; left: 28px; right: 28px;
+      height: 1px; background: var(--ink-faint);
+    }
+    .tool-card:hover { background: var(--gold-bg); }
+    .tool-icon {
+      width: 40px; height: 40px; border-radius: 10px;
+      background: var(--cream); border: 1px solid var(--ink-faint);
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 20px;
+      font-size: 18px;
+    }
+    .tool-number {
+      font-family: var(--font-mono);
+      font-size: 10px; color: var(--ink-light);
+      letter-spacing: 1.2px; text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+    .tool-name {
+      font-family: var(--font-display);
+      font-size: 19px; font-weight: 600;
+      color: var(--ink); letter-spacing: -.3px;
+      margin-bottom: 10px; line-height: 1.2;
+    }
+    .tool-desc {
+      font-size: 13.5px; color: var(--ink-mid);
+      line-height: 1.65; font-weight: 300;
+    }
+    .tool-detail {
+      margin-top: 18px; padding-top: 18px;
+      border-top: 1px solid var(--cream-deep);
+      font-size: 12px; color: var(--ink-light);
+      font-family: var(--font-mono);
+    }
+
+    /* ─────────────────────────────────────────────
+       EXAMPLE SECTION
+    ───────────────────────────────────────────── */
+    .example-section {
+      padding: 80px 0;
+      border-top: 1px solid var(--ink-faint);
+    }
+    .example-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 60px;
+      align-items: center;
+      margin-top: 52px;
+    }
+    .example-card {
+      background: var(--white);
+      border: 1px solid var(--ink-faint);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      box-shadow: var(--shadow-md);
+    }
+    .example-card-header {
+      padding: 20px 24px 16px;
+      border-bottom: 1px solid var(--cream-deep);
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .example-card-title {
+      font-family: var(--font-display);
+      font-size: 15px; font-weight: 600; color: var(--ink);
+    }
+    .example-live-dot {
+      display: flex; align-items: center; gap: 5px;
+      font-size: 11px; color: var(--green-dark);
+      font-family: var(--font-mono);
+    }
+    .dot-pulse {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: #22c55e;
+      animation: pulse 2s ease-in-out infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50%       { opacity: .5; transform: scale(.85); }
+    }
+    .example-card-body { padding: 20px 24px; }
+    .example-row {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 8px 0; border-bottom: 1px solid var(--cream-mid);
+      font-size: 13px;
+    }
+    .example-row:last-child { border-bottom: none; }
+    .example-row-label { color: var(--ink-mid); }
+    .example-row-value {
+      font-family: var(--font-mono);
+      font-weight: 500; color: var(--ink);
+    }
+    .example-row-value.positive { color: var(--green-dark); }
+    .example-row-value.negative { color: var(--red-dark); }
+    .example-result-bar {
+      margin-top: 18px; padding-top: 18px;
+      border-top: 1px solid var(--cream-deep);
+    }
+    .bar-label {
+      display: flex; justify-content: space-between;
+      font-size: 11px; color: var(--ink-light); margin-bottom: 5px;
+    }
+    .bar-track {
+      background: var(--cream-mid); border-radius: 4px;
+      height: 8px; overflow: hidden; margin-bottom: 8px;
+    }
+    .bar-fill {
+      height: 100%; border-radius: 4px;
+      transition: width 1.2s cubic-bezier(.4,0,.2,1);
+    }
+    .bar-fill-fv  { background: var(--green-dark); }
+    .bar-fill-px  { background: #1e3a5f; }
+
+    /* IRR heatmap preview */
+    .heatmap-preview {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 3px; margin-top: 14px;
+    }
+    .hm-cell {
+      height: 32px; border-radius: 4px;
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--font-mono);
+      font-size: 10.5px; font-weight: 600;
+    }
+
+    /* Right-side explanation */
+    .example-text {}
+    .example-text .section-label { margin-bottom: 10px; }
+    .example-feature-list {
+      list-style: none; margin-top: 28px;
+      display: flex; flex-direction: column; gap: 18px;
+    }
+    .example-feature {
+      display: flex; gap: 14px; align-items: flex-start;
+    }
+    .feature-icon-wrap {
+      width: 32px; height: 32px; border-radius: 8px;
+      background: var(--cream-mid);
+      border: 1px solid var(--ink-faint);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; font-size: 14px;
+    }
+    .feature-text-title {
+      font-size: 13.5px; font-weight: 600; color: var(--ink);
+      margin-bottom: 2px;
+    }
+    .feature-text-body {
+      font-size: 12.5px; color: var(--ink-mid); line-height: 1.55; font-weight: 300;
+    }
+
+    /* ─────────────────────────────────────────────
+       HOW IT WORKS
+    ───────────────────────────────────────────── */
+    .steps-section {
+      padding: 80px 0;
+      border-top: 1px solid var(--ink-faint);
+      background: var(--white);
+    }
+    .steps-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 48px;
+      margin-top: 52px;
+    }
+    .step {}
+    .step-num {
+      font-family: var(--font-display);
+      font-size: 48px; font-weight: 700;
+      color: var(--ink-faint);
+      line-height: 1; margin-bottom: 16px;
+      letter-spacing: -2px;
+    }
+    .step-title {
+      font-family: var(--font-display);
+      font-size: 19px; font-weight: 600;
+      color: var(--ink); margin-bottom: 10px;
+      letter-spacing: -.2px;
+    }
+    .step-body {
+      font-size: 13.5px; color: var(--ink-mid);
+      line-height: 1.7; font-weight: 300;
+    }
+    .step-note {
+      margin-top: 12px; padding: 10px 12px;
+      background: var(--cream); border-radius: var(--radius-sm);
+      border-left: 2px solid var(--gold);
+      font-size: 12px; color: var(--ink-mid);
+      font-family: var(--font-mono);
+    }
+
+    /* ─────────────────────────────────────────────
+       CTA SECTION
+    ───────────────────────────────────────────── */
+    .cta-section {
+      padding: 96px 0;
+      border-top: 1px solid var(--ink-faint);
+      text-align: center;
+    }
+    .cta-headline {
+      font-family: var(--font-display);
+      font-size: clamp(32px, 4vw, 52px);
+      font-weight: 700; color: var(--ink);
+      letter-spacing: -1.2px; line-height: 1.1;
+      margin-bottom: 18px;
+    }
+    .cta-headline em { font-style: italic; color: var(--gold); }
+    .cta-body {
+      font-size: 16px; color: var(--ink-mid);
+      margin-bottom: 36px; font-weight: 300;
+    }
+
+    /* ─────────────────────────────────────────────
+       FOOTER
+    ───────────────────────────────────────────── */
+    footer {
+      border-top: 1px solid var(--ink-faint);
+      padding: 28px 0;
+    }
+    .footer-inner {
+      max-width: 1080px; margin: 0 auto; padding: 0 2rem;
+      display: flex; justify-content: space-between; align-items: center;
+      flex-wrap: wrap; gap: 12px;
+    }
+    .footer-brand {
+      font-family: var(--font-display);
+      font-size: 14px; color: var(--ink-mid);
+    }
+    .footer-legal {
+      font-size: 11.5px; color: var(--ink-light);
+      max-width: 480px; line-height: 1.5;
+    }
+
+    /* ─────────────────────────────────────────────
+       ANIMATIONS
+    ───────────────────────────────────────────── */
+    .fade-up {
+      opacity: 0;
+      transform: translateY(24px);
+      animation: fadeUp .7s cubic-bezier(.4,0,.2,1) forwards;
+    }
+    @keyframes fadeUp {
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .fade-up:nth-child(1) { animation-delay: .05s; }
+    .fade-up:nth-child(2) { animation-delay: .15s; }
+    .fade-up:nth-child(3) { animation-delay: .25s; }
+    .fade-up:nth-child(4) { animation-delay: .35s; }
+    .fade-up:nth-child(5) { animation-delay: .45s; }
+
+    /* ─────────────────────────────────────────────
+       RESPONSIVE
+    ───────────────────────────────────────────── */
+    @media (max-width: 760px) {
+      .stats-inner { grid-template-columns: repeat(2, 1fr); gap: 24px; }
+      .stat { padding-left: 20px; }
+      .tools-grid { grid-template-columns: 1fr; }
+      .example-grid { grid-template-columns: 1fr; gap: 36px; }
+      .steps-grid { grid-template-columns: 1fr; gap: 36px; }
+      .hero-numbers { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ── Navigation ── -->
+  <nav>
+    <div class="nav-inner">
+      <a href="#" class="nav-logo">
+        <div class="nav-logo-mark">
+          <svg viewBox="0 0 20 20"><path d="M3 15l4-6 4 4 3-4 3 3" stroke="#f5f2ec" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <span class="nav-logo-text">Valuation Studio</span>
+      </a>
+      <a href="YOUR_STREAMLIT_URL" class="nav-cta" target="_blank" rel="noopener">
+        Open App
+        <svg viewBox="0 0 16 16"><path d="M3 8h10M9 4l4 4-4 4" stroke="#f5f2ec" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </a>
+    </div>
+  </nav>
+
+  <!-- ── Hero ── -->
+  <section class="hero">
+    <div class="container" style="position:relative">
+
+      <!-- Decorative background numbers -->
+      <div class="hero-numbers" aria-hidden="true">
+        <span>FCF / Share</span>
+        <span>0.1200  ·  12.00%</span>
+        <span>─────────────</span>
+        <span>PV FCFs</span>
+        <span>Terminal Value</span>
+        <span>Net Debt</span>
+        <span>─────────────</span>
+        <span>Equity PV</span>
+        <span>÷ Shares</span>
+        <span>─────────────</span>
+        <span>Fair Value</span>
+      </div>
+
+      <div class="fade-up">
+        <div class="hero-eyebrow">
+          <span class="hero-eyebrow-line"></span>
+          Professional DCF Analysis
+        </div>
+      </div>
+
+      <h1 class="hero-headline fade-up">
+        Intrinsic value,<br>
+        calculated <em>properly.</em>
+      </h1>
+
+      <p class="hero-body fade-up">
+        Three institutional-grade valuation tools in one place —
+        Normal DCF, Reverse DCF, and an IRR Scenario Matrix.
+        Enter your assumptions once. Results update instantly.
+      </p>
+
+      <div class="hero-actions fade-up">
+        <a href="YOUR_STREAMLIT_URL" class="btn-primary" target="_blank" rel="noopener">
+          <svg viewBox="0 0 16 16"><path d="M8 3v10M4 9l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Open Valuation Studio
+        </a>
+        <a href="#tools" class="btn-ghost">
+          See what's inside
+        </a>
+      </div>
+
+      <p class="hero-legal fade-up">
+        For informational purposes only — not financial or investment advice.
+        All outputs are illustrative.
+      </p>
+
+    </div>
+  </section>
+
+  <hr class="divider" />
+
+  <!-- ── Stats bar ── -->
+  <section class="stats-bar">
+    <div class="container">
+      <div class="stats-inner">
+        <div class="stat">
+          <div class="stat-value">3</div>
+          <div class="stat-label">Valuation tools</div>
+        </div>
+        <div class="stat">
+          <div class="stat-value">0</div>
+          <div class="stat-label">Spreadsheets required</div>
+        </div>
+        <div class="stat">
+          <div class="stat-value">100%</div>
+          <div class="stat-label">Free to use</div>
+        </div>
+        <div class="stat">
+          <div class="stat-value">∞</div>
+          <div class="stat-label">Scenarios to explore</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Tools section ── -->
+  <section class="section" id="tools">
+    <div class="container">
+      <div class="section-label">The Tools</div>
+      <h2 class="section-title">Everything in one place</h2>
+      <p class="section-body">
+        Three analyses that usually take a full spreadsheet model,
+        condensed into a single interface. No prior DCF experience needed.
+      </p>
+
+      <div class="tools-grid">
+
+        <div class="tool-card">
+          <div class="tool-icon">📊</div>
+          <div class="tool-number">01</div>
+          <div class="tool-name">Normal DCF</div>
+          <div class="tool-desc">
+            Project free cash flows over your forecast horizon, add a terminal value,
+            and discount everything back at your required return.
+            Get a precise fair value per share — and see how it compares to today's price.
+          </div>
+          <div class="tool-detail">
+            → Fair value / share &nbsp;·&nbsp; Upside %<br>
+            → Sensitivity chart &nbsp;·&nbsp; Valuation bridge
+          </div>
+        </div>
+
+        <div class="tool-card">
+          <div class="tool-icon">🔄</div>
+          <div class="tool-number">02</div>
+          <div class="tool-name">Reverse DCF</div>
+          <div class="tool-desc">
+            Flip the question. Given today's stock price,
+            what annual return is the market implying?
+            If the implied IRR exceeds your hurdle rate, the stock may be attractively priced.
+          </div>
+          <div class="tool-detail">
+            → Implied IRR &nbsp;·&nbsp; IRR vs price curve<br>
+            → Full price sensitivity table
+          </div>
+        </div>
+
+        <div class="tool-card">
+          <div class="tool-icon">🗂️</div>
+          <div class="tool-number">03</div>
+          <div class="tool-name">IRR Matrix</div>
+          <div class="tool-desc">
+            Run the Reverse DCF across every combination of revenue growth
+            and terminal value — simultaneously in Bear, Base, and Bull margin scenarios.
+            A full return map in seconds.
+          </div>
+          <div class="tool-detail">
+            → Bear / Base / Bull &nbsp;·&nbsp; 6×5 grid<br>
+            → Diverging colour scale &nbsp;·&nbsp; CSV export
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Example section ── -->
+  <section class="example-section" id="example">
+    <div class="container">
+      <div class="example-grid">
+
+        <!-- Left: card mockup -->
+        <div class="example-card">
+          <div class="example-card-header">
+            <div class="example-card-title">Netflix (NFLX) — FY2025</div>
+            <div class="example-live-dot">
+              <div class="dot-pulse"></div>
+              Example
+            </div>
+          </div>
+          <div class="example-card-body">
+            <div class="example-row">
+              <span class="example-row-label">Revenue (LTM)</span>
+              <span class="example-row-value">$45,183M</span>
+            </div>
+            <div class="example-row">
+              <span class="example-row-label">Free Cash Flow</span>
+              <span class="example-row-value positive">$9,461M</span>
+            </div>
+            <div class="example-row">
+              <span class="example-row-label">FCF Margin</span>
+              <span class="example-row-value positive">20.9%</span>
+            </div>
+            <div class="example-row">
+              <span class="example-row-label">Net Debt</span>
+              <span class="example-row-value negative">$4,500M</span>
+            </div>
+            <div class="example-row">
+              <span class="example-row-label">Shares Outstanding</span>
+              <span class="example-row-value">4,317M</span>
+            </div>
+            <div class="example-row">
+              <span class="example-row-label">Growth Assumption</span>
+              <span class="example-row-value">+12%/yr · 8y</span>
+            </div>
+            <div class="example-row">
+              <span class="example-row-label">Current Price</span>
+              <span class="example-row-value">$78.00</span>
+            </div>
+
+            <!-- Visual bars -->
+            <div class="example-result-bar">
+              <div class="bar-label">
+                <span>Fair Value / Share</span>
+                <span style="font-family:var(--font-mono); font-weight:500;">—</span>
+              </div>
+              <div class="bar-track"><div class="bar-fill bar-fill-fv" style="width:68%"></div></div>
+              <div class="bar-label">
+                <span>Market Price</span>
+                <span style="font-family:var(--font-mono); font-weight:500;">$78.00</span>
+              </div>
+              <div class="bar-track"><div class="bar-fill bar-fill-px" style="width:78%"></div></div>
+              <p style="font-size:11px;color:var(--ink-light);margin-top:8px;font-family:var(--font-mono);">
+                Load in app to see live fair value at your discount rate
+              </p>
+            </div>
+
+            <!-- Mini heatmap -->
+            <div style="margin-top:20px;padding-top:16px;border-top:1px solid var(--cream-deep);">
+              <div style="font-size:10.5px;color:var(--ink-light);font-family:var(--font-mono);margin-bottom:8px;letter-spacing:.5px;text-transform:uppercase;">IRR Matrix preview</div>
+              <div class="heatmap-preview">
+                <div class="hm-cell" style="background:#fca5a5;color:#7f1d1d">5.2%</div>
+                <div class="hm-cell" style="background:#fdd8b8;color:#78350f">7.1%</div>
+                <div class="hm-cell" style="background:#fef3e2;color:#92400e">9.4%</div>
+                <div class="hm-cell" style="background:#dbeafe;color:#1e3a8a">11.8%</div>
+                <div class="hm-cell" style="background:#93c5fd;color:#fff">14.2%</div>
+                <div class="hm-cell" style="background:#fca5a5;color:#7f1d1d">6.1%</div>
+                <div class="hm-cell" style="background:#fef3e2;color:#92400e">8.9%</div>
+                <div class="hm-cell" style="background:#dbeafe;color:#1e3a8a">11.2%</div>
+                <div class="hm-cell" style="background:#93c5fd;color:#fff">13.5%</div>
+                <div class="hm-cell" style="background:#3b82f6;color:#fff">16.1%</div>
+                <div class="hm-cell" style="background:#fdd8b8;color:#78350f">7.8%</div>
+                <div class="hm-cell" style="background:#fef3e2;color:#92400e">10.3%</div>
+                <div class="hm-cell" style="background:#dbeafe;color:#1e3a8a">12.7%</div>
+                <div class="hm-cell" style="background:#3b82f6;color:#fff">15.2%</div>
+                <div class="hm-cell" style="background:#1e3a8a;color:#fff">18.0%</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: text -->
+        <div class="example-text">
+          <div class="section-label">Live Example</div>
+          <h2 class="section-title">Start with Netflix — or bring your own company</h2>
+          <p class="section-body">
+            One click loads real Netflix FY2025 data into every field.
+            See how the tools work, then replace the inputs with any stock you're researching.
+          </p>
+
+          <ul class="example-feature-list">
+            <li class="example-feature">
+              <div class="feature-icon-wrap">📥</div>
+              <div>
+                <div class="feature-text-title">Pre-loaded data</div>
+                <div class="feature-text-body">Revenue, FCF, shares, net debt, growth and terminal assumptions — all set. Click Load Example in the sidebar.</div>
+              </div>
+            </li>
+            <li class="example-feature">
+              <div class="feature-icon-wrap">🎚️</div>
+              <div>
+                <div class="feature-text-title">Fully adjustable</div>
+                <div class="feature-text-body">Change any input at any time. Sliders update charts live. No page reloads, no formulas to re-drag.</div>
+              </div>
+            </li>
+            <li class="example-feature">
+              <div class="feature-icon-wrap">⬇️</div>
+              <div>
+                <div class="feature-text-title">Export everything</div>
+                <div class="feature-text-body">Every table — forecast, IRR matrix, sensitivity — downloads as a clean CSV. Bring it into Excel or Sheets.</div>
+              </div>
+            </li>
+          </ul>
+
+          <div style="margin-top:32px">
+            <a href="YOUR_STREAMLIT_URL" class="btn-primary" target="_blank" rel="noopener">
+              <svg viewBox="0 0 16 16" style="width:14px;height:14px;fill:currentColor"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              Try it with Netflix data
+            </a>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ── How it works ── -->
+  <section class="steps-section">
+    <div class="container">
+      <div class="section-label">How it works</div>
+      <h2 class="section-title">From zero to insight in three steps</h2>
+
+      <div class="steps-grid">
+        <div class="step">
+          <div class="step-num">01</div>
+          <div class="step-title">Enter your inputs</div>
+          <div class="step-body">
+            Fill the sidebar with stock price, shares outstanding, revenue,
+            free cash flow, and your growth assumptions. Or load the Netflix
+            example to see the tools in action immediately.
+          </div>
+          <div class="step-note">All monetary values in millions · Shares in millions</div>
+        </div>
+        <div class="step">
+          <div class="step-num">02</div>
+          <div class="step-title">Explore all three tabs</div>
+          <div class="step-body">
+            Normal DCF gives you a fair value per share. Reverse DCF tells you
+            what return the current price implies. The IRR Matrix maps every
+            combination of growth and terminal value across three margin scenarios.
+          </div>
+          <div class="step-note">Results update instantly — no recalculate button</div>
+        </div>
+        <div class="step">
+          <div class="step-num">03</div>
+          <div class="step-title">Adjust and export</div>
+          <div class="step-body">
+            Move the discount rate slider, widen the IRR Matrix ranges, change
+            the terminal growth assumption. Download any result as CSV.
+            FX conversion is built in for international stocks.
+          </div>
+          <div class="step-note">Gordon Growth or Exit Multiple terminal value</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Final CTA ── -->
+  <section class="cta-section">
+    <div class="container">
+      <h2 class="cta-headline">
+        What's the stock<br>actually <em>worth?</em>
+      </h2>
+      <p class="cta-body">
+        Open the app, enter your assumptions, and find out in under a minute.
+      </p>
+      <a href="YOUR_STREAMLIT_URL" class="btn-primary" style="margin:0 auto;display:inline-flex" target="_blank" rel="noopener">
+        <svg viewBox="0 0 16 16" style="width:14px;height:14px"><path d="M8 3v10M4 9l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Open Valuation Studio — Free
+      </a>
+    </div>
+  </section>
+
+  <!-- ── Footer ── -->
+  <footer>
+    <div class="footer-inner">
+      <div class="footer-brand">Valuation Studio</div>
+      <div class="footer-legal">
+        For informational purposes only — not financial or investment advice.
+        All outputs are illustrative. Users are solely responsible for their own investment decisions.
+      </div>
+    </div>
+  </footer>
+
+</body>
+</html>
