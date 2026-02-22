@@ -81,7 +81,7 @@
       max-width: 1100px; margin: 0 auto; padding: 0 2rem;
       height: 58px; display: flex; align-items: center; justify-content: space-between;
     }
-    .nav-logo { display: flex; align-items: center; gap: 11px; text-decoration: none; }
+    .nav-logo { display: flex; align-items: center; gap: 11px; }
     .nav-mark {
       width: 30px; height: 30px; border-radius: 8px;
       background: var(--ink);
@@ -466,7 +466,7 @@
     }
     [data-theme="dark"] body { background: var(--paper); color: var(--ink); }
     [data-theme="dark"] nav { background: rgba(15,14,12,.92); border-bottom-color: var(--paper-4); }
-    [data-theme="dark"] .nav-logo, [data-theme="dark"] .nav-link { color: var(--ink-3); }
+    [data-theme="dark"] .nav-link { color: var(--ink-3); }
     [data-theme="dark"] .nav-link:hover { color: var(--ink); }
     [data-theme="dark"] footer { border-top-color: var(--paper-4); }
     [data-theme="dark"] .footer-brand, [data-theme="dark"] .footer-legal { color: var(--ink-4); }
@@ -500,19 +500,18 @@
 <!-- NAV -->
 <nav>
   <div class="nav-inner">
-    <a href="/" class="nav-logo">
+    <div class="nav-logo">
       <div class="nav-mark">
         <svg viewBox="0 0 20 20" fill="none"><path d="M3 15l4-6 4 4 3-4 3 3" stroke="#f4f0e8" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </div>
       <span class="nav-name">Valuation Studio</span>
-    </a>
+    </div>
     <div class="nav-links">
       <a href="#tools" class="nav-link">Tools</a>
-      <a href="#example" class="nav-link">Example</a>
       <a href="#how" class="nav-link">How it works</a>
     </div>
     <button class="nav-dark-btn" id="idx-dark-btn" onclick="toggleIdxDark()" title="Toggle dark mode">🌙</button>
-    <a href="app.html" class="nav-cta">
+    <a href="app.html?blank=1" class="nav-cta">
       Open App
       <svg viewBox="0 0 14 14" fill="none" width="11" height="11"><path d="M2.5 7h9M8 3.5L11.5 7 8 10.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
     </a>
@@ -524,24 +523,20 @@
   <div class="container">
     <div class="hero-inner">
       <div class="hero-left">
-        <div class="hero-eyebrow fade-up d1">
-          <span class="eyebrow-rule"></span>
-          Valuation Studio
-        </div>
-        <h1 class="hero-headline fade-up d2">
+        <h1 class="hero-headline fade-up d1">
           Intrinsic value,<br><em>calculated</em><br>properly.
         </h1>
-        <p class="hero-body fade-up d3">
+        <p class="hero-body fade-up d2">
           Three professional DCF tools in one place — pre-loaded with Apple, Nvidia, Microsoft, and more. Fair value, implied return, and full scenario analysis. No spreadsheet needed.
         </p>
-        <div class="hero-actions fade-up d4">
-          <a href="app.html" class="btn-primary">
+        <div class="hero-actions fade-up d3">
+          <a href="app.html?blank=1" class="btn-primary">
             Open the App — Free
             <svg viewBox="0 0 14 14" fill="none" width="13" height="13"><path d="M2.5 7h9M8 3.5L11.5 7 8 10.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
           </a>
           <a href="#tools" class="btn-outline">See the tools</a>
         </div>
-        <p class="hero-disclaimer fade-up d5">For informational purposes only — not financial advice.</p>
+        <p class="hero-disclaimer fade-up d4">For informational purposes only — not financial advice.</p>
       </div>
 
       <div class="hero-right fade-up d3">
@@ -593,12 +588,12 @@
       <div class="ticker-left">
         <span class="ticker-label">Pre-loaded</span>
         <div class="ticker-pills">
-          <a href="app.html" class="ticker-pill"><span class="tp-sym">AAPL</span></a>
-          <a href="app.html" class="ticker-pill"><span class="tp-sym">MSFT</span></a>
-          <a href="app.html" class="ticker-pill"><span class="tp-sym">NVDA</span></a>
-          <a href="app.html" class="ticker-pill"><span class="tp-sym">META</span></a>
-          <a href="app.html" class="ticker-pill"><span class="tp-sym">TSLA</span></a>
-          <a href="app.html" class="ticker-pill"><span class="tp-sym">NFLX</span></a>
+          <a href="app.html?preset=AAPL" class="ticker-pill"><span class="tp-sym">AAPL</span></a>
+          <a href="app.html?preset=MSFT" class="ticker-pill"><span class="tp-sym">MSFT</span></a>
+          <a href="app.html?preset=NVDA" class="ticker-pill"><span class="tp-sym">NVDA</span></a>
+          <a href="app.html?preset=META" class="ticker-pill"><span class="tp-sym">META</span></a>
+          <a href="app.html?preset=TSLA" class="ticker-pill"><span class="tp-sym">TSLA</span></a>
+          <a href="app.html?preset=NFLX" class="ticker-pill"><span class="tp-sym">NFLX</span></a>
         </div>
       </div>
       <div class="ticker-right">
@@ -763,7 +758,7 @@
     <div class="cta-rule"></div>
     <h2 class="cta-headline">What's the stock<br>actually <em>worth?</em></h2>
     <p class="cta-body">Open the app, enter your assumptions, and find out in under a minute.</p>
-    <a href="app.html" class="btn-primary" style="display:inline-flex;margin:0 auto">
+    <a href="app.html?blank=1" class="btn-primary" style="display:inline-flex;margin:0 auto">
       Open Valuation Studio — Free
       <svg viewBox="0 0 14 14" fill="none" width="13" height="13"><path d="M2.5 7h9M8 3.5L11.5 7 8 10.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
     </a>
