@@ -128,6 +128,22 @@
     .tool-title { font-family: var(--ff-head); font-size: 19px; font-weight: 600; color: var(--ink); letter-spacing: -.3px; margin-bottom: 10px; }
     .tool-desc { font-size: 13.5px; color: var(--ink-mid); line-height: 1.6; margin-bottom: 16px; }
     .tool-detail { font-family: var(--ff-mono); font-size: 11px; color: var(--ink-light); line-height: 2; border-top: 1px solid var(--cream-deep); padding-top: 14px; }
+    /* Companies strip */
+    .companies-section { padding: 56px 0; border-bottom: 1px solid var(--ink-faint); }
+    .companies-label { font-family: var(--ff-mono); font-size: 10px; letter-spacing: 1.8px; text-transform: uppercase; color: var(--ink-light); text-align: center; margin-bottom: 20px; }
+    .companies-strip { display: flex; justify-content: center; align-items: center; gap: 10px; flex-wrap: wrap; }
+    .co-badge {
+      padding: 7px 16px; border-radius: 6px; font-family: var(--ff-mono); font-size: 12px; font-weight: 500;
+      border: 1px solid var(--ink-faint); color: var(--ink-mid); background: var(--white);
+      text-decoration: none; transition: all .15s;
+    }
+    .co-badge:hover { border-color: var(--ink-mid); color: var(--ink); transform: translateY(-1px); box-shadow: 0 3px 10px rgba(28,25,23,.07); }
+    /* Features strip */
+    .features-strip { display: grid; grid-template-columns: repeat(4,1fr); gap: 1px; background: var(--ink-faint); border: 1px solid var(--ink-faint); border-radius: 12px; overflow: hidden; margin-top: 48px; }
+    .feat { background: var(--white); padding: 20px 18px; }
+    .feat-icon { font-size: 20px; margin-bottom: 10px; }
+    .feat-title { font-size: 13px; font-weight: 600; color: var(--ink); margin-bottom: 5px; }
+    .feat-body { font-size: 12px; color: var(--ink-mid); line-height: 1.6; }
     .example-section { padding: 80px 0; background: var(--cream-mid); border-top: 1px solid var(--ink-faint); border-bottom: 1px solid var(--ink-faint); }
     .example-grid { display: grid; grid-template-columns: 420px 1fr; gap: 64px; align-items: center; }
     .example-card { background: var(--white); border: 1px solid var(--ink-faint); border-radius: 14px; overflow: hidden; box-shadow: 0 8px 32px rgba(28,25,23,.08); }
@@ -177,6 +193,7 @@
       .tools-grid { grid-template-columns: 1fr; }
       .example-grid { grid-template-columns: 1fr; }
       .steps-grid { grid-template-columns: 1fr; }
+      .features-strip { grid-template-columns: repeat(2,1fr); }
       .stats-inner { grid-template-columns: repeat(2,1fr); gap: 20px; }
       .stat { border-left: none; padding-left: 0; border-top: 1px solid var(--ink-faint); padding-top: 20px; }
       .stat:first-child { border-top: none; padding-top: 0; }
@@ -184,6 +201,7 @@
     @media(max-width:600px) {
       .hero { padding: 56px 0 48px; }
       .hero-numbers { display: none; }
+      .features-strip { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -205,7 +223,7 @@
   <div class="container">
     <div class="hero-eyebrow fade-up d1"><span class="hero-eyebrow-line"></span>Valuation Studio</div>
     <h1 class="hero-headline fade-up d2">Intrinsic value,<br><em>calculated properly.</em></h1>
-    <p class="hero-body fade-up d3">Three professional DCF tools in one place. Fair value, implied return, and full scenario analysis — without a spreadsheet.</p>
+    <p class="hero-body fade-up d3">Three professional DCF tools in one place. Fair value, implied return, and full scenario analysis — pre-loaded with Apple, Nvidia, Microsoft and more.</p>
     <div class="hero-actions fade-up d4">
       <a href="app.html" class="btn-primary">Open the App — Free</a>
       <a href="#tools" class="btn-ghost">See the tools ↓</a>
@@ -221,9 +239,24 @@
   <div class="container">
     <div class="stats-inner">
       <div class="stat"><div class="stat-value">3</div><div class="stat-label">Valuation tools</div></div>
-      <div class="stat"><div class="stat-value">0</div><div class="stat-label">Spreadsheets needed</div></div>
+      <div class="stat"><div class="stat-value">6</div><div class="stat-label">Pre-loaded companies</div></div>
       <div class="stat"><div class="stat-value">100%</div><div class="stat-label">Free, forever</div></div>
       <div class="stat"><div class="stat-value">∞</div><div class="stat-label">Scenarios to run</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- COMPANIES STRIP -->
+<div class="companies-section">
+  <div class="container">
+    <div class="companies-label">Pre-loaded companies — one click to analyse</div>
+    <div class="companies-strip">
+      <a href="app.html" class="co-badge">AAPL — Apple</a>
+      <a href="app.html" class="co-badge">MSFT — Microsoft</a>
+      <a href="app.html" class="co-badge">NVDA — Nvidia</a>
+      <a href="app.html" class="co-badge">META — Meta</a>
+      <a href="app.html" class="co-badge">TSLA — Tesla</a>
+      <a href="app.html" class="co-badge">NFLX — Netflix</a>
     </div>
   </div>
 </div>
@@ -253,6 +286,30 @@
         <div class="tool-title">Scenario Grid</div>
         <div class="tool-desc">Run the Reverse DCF across every combination of revenue growth and terminal assumption simultaneously — in Bear, Base, and Bull margin scenarios.</div>
         <div class="tool-detail">→ Bear / Base / Bull scenarios<br>→ Fully customisable grid dimensions<br>→ Diverging colour scale at 10% hurdle<br>→ CSV export per scenario</div>
+      </div>
+    </div>
+
+    <!-- Features strip -->
+    <div class="features-strip">
+      <div class="feat">
+        <div class="feat-icon">⬆</div>
+        <div class="feat-title">Share any valuation</div>
+        <div class="feat-body">Every input encodes into a URL. Copy and send your exact analysis to anyone.</div>
+      </div>
+      <div class="feat">
+        <div class="feat-icon">💱</div>
+        <div class="feat-title">Currency converter</div>
+        <div class="feat-body">Financials in JPY but price in USD? Enter an FX rate and the app converts automatically.</div>
+      </div>
+      <div class="feat">
+        <div class="feat-icon">📱</div>
+        <div class="feat-title">Mobile ready</div>
+        <div class="feat-body">Full sidebar collapses on small screens. Works on any phone or tablet.</div>
+      </div>
+      <div class="feat">
+        <div class="feat-icon">📖</div>
+        <div class="feat-title">Full methodology</div>
+        <div class="feat-body">Every formula documented. Open the Methodology page inside the app to see the exact math.</div>
       </div>
     </div>
   </div>
@@ -304,25 +361,25 @@
         </div>
       </div>
       <div class="example-text">
-        <div class="section-label">Live Example</div>
-        <h2 class="section-title">Start with Netflix — or bring your own company.</h2>
-        <p class="section-body">One click loads real Netflix data into every field. See how the tools work, then replace the inputs with any stock you're researching.</p>
+        <div class="section-label">Pre-loaded Companies</div>
+        <h2 class="section-title">Six companies ready to analyse — or bring your own.</h2>
+        <p class="section-body">Apple, Microsoft, Nvidia, Meta, Tesla, and Netflix load instantly with one click. Real annual report data, manually maintained. Then swap in any stock you're researching.</p>
         <ul class="example-feature-list">
           <li class="example-feature">
             <div class="feature-icon-wrap">📥</div>
-            <div><div class="feature-text-title">Pre-loaded data</div><div class="feature-text-body">Revenue, FCF, shares, net debt, growth and terminal assumptions — all set. Click Load Example in the sidebar.</div></div>
+            <div><div class="feature-text-title">One-click presets</div><div class="feature-text-body">Click any company pill in the sidebar — all fields populate instantly with the latest reported financials.</div></div>
           </li>
           <li class="example-feature">
             <div class="feature-icon-wrap">🎚️</div>
-            <div><div class="feature-text-title">Fully adjustable</div><div class="feature-text-body">Change any input at any time. Sliders update charts live. No page reloads, no formulas to re-drag.</div></div>
+            <div><div class="feature-text-title">Fully adjustable</div><div class="feature-text-body">Change any assumption at any time. Sliders update every chart and table live.</div></div>
           </li>
           <li class="example-feature">
-            <div class="feature-icon-wrap">⬇️</div>
-            <div><div class="feature-text-title">Export everything</div><div class="feature-text-body">Every table — forecast, IRR matrix, sensitivity — downloads as a clean CSV for Excel or Sheets.</div></div>
+            <div class="feature-icon-wrap">⬆</div>
+            <div><div class="feature-text-title">Share your analysis</div><div class="feature-text-body">Hit Share in the header — your exact inputs encode into a URL you can send to anyone.</div></div>
           </li>
         </ul>
         <div style="margin-top:32px">
-          <a href="app.html" class="btn-primary">Try it with Netflix data →</a>
+          <a href="app.html" class="btn-primary">Open Valuation Studio →</a>
         </div>
       </div>
     </div>
@@ -336,21 +393,21 @@
     <div class="steps-grid">
       <div class="step">
         <div class="step-num">01</div>
-        <div class="step-title">Enter your inputs</div>
-        <div class="step-body">Fill the sidebar with stock price, shares outstanding, revenue, free cash flow, and your growth assumptions. Or load the Netflix example to see the tools in action immediately.</div>
+        <div class="step-title">Pick a company or enter your own</div>
+        <div class="step-body">Choose from six pre-loaded companies — Apple, Microsoft, Nvidia, Meta, Tesla, Netflix — or fill the sidebar with any stock's financials. All values in millions.</div>
         <div class="step-note">All monetary values in millions · Shares in millions</div>
       </div>
       <div class="step">
         <div class="step-num">02</div>
         <div class="step-title">Explore all three tabs</div>
-        <div class="step-body">Normal DCF gives you a fair value per share. Reverse DCF tells you what return the current price implies. The IRR Matrix maps every combination across three margin scenarios.</div>
+        <div class="step-body">Normal DCF gives you a fair value per share. Reverse DCF tells you what return the current price implies. The IRR Matrix maps every scenario combination across Bear, Base, and Bull margins.</div>
         <div class="step-note">Results update instantly — no recalculate button</div>
       </div>
       <div class="step">
         <div class="step-num">03</div>
-        <div class="step-title">Adjust and export</div>
-        <div class="step-body">Move the discount rate slider, widen the IRR Matrix ranges, change the terminal growth assumption. Download any result as a clean CSV.</div>
-        <div class="step-note">Gordon Growth or Exit Multiple terminal value</div>
+        <div class="step-title">Share, adjust, and export</div>
+        <div class="step-body">Hit Share to copy a link with your exact inputs. Adjust any assumption and watch charts update live. Download any table as a clean CSV for Excel or Sheets.</div>
+        <div class="step-note">Gordon Growth or Exit Multiple · FX conversion built in</div>
       </div>
     </div>
   </div>
@@ -359,7 +416,7 @@
 <section class="cta-section">
   <div class="container">
     <h2 class="cta-headline">What's the stock<br>actually <em>worth?</em></h2>
-    <p class="cta-body">Open the app, enter your assumptions, and find out in under a minute.</p>
+    <p class="cta-body">Open the app, pick a company, and find out in under a minute.</p>
     <a href="app.html" class="btn-primary" style="margin:0 auto;display:inline-flex">Open Valuation Studio — Free</a>
   </div>
 </section>
