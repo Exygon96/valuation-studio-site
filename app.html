@@ -1214,7 +1214,24 @@ const PRESETS={
 /* ══════════════════════════════════════════
    ENGINE
 ══════════════════════════════════════════ */
-function pf(s){if(s===null||s===undefined||s==='')return NaN;const n=parseFloat(String(s).replace(/,/g,''));return isNaN(n)?NaN:n}
+function pf(s){
+  if(s===null||s===undefined||s==='')return NaN;
+  s=String(s).trim();
+  // Detect comma-as-decimal: if comma appears once and after it are exactly 1-2 digits at end
+  // e.g. "199,78" or "1,5" → treat comma as decimal point
+  // But "1,000" or "1,000,000" → treat commas as thousand separators
+  const commaCount=(s.match(/,/g)||[]).length;
+  const dotCount=(s.match(/\./g)||[]).length;
+  if(commaCount===1&&dotCount===0&&/,\d{1,2}$/.test(s)){
+    // Single comma followed by 1-2 digits — decimal separator
+    s=s.replace(',','.');
+  } else {
+    // Strip commas as thousand separators
+    s=s.replace(/,/g,'');
+  }
+  const n=parseFloat(s);
+  return isNaN(n)?NaN:n;
+}
 function linspace(a,b,n){const r=[];for(let i=0;i<n;i++)r.push(a+(b-a)*i/Math.max(n-1,1));return r}
 
 function projectFCFs(inp){
@@ -1341,8 +1358,19 @@ function onDiscChange(){
 }
 function setDisc(v){document.getElementById('sl-disc').value=v;onDiscChange();}
 
-['inp-company','inp-price','inp-shares','inp-revenue','inp-fcf','inp-netcash','inp-years']
+['inp-price','inp-shares','inp-revenue','inp-fcf','inp-netcash','inp-years']
   .forEach(id=>document.getElementById(id).addEventListener('input',()=>{clearPills();update()}));
+
+// When company name is cleared, wipe the company-specific financials
+// but leave all assumptions (growth, discount, terminal, years) intact
+document.getElementById('inp-company').addEventListener('input',function(){
+  clearPills();
+  if(this.value.trim()===''){
+    ['inp-price','inp-shares','inp-revenue','inp-fcf','inp-netcash'].forEach(id=>document.getElementById(id).value='');
+    document.getElementById('btn-reset').style.display='none';
+  }
+  update();
+});
 
 function onCurrencyChange(){
   const f=document.getElementById('sel-fccy').value,p=document.getElementById('sel-pccy').value;
@@ -1496,8 +1524,9 @@ function updateEmptyStates(raw){
 function update(){
   const raw=getInputs();
   const hasFCF=isFinite(raw.fcfLTM),hasRev=isFinite(raw.revLTM)&&raw.revLTM>0;
+  const revFieldVal=document.getElementById('inp-revenue').value.trim();
   document.getElementById('warn-fcf').style.display=(hasFCF&&raw.fcfLTM<0)?'block':'none';
-  document.getElementById('err-rev').style.display=(raw.price&&raw.shares&&!hasRev)?'block':'none';
+  document.getElementById('err-rev').style.display=(revFieldVal!==''&&!hasRev)?'block':'none';
   document.getElementById('margin-chip').style.display=(hasFCF&&hasRev)?'':'none';
   if(hasFCF&&hasRev){
     const m=raw.fcfLTM/raw.revLTM;
