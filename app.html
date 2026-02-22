@@ -1439,8 +1439,8 @@ function shareURL(){
 }
 function loadFromURL(){
   const p=new URLSearchParams(window.location.search);
-  // ?blank=1 → open empty, show onboarding hint, don't auto-load NFLX
-  if(p.get('blank')==='1'){update();return;}
+  // ?blank=1 → full reset, open empty with defaults, show onboarding hint
+  if(p.get('blank')==='1'){resetInputs();document.getElementById('btn-reset').style.display='none';return;}
   // ?preset=AAPL → load a specific preset from landing page ticker pills
   if(p.has('preset')&&PRESETS[p.get('preset')]){loadPreset(p.get('preset'));return;}
   if(!p.has('co')&&!p.has('px'))return;
