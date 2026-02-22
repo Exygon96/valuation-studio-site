@@ -3,625 +3,648 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>Valuation Studio — DCF Analysis</title>
+<title>Valuation Studio</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
 <style>
-/* ═══════════════════════════════════════════
-   COLOUR TOKENS — Light & Dark
-═══════════════════════════════════════════ */
+/* ═══════════════════════════════════════
+   TOKENS
+═══════════════════════════════════════ */
 :root {
-  /* Slate-warm palette — more refined than plain cream */
-  --bg:       #f7f5f0;
-  --bg-b:     #ede9e1;
-  --bg-c:     #e4dfd4;
-  --surface:  #ffffff;
-  --border:   #dbd6ce;
-  --border-b: #ccc7bf;
+  --bg:        #f2f2f7;
+  --surface:   #ffffff;
+  --surface-2: #f2f2f7;
+  --border:    rgba(0,0,0,.1);
+  --border-2:  rgba(0,0,0,.06);
 
-  --ink:      #18181b;
-  --ink-2:    #3f3f46;
-  --ink-3:    #71717a;
-  --ink-4:    #a1a1aa;
-  --ink-5:    #d4d4d8;
+  --ink:       #1c1c1e;
+  --ink-2:     #3a3a3c;
+  --ink-3:     #636366;
+  --ink-4:     #aeaeb2;
+  --ink-5:     #d1d1d6;
 
-  --accent:   #2563eb;   /* primary blue */
-  --accent-b: #1d4ed8;
-  --accent-bg:#eff6ff;
+  --blue:      #0071e3;
+  --blue-b:    #0077ed;
+  --blue-bg:   #e8f1fd;
 
-  --gold:     #b45309;
-  --gold-bg:  #fef3c7;
+  --green:     #34c759;
+  --green-bg:  #e9f9ee;
+  --green-dk:  #1a7a30;
+  --red:       #ff3b30;
+  --red-bg:    #fff0ef;
+  --red-dk:    #c0392b;
 
-  --up:       #16a34a;
-  --up-bg:    #dcfce7;
-  --up-border:#bbf7d0;
-  --dn:       #dc2626;
-  --dn-bg:    #fee2e2;
-  --dn-border:#fecaca;
-
-  --ff-head: 'Playfair Display', Georgia, serif;
-  --ff-body: 'DM Sans', system-ui, sans-serif;
-  --ff-mono: 'DM Mono', 'Courier New', monospace;
-  --sidebar-w: 296px;
-  --header-h:  52px;
-
-  --shadow-sm: 0 1px 3px rgba(0,0,0,.06), 0 1px 2px rgba(0,0,0,.04);
-  --shadow-md: 0 4px 12px rgba(0,0,0,.08), 0 2px 4px rgba(0,0,0,.04);
+  --ff: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --ff-mono: 'DM Mono', 'SF Mono', monospace;
+  --r: 12px;
+  --r-sm: 8px;
+  --sidebar-w: 288px;
+  --header-h: 48px;
+  --shadow: 0 1px 3px rgba(0,0,0,.08), 0 1px 2px rgba(0,0,0,.04);
+  --shadow-md: 0 4px 16px rgba(0,0,0,.1);
 }
 [data-theme="dark"] {
-  --bg:       #0f1117;
-  --bg-b:     #1a1d27;
-  --bg-c:     #222536;
-  --surface:  #1e2130;
-  --border:   #2e3245;
-  --border-b: #3a3f56;
+  --bg:        #000000;
+  --surface:   #1c1c1e;
+  --surface-2: #2c2c2e;
+  --border:    rgba(255,255,255,.12);
+  --border-2:  rgba(255,255,255,.06);
 
-  --ink:      #f1f5f9;
-  --ink-2:    #cbd5e1;
-  --ink-3:    #94a3b8;
-  --ink-4:    #64748b;
-  --ink-5:    #334155;
+  --ink:       #f2f2f7;
+  --ink-2:     #e5e5ea;
+  --ink-3:     #98989d;
+  --ink-4:     #636366;
+  --ink-5:     #3a3a3c;
 
-  --accent:   #3b82f6;
-  --accent-b: #2563eb;
-  --accent-bg:#1e3a5f;
+  --blue:      #0a84ff;
+  --blue-b:    #409cff;
+  --blue-bg:   #001f3d;
 
-  --gold:     #f59e0b;
-  --gold-bg:  #292010;
-
-  --up:       #22c55e;
-  --up-bg:    #052e16;
-  --up-border:#14532d;
-  --dn:       #f87171;
-  --dn-bg:    #450a0a;
-  --dn-border:#7f1d1d;
-
-  --shadow-sm: 0 1px 3px rgba(0,0,0,.3);
-  --shadow-md: 0 4px 12px rgba(0,0,0,.4);
+  --green:     #30d158;
+  --green-bg:  #001f0f;
+  --green-dk:  #30d158;
+  --red:       #ff453a;
+  --red-bg:    #2d0000;
+  --red-dk:    #ff453a;
 }
 
-/* ═══════════════════════════════════════════
-   RESET & BASE
-═══════════════════════════════════════════ */
+/* ═══════════════════════════════════════
+   RESET
+═══════════════════════════════════════ */
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%;overflow:hidden}
-body{font-family:var(--ff-body);background:var(--bg);color:var(--ink);-webkit-font-smoothing:antialiased;font-size:14px;transition:background .2s,color .2s}
+body{
+  font-family:var(--ff);background:var(--bg);color:var(--ink);
+  font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased;
+  transition:background .2s,color .2s;
+}
 input,select,button,textarea{font-family:inherit;font-size:inherit}
 button{cursor:pointer;border:none;background:none}
 a{color:inherit;text-decoration:none}
 
-/* ═══════════════════════════════════════════
+/* ═══════════════════════════════════════
    SHELL
-═══════════════════════════════════════════ */
+═══════════════════════════════════════ */
 #shell{display:flex;flex-direction:column;height:100vh}
 
-/* ═══════════════════════════════════════════
+/* ═══════════════════════════════════════
    HEADER
-═══════════════════════════════════════════ */
+═══════════════════════════════════════ */
 #header{
   height:var(--header-h);flex-shrink:0;z-index:50;
-  background:rgba(247,245,240,.94);backdrop-filter:blur(14px);
+  background:rgba(242,242,247,.85);backdrop-filter:saturate(180%) blur(20px);
+  -webkit-backdrop-filter:saturate(180%) blur(20px);
   border-bottom:1px solid var(--border);
   display:flex;align-items:center;padding:0 16px;gap:8px;
-  transition:background .2s,border-color .2s;
 }
-[data-theme="dark"] #header{background:rgba(15,17,23,.94)}
+[data-theme="dark"] #header{background:rgba(0,0,0,.85)}
 
-.h-logo{display:flex;align-items:center;gap:9px}
-.h-logo-mark{
-  width:28px;height:28px;border-radius:7px;
-  background:linear-gradient(135deg,var(--accent) 0%,#1d4ed8 100%);
-  display:flex;align-items:center;justify-content:center;flex-shrink:0;
-  box-shadow:var(--shadow-sm);
-}
-.h-logo-mark svg{width:14px;height:14px}
-.h-logo-name{font-family:var(--ff-head);font-size:15px;font-weight:600;color:var(--ink);letter-spacing:-.3px}
-.h-sep{flex:1}
-
-.h-btn{
-  display:inline-flex;align-items:center;gap:5px;
-  padding:6px 12px;border-radius:6px;font-size:12px;font-weight:500;
-  border:1px solid var(--border);color:var(--ink-3);background:var(--surface);
-  transition:all .12s;white-space:nowrap;
-  box-shadow:var(--shadow-sm);
-}
-.h-btn:hover{border-color:var(--border-b);color:var(--ink);background:var(--bg-b)}
-.h-disclaimer{font-size:10.5px;color:var(--ink-4);max-width:280px;line-height:1.4;text-align:right}
-
-/* Dark mode toggle */
-#dark-btn{
-  width:32px;height:32px;border-radius:6px;border:1px solid var(--border);
-  background:var(--surface);color:var(--ink-3);font-size:15px;
+.h-logo{display:flex;align-items:center;gap:8px}
+.h-mark{
+  width:26px;height:26px;border-radius:7px;
+  background:var(--blue);
   display:flex;align-items:center;justify-content:center;
-  transition:all .12s;box-shadow:var(--shadow-sm);
 }
-#dark-btn:hover{border-color:var(--border-b);color:var(--ink);background:var(--bg-b)}
+.h-mark svg{width:13px;height:13px}
+.h-name{font-size:15px;font-weight:600;color:var(--ink);letter-spacing:-.3px}
+.h-sep{flex:1}
+.h-btn{
+  height:28px;padding:0 12px;border-radius:6px;font-size:12px;font-weight:500;
+  color:var(--ink-3);background:var(--surface);border:1px solid var(--border);
+  display:inline-flex;align-items:center;gap:5px;transition:all .1s;
+  box-shadow:var(--shadow);white-space:nowrap;
+}
+.h-btn:hover{color:var(--ink);background:var(--surface-2)}
+.h-note{font-size:11px;color:var(--ink-4);white-space:nowrap}
+#dark-btn{width:28px;height:28px;padding:0;border-radius:6px;font-size:14px;display:flex;align-items:center;justify-content:center;border:1px solid var(--border);background:var(--surface);box-shadow:var(--shadow);color:var(--ink-3)}
+#dark-btn:hover{color:var(--ink)}
+#menu-btn{display:none;height:28px;padding:0 10px;border-radius:6px;font-size:12px;font-weight:500;color:var(--ink-3);background:var(--surface);border:1px solid var(--border);box-shadow:var(--shadow);align-items:center;gap:5px}
+#menu-btn:hover{color:var(--ink)}
 
-/* ═══════════════════════════════════════════
-   BODY / SIDEBAR / MAIN
-═══════════════════════════════════════════ */
+/* ═══════════════════════════════════════
+   BODY
+═══════════════════════════════════════ */
 #body{display:flex;flex:1;overflow:hidden}
 
+/* ═══════════════════════════════════════
+   SIDEBAR
+═══════════════════════════════════════ */
 #sidebar{
   width:var(--sidebar-w);flex-shrink:0;
-  background:var(--bg);border-right:1px solid var(--border);
+  background:var(--surface);border-right:1px solid var(--border);
   overflow-y:auto;padding:12px 12px 60px;
-  display:flex;flex-direction:column;
-  transition:transform .25s ease,background .2s,border-color .2s;
+  transition:transform .25s ease,background .2s;
 }
-#sidebar::-webkit-scrollbar{width:3px}
-#sidebar::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+#sidebar::-webkit-scrollbar{width:0}
 
-.sb-hdr{
-  font-family:var(--ff-mono);font-size:9px;font-weight:500;
-  letter-spacing:1.5px;text-transform:uppercase;color:var(--ink-4);
-  padding:12px 0 5px;border-bottom:1px solid var(--border);margin-bottom:9px;
+/* Section label */
+.sb-lbl{
+  font-size:10px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;
+  color:var(--ink-4);padding:10px 0 5px;border-bottom:1px solid var(--border-2);
+  margin-bottom:8px;
 }
-.sb-hdr:first-child{padding-top:2px}
+.sb-lbl:first-child{padding-top:2px}
 
-/* Company pills */
-.company-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px;margin-bottom:10px}
+/* Company pills — 3-column grid */
+.co-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;margin-bottom:10px}
 .co-pill{
-  padding:6px 4px;border-radius:6px;font-size:11px;font-weight:600;
-  border:1px solid var(--border);color:var(--ink-3);background:var(--surface);
+  padding:7px 4px 5px;border-radius:var(--r-sm);
+  border:1px solid var(--border);background:var(--surface-2);
   cursor:pointer;transition:all .12s;text-align:center;
-  box-shadow:var(--shadow-sm);
   display:flex;flex-direction:column;align-items:center;gap:1px;
 }
-.co-pill .pill-ticker{font-size:11px;font-weight:600;font-family:var(--ff-mono)}
-.co-pill .pill-date{font-size:8.5px;font-weight:400;color:var(--ink-4);font-family:var(--ff-body)}
-.co-pill:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-bg)}
-.co-pill.active{
-  background:var(--accent);color:#fff;border-color:var(--accent);
-  box-shadow:0 2px 8px rgba(37,99,235,.3);
-}
-.co-pill.active .pill-date{color:rgba(255,255,255,.7)}
+.co-pill .pt{font-size:11.5px;font-weight:600;font-family:var(--ff-mono);color:var(--ink-2)}
+.co-pill .pd{font-size:8px;color:var(--ink-4);font-weight:400}
+.co-pill:hover{border-color:var(--blue);background:var(--blue-bg)}
+.co-pill:hover .pt{color:var(--blue)}
+.co-pill.active{background:var(--blue);border-color:var(--blue)}
+.co-pill.active .pt{color:#fff}
+.co-pill.active .pd{color:rgba(255,255,255,.65)}
 
-/* Fields */
+/* Form fields */
 .field{margin-bottom:8px}
-.field label{
+.field>label{
   display:flex;justify-content:space-between;align-items:baseline;
-  font-size:10px;font-weight:500;color:var(--ink-3);margin-bottom:3px;
+  font-size:11px;font-weight:500;color:var(--ink-3);margin-bottom:3px;
 }
-.label-note{font-size:9.5px;color:var(--ink-4);font-weight:400}
+.field>label .note{font-size:10px;color:var(--ink-4);font-weight:400}
 .field input[type=text],.field input[type=number],.field select{
-  width:100%;background:var(--surface);border:1px solid var(--border);
-  border-radius:6px;padding:6px 9px;font-size:12.5px;font-family:var(--ff-mono);
-  color:var(--ink);transition:border-color .12s,box-shadow .12s;outline:none;
-  box-shadow:var(--shadow-sm);
+  width:100%;padding:7px 10px;border-radius:var(--r-sm);
+  border:1px solid var(--border);background:var(--surface-2);
+  color:var(--ink);font-size:13px;font-family:var(--ff-mono);
+  outline:none;transition:border-color .1s,box-shadow .1s;
 }
 .field input:focus,.field select:focus{
-  border-color:var(--accent);box-shadow:0 0 0 3px rgba(37,99,235,.12);
+  border-color:var(--blue);box-shadow:0 0 0 3px rgba(0,113,227,.15);
+  background:var(--surface);
 }
-
-/* Currency row */
-.currency-row{display:flex;gap:6px;margin-bottom:10px}
-.currency-row .field{flex:1;margin-bottom:0}
-.fx-wrap{margin-bottom:10px}
-.fx-wrap label{display:block;font-size:10px;font-weight:500;color:var(--ink-3);margin-bottom:3px}
-.fx-inner{
-  background:var(--bg-b);border:1px solid var(--border);border-radius:6px;
-  padding:6px 9px;
-}
-.fx-inner input{background:none;border:none;outline:none;width:100%;font-family:var(--ff-mono);font-size:12.5px;color:var(--ink)}
 
 /* Sliders */
-.sl-wrap{margin-bottom:10px}
-.sl-wrap label{display:flex;justify-content:space-between;align-items:baseline;font-size:10px;font-weight:500;color:var(--ink-3);margin-bottom:5px}
-.sl-wrap label span{font-family:var(--ff-mono);font-size:12px;font-weight:600;color:var(--ink)}
+.sl-row{margin-bottom:9px}
+.sl-top{display:flex;justify-content:space-between;align-items:baseline;font-size:11px;font-weight:500;color:var(--ink-3);margin-bottom:4px}
+.sl-top span{font-family:var(--ff-mono);font-size:12px;font-weight:600;color:var(--ink)}
 input[type=range]{
-  width:100%;height:4px;-webkit-appearance:none;appearance:none;
-  background:var(--border);border-radius:2px;outline:none;cursor:pointer;
+  width:100%;height:3px;-webkit-appearance:none;appearance:none;
+  background:var(--ink-5);border-radius:2px;outline:none;cursor:pointer;
+  transition:background .1s;
 }
-input[type=range].sl-up{background:linear-gradient(90deg,var(--up) 0%,var(--border) 0%)}
-input[type=range].sl-dn{background:linear-gradient(90deg,var(--dn) 0%,var(--border) 0%)}
 input[type=range]::-webkit-slider-thumb{
-  -webkit-appearance:none;width:14px;height:14px;border-radius:50%;
-  background:var(--accent);border:2px solid var(--surface);
-  box-shadow:0 0 0 1px var(--accent);transition:transform .1s;
+  -webkit-appearance:none;width:16px;height:16px;border-radius:50%;
+  background:var(--surface);border:2px solid var(--blue);
+  box-shadow:0 1px 4px rgba(0,0,0,.15);transition:transform .1s;
 }
-input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.2)}
+input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.15)}
 
-/* Radio */
-.radio-row{display:flex;gap:4px;margin-bottom:8px;background:var(--bg-b);border-radius:7px;padding:3px;border:1px solid var(--border)}
-.rb{
-  flex:1;padding:5px 0;text-align:center;font-size:11px;font-weight:500;
-  border-radius:5px;color:var(--ink-3);background:none;cursor:pointer;
-  transition:all .12s;border:none;
+/* Segmented control */
+.seg{
+  display:flex;background:var(--surface-2);border:1px solid var(--border);
+  border-radius:var(--r-sm);padding:2px;gap:2px;margin-bottom:8px;
 }
-.rb.active{background:var(--surface);color:var(--ink);box-shadow:var(--shadow-sm)}
-
-/* FCF margin pill */
-.margin-pill{
-  background:var(--surface);border:1px solid var(--border);border-radius:6px;
-  padding:7px 10px;display:flex;justify-content:space-between;align-items:center;
-  margin-bottom:8px;box-shadow:var(--shadow-sm);
+.seg-btn{
+  flex:1;padding:5px 0;text-align:center;font-size:11.5px;font-weight:500;
+  color:var(--ink-3);border-radius:6px;border:none;background:none;
+  cursor:pointer;transition:all .12s;
 }
-.mp-lbl{font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.8px;color:var(--ink-4)}
-.mp-val{font-family:var(--ff-mono);font-size:16px;font-weight:600}
+.seg-btn.active{background:var(--surface);color:var(--ink);box-shadow:var(--shadow);font-weight:600}
 
-/* Warning / error */
-.warn{font-size:10.5px;color:#92400e;background:#fffbeb;border:1px solid #fde68a;border-radius:5px;padding:5px 8px;margin-top:3px;line-height:1.4;display:none}
-.err{font-size:10.5px;color:#991b1b;background:#fef2f2;border:1px solid #fecaca;border-radius:5px;padding:5px 8px;margin-top:3px;line-height:1.4;display:none}
-[data-theme="dark"] .warn{color:#fde68a;background:#292010;border-color:#78350f}
-[data-theme="dark"] .err{color:#fca5a5;background:#450a0a;border-color:#7f1d1d}
+/* FCF margin chip */
+.margin-chip{
+  display:flex;justify-content:space-between;align-items:center;
+  background:var(--surface-2);border:1px solid var(--border);
+  border-radius:var(--r-sm);padding:6px 10px;margin-bottom:8px;
+}
+.mc-lbl{font-size:10px;font-weight:500;color:var(--ink-4);text-transform:uppercase;letter-spacing:.4px}
+.mc-val{font-family:var(--ff-mono);font-size:15px;font-weight:600}
 
-/* Summary card */
+/* Warn / err */
+.warn{font-size:11px;color:#b45309;background:#fffbeb;border:1px solid #fde68a;border-radius:6px;padding:5px 8px;margin-bottom:6px;display:none;line-height:1.5}
+.err{font-size:11px;color:var(--red-dk);background:var(--red-bg);border:1px solid rgba(255,59,48,.2);border-radius:6px;padding:5px 8px;margin-bottom:6px;display:none;line-height:1.5}
+[data-theme="dark"] .warn{background:#1a1000;border-color:#78350f;color:#fde68a}
+
+/* Sidebar summary */
 .sb-sum{
-  background:var(--surface);border:1px solid var(--border);border-radius:8px;
-  padding:10px 12px;margin-top:12px;box-shadow:var(--shadow-sm);
+  background:var(--surface-2);border:1px solid var(--border);
+  border-radius:var(--r);padding:10px 12px;margin-top:10px;
 }
-.sb-sum-title{font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.8px;color:var(--ink-4);margin-bottom:7px}
-.sb-sum-row{display:flex;justify-content:space-between;font-size:11px;padding:3px 0;border-bottom:1px solid var(--bg-b)}
-.sb-sum-row:last-child{border-bottom:none}
-.sb-sum-lbl{color:var(--ink-3)}.sb-sum-val{font-family:var(--ff-mono);font-size:11px;font-weight:500}
+.ss-row{display:flex;justify-content:space-between;font-size:11.5px;padding:3px 0;border-bottom:1px solid var(--border-2)}
+.ss-row:last-child{border-bottom:none}
+.ss-lbl{color:var(--ink-3)}.ss-val{font-family:var(--ff-mono);font-weight:500;color:var(--ink);font-size:11px}
 
-/* Sidebar buttons */
-.sb-btn{width:100%;padding:8px 0;border-radius:6px;font-size:12px;font-weight:500;transition:all .12s;margin-top:7px}
-.sb-btn.dark{background:var(--accent);color:#fff;box-shadow:var(--shadow-sm)}
-.sb-btn.dark:hover{background:var(--accent-b)}
-.sb-btn.light{background:var(--surface);color:var(--ink-3);border:1px solid var(--border)}
-.sb-btn.light:hover{border-color:var(--border-b);color:var(--ink)}
+/* Reset btn */
+.sb-reset{
+  width:100%;margin-top:8px;padding:7px;border-radius:var(--r-sm);
+  font-size:12px;font-weight:500;color:var(--ink-3);
+  background:var(--surface-2);border:1px solid var(--border);
+  transition:all .1s;
+}
+.sb-reset:hover{color:var(--red-dk);border-color:rgba(255,59,48,.3)}
 
-/* ═══════════════════════════════════════════
-   MAIN CONTENT
-═══════════════════════════════════════════ */
+/* Currency row */
+.ccy-row{display:flex;gap:6px}
+.ccy-row .field{flex:1;margin-bottom:0}
+.fx-box{background:var(--surface-2);border:1px solid var(--border);border-radius:var(--r-sm);padding:7px 10px;margin-bottom:8px}
+.fx-box label{display:block;font-size:10px;font-weight:500;color:var(--ink-4);margin-bottom:3px}
+.fx-box input{background:none;border:none;outline:none;width:100%;font-family:var(--ff-mono);font-size:13px;color:var(--ink)}
+
+/* ═══════════════════════════════════════
+   MAIN
+═══════════════════════════════════════ */
 #main{flex:1;overflow-y:auto;display:flex;flex-direction:column;min-width:0}
-#main::-webkit-scrollbar{width:3px}
-#main::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+#main::-webkit-scrollbar{width:0}
 
-/* Tabbar */
+/* Tab bar */
 #tabbar{
   flex-shrink:0;display:flex;align-items:center;
+  background:rgba(242,242,247,.85);backdrop-filter:saturate(180%) blur(20px);
   border-bottom:1px solid var(--border);
-  background:rgba(247,245,240,.96);backdrop-filter:blur(8px);
-  position:sticky;top:0;z-index:10;padding:0 24px;
-  transition:background .2s;
+  position:sticky;top:0;z-index:10;padding:0 20px;
 }
-[data-theme="dark"] #tabbar{background:rgba(15,17,23,.96)}
+[data-theme="dark"] #tabbar{background:rgba(28,28,30,.85)}
 .tab-btn{
-  padding:13px 0;margin-right:24px;font-size:12.5px;font-weight:500;
+  padding:13px 0;margin-right:20px;font-size:13px;font-weight:500;
   color:var(--ink-4);border-bottom:2px solid transparent;margin-bottom:-1px;
-  transition:color .12s,border-color .12s;white-space:nowrap;background:none;
+  transition:color .1s,border-color .1s;background:none;white-space:nowrap;
 }
-.tab-btn.active{color:var(--accent);border-bottom-color:var(--accent)}
+.tab-btn.active{color:var(--blue);border-bottom-color:var(--blue)}
 .tab-btn:hover:not(.active){color:var(--ink-2)}
 .tab-sep{flex:1}
 
 /* Panels */
-.tab-panel{display:none;padding:22px 24px;animation:fadeIn .18s ease}
+.tab-panel{display:none;padding:20px;animation:fadeIn .15s ease}
 .tab-panel.active{display:block}
-@keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeIn{from{opacity:0;transform:translateY(3px)}to{opacity:1;transform:translateY(0)}}
 
 /* Empty state */
-.empty{text-align:center;padding:72px 20px;color:var(--ink-4)}
-.empty-icon{font-size:36px;opacity:.2;margin-bottom:14px}
-.empty-title{font-family:var(--ff-head);font-size:18px;color:var(--ink-3);margin-bottom:6px}
-.empty-body{font-size:12.5px;line-height:1.7}
+.empty{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:80px 20px;text-align:center;gap:10px}
+.empty svg{opacity:.15;width:40px;height:40px}
+.empty-title{font-size:17px;font-weight:600;color:var(--ink-2)}
+.empty-body{font-size:13px;color:var(--ink-4);max-width:280px;line-height:1.6}
 
-/* Section header */
-.sec-hdr{
-  font-family:var(--ff-mono);font-size:9px;letter-spacing:1.5px;
-  text-transform:uppercase;color:var(--ink-4);
-  margin-bottom:12px;padding-bottom:6px;border-bottom:1px solid var(--border);
+/* ═══════════════════════════════════════
+   RESULT CARD — big, clean, Apple-style
+═══════════════════════════════════════ */
+.result-hero{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--r);padding:20px 20px 16px;
+  margin-bottom:12px;box-shadow:var(--shadow);
+  display:grid;grid-template-columns:1fr 1fr;gap:0;
 }
+.rh-left{padding-right:20px;border-right:1px solid var(--border-2)}
+.rh-right{padding-left:20px}
+.rh-label{font-size:11px;font-weight:500;color:var(--ink-4);text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px}
+.rh-value{font-size:36px;font-weight:700;letter-spacing:-1.5px;line-height:1;font-family:var(--ff-mono)}
+.rh-value.good{color:var(--green-dk)}
+.rh-value.bad{color:var(--red-dk)}
+.rh-value.neutral{color:var(--blue)}
+[data-theme="dark"] .rh-value.good{color:var(--green)}
+[data-theme="dark"] .rh-value.bad{color:var(--red)}
+.rh-sub{font-size:12px;color:var(--ink-4);margin-top:4px}
+.rh-badge{
+  display:inline-flex;align-items:center;gap:4px;
+  font-size:11px;font-weight:600;padding:3px 8px;border-radius:20px;
+  margin-top:8px;font-family:var(--ff-mono);
+}
+.rh-badge.good{background:var(--green-bg);color:var(--green-dk)}
+.rh-badge.bad{background:var(--red-bg);color:var(--red-dk)}
+[data-theme="dark"] .rh-badge.good{color:var(--green)}
+[data-theme="dark"] .rh-badge.bad{color:var(--red)}
 
-/* KPI grid */
-.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:18px}
-.kpi{
-  background:var(--surface);border:1px solid var(--border);border-radius:10px;
-  padding:13px 14px;box-shadow:var(--shadow-sm);position:relative;overflow:hidden;
-  transition:box-shadow .15s;
+/* Two stat row below hero */
+.stat-row{
+  display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;
 }
-.kpi:hover{box-shadow:var(--shadow-md)}
-.kpi.kpi-up{border-left:3px solid var(--up)}
-.kpi.kpi-dn{border-left:3px solid var(--dn)}
-.kpi.kpi-neutral{border-left:3px solid var(--accent)}
-.kpi-lbl{font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.7px;color:var(--ink-4);margin-bottom:8px}
-.kpi-val{font-family:var(--ff-mono);font-size:22px;font-weight:600;letter-spacing:-.5px;line-height:1;color:var(--ink)}
-.kpi-val.up{color:var(--up)}.kpi-val.dn{color:var(--dn)}.kpi-val.accent{color:var(--accent)}
-.kpi-sub{font-size:10px;color:var(--ink-4);margin-top:4px;display:flex;align-items:center;gap:4px}
-.kpi-badge{
-  display:inline-flex;align-items:center;padding:2px 6px;border-radius:3px;
-  font-family:var(--ff-mono);font-size:9.5px;font-weight:600;margin-top:5px;
+.stat-card{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--r);padding:14px 16px;box-shadow:var(--shadow);
 }
-.kpi-badge.up{background:var(--up-bg);color:var(--up);border:1px solid var(--up-border)}
-.kpi-badge.dn{background:var(--dn-bg);color:var(--dn);border:1px solid var(--dn-border)}
+.sc-lbl{font-size:11px;font-weight:500;color:var(--ink-4);margin-bottom:4px}
+.sc-val{font-size:22px;font-weight:700;letter-spacing:-.8px;font-family:var(--ff-mono);color:var(--ink)}
+.sc-sub{font-size:11px;color:var(--ink-4);margin-top:2px}
 
-/* Bars */
-.bars{margin-bottom:18px}
-.bar-item{margin-bottom:8px}
-.bar-meta{display:flex;justify-content:space-between;font-size:11px;color:var(--ink-3);margin-bottom:3px}
-.bar-meta-val{font-family:var(--ff-mono);font-weight:600;color:var(--ink)}
-.bar-track{
-  background:var(--bg-b);border-radius:4px;height:18px;overflow:hidden;
-  border:1px solid var(--border);
+/* Comparison bar */
+.cmp-bar{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--r);padding:16px 18px;margin-bottom:12px;
+  box-shadow:var(--shadow);
 }
-.bar-fill{
-  height:100%;border-radius:4px;display:flex;align-items:center;padding:0 8px;
-  font-family:var(--ff-mono);font-size:9.5px;font-weight:600;color:#fff;
-  transition:width .8s cubic-bezier(.4,0,.2,1);white-space:nowrap;
+.cmp-lbl{font-size:11px;font-weight:500;color:var(--ink-3);margin-bottom:6px;display:flex;justify-content:space-between}
+.cmp-track{background:var(--bg);border-radius:4px;height:20px;overflow:hidden;position:relative;margin-bottom:10px}
+.cmp-fill{height:100%;border-radius:4px;display:flex;align-items:center;padding:0 8px;font-size:10.5px;font-weight:600;font-family:var(--ff-mono);color:#fff;transition:width .7s cubic-bezier(.4,0,.2,1)}
+.cmp-fill.fv{background:var(--green)}
+.cmp-fill.px{background:var(--blue)}
+.cmp-fill.fv.bad{background:var(--red)}
+.upside-pill{
+  display:inline-flex;align-items:center;gap:5px;
+  padding:6px 14px;border-radius:20px;
+  font-size:13px;font-weight:600;font-family:var(--ff-mono);
 }
-.bar-fv{background:linear-gradient(90deg,var(--up) 0%,#15803d 100%)}
-.bar-px{background:linear-gradient(90deg,var(--accent) 0%,var(--accent-b) 100%)}
-.upside-tag{
-  display:inline-flex;align-items:center;gap:5px;padding:5px 11px;
-  border-radius:5px;margin-top:8px;font-family:var(--ff-mono);font-size:12px;font-weight:600;
-}
-.upside-tag.up{background:var(--up-bg);color:var(--up);border:1px solid var(--up-border)}
-.upside-tag.dn{background:var(--dn-bg);color:var(--dn);border:1px solid var(--dn-border)}
+.upside-pill.good{background:var(--green-bg);color:var(--green-dk)}
+.upside-pill.bad{background:var(--red-bg);color:var(--red-dk)}
+[data-theme="dark"] .upside-pill.good{color:var(--green)}
+[data-theme="dark"] .upside-pill.bad{color:var(--red)}
 
-/* Two-col layout */
-.two-col{display:grid;grid-template-columns:210px 1fr;gap:20px;margin-bottom:20px}
-
-/* Hint box */
-.hint{
-  background:var(--accent-bg);border-radius:7px;padding:11px 13px;
-  border-left:3px solid var(--accent);margin-bottom:12px;
+/* Discount slider area */
+.disc-area{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--r);padding:16px 18px;margin-bottom:12px;
+  box-shadow:var(--shadow);
 }
-.hint-title{font-size:11px;font-weight:600;color:var(--accent);margin-bottom:4px}
-.hint-body{font-size:11px;color:var(--ink-3);line-height:1.7}
-[data-theme="dark"] .hint-body{color:var(--ink-2)}
-
-/* Discount rate slider colour */
-.disc-sl-wrap{margin-bottom:10px}
-.disc-sl-wrap label{display:flex;justify-content:space-between;align-items:baseline;font-size:10px;font-weight:500;color:var(--ink-3);margin-bottom:5px}
-.disc-sl-wrap label span{font-family:var(--ff-mono);font-size:12px;font-weight:600;color:var(--ink)}
-#sl-disc-track{
-  position:relative;height:4px;border-radius:2px;margin-bottom:2px;
-  background:linear-gradient(90deg,var(--up) 0%,#eab308 35%,var(--dn) 70%,#7f1d1d 100%);
-}
-#sl-disc{
-  position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;
-  height:20px;top:-8px;margin:0;
-}
-.disc-thumb{
-  position:absolute;top:50%;transform:translate(-50%,-50%);
-  width:14px;height:14px;border-radius:50%;
-  background:var(--accent);border:2px solid var(--surface);
-  box-shadow:0 0 0 1px var(--accent);pointer-events:none;transition:left .05s;
-}
+.disc-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.disc-title{font-size:13px;font-weight:600;color:var(--ink)}
+.disc-val{font-size:22px;font-weight:700;font-family:var(--ff-mono);color:var(--blue);letter-spacing:-.5px}
+.disc-track{position:relative;height:4px;border-radius:2px;margin-bottom:14px;background:linear-gradient(90deg,var(--green) 0%,#fbbf24 40%,var(--red) 75%,#7f1d1d 100%)}
+.disc-track input[type=range]{position:absolute;inset:0;width:100%;opacity:0;cursor:pointer;height:20px;top:-8px;margin:0}
+.disc-thumb{position:absolute;top:50%;transform:translate(-50%,-50%);width:16px;height:16px;border-radius:50%;background:var(--surface);border:2px solid var(--blue);box-shadow:0 1px 4px rgba(0,0,0,.2);pointer-events:none;transition:left .05s}
+.disc-hint{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.dh-item{text-align:center;padding:6px 4px;background:var(--surface-2);border-radius:6px;cursor:pointer;transition:all .1s;border:1px solid transparent}
+.dh-item:hover{border-color:var(--blue);background:var(--blue-bg)}
+.dh-rate{font-size:11px;font-weight:600;font-family:var(--ff-mono);color:var(--ink-2)}
+.dh-lbl{font-size:10px;color:var(--ink-4);margin-top:1px}
 
 /* Chart card */
 .chart-card{
-  background:var(--surface);border:1px solid var(--border);border-radius:12px;
-  padding:18px;margin-bottom:18px;box-shadow:var(--shadow-sm);
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--r);padding:16px 18px;margin-bottom:12px;
+  box-shadow:var(--shadow);
 }
-.chart-title{font-family:var(--ff-head);font-size:15px;font-weight:600;color:var(--ink);margin-bottom:3px}
-.chart-sub{font-size:11.5px;color:var(--ink-4);margin-bottom:14px;line-height:1.5}
-.chart-legend{display:flex;gap:16px;margin-top:10px;flex-wrap:wrap}
-.leg-item{display:flex;align-items:center;gap:5px;font-size:10.5px;color:var(--ink-3)}
+.chart-card-title{font-size:13px;font-weight:600;color:var(--ink);margin-bottom:2px}
+.chart-card-sub{font-size:12px;color:var(--ink-4);margin-bottom:12px;line-height:1.5}
+.chart-legend{display:flex;gap:14px;margin-top:8px;flex-wrap:wrap}
+.leg{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--ink-3)}
 .leg-dot{width:8px;height:8px;border-radius:2px;flex-shrink:0}
 
-/* Bridge */
-.bridge{border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:18px;box-shadow:var(--shadow-sm)}
-.br-row{
-  display:flex;justify-content:space-between;align-items:center;
-  padding:8px 13px;font-size:12px;border-bottom:1px solid var(--bg-b);
-  background:var(--surface);
-}
-.br-row:nth-child(even){background:var(--bg)}
-.br-row:last-child{border-bottom:none;font-weight:600;font-size:12.5px;background:var(--bg-b);border-top:1px solid var(--border)}
-.br-lbl{color:var(--ink-3)}.br-val{font-family:var(--ff-mono);font-size:11.5px;color:var(--ink)}
-
-/* Table */
-.data-tbl{width:100%;border-collapse:collapse;font-size:11.5px;margin-bottom:10px}
-.data-tbl th{
-  text-align:left;padding:7px 10px;font-size:9px;font-weight:600;
-  text-transform:uppercase;letter-spacing:.7px;color:var(--ink-4);
-  border-bottom:1px solid var(--border);background:var(--bg-b);font-family:var(--ff-mono);
-}
-.data-tbl td{padding:7px 10px;border-bottom:1px solid var(--bg-b);font-family:var(--ff-mono);font-size:11.5px;color:var(--ink)}
-.data-tbl tr:last-child td{border-bottom:none}
-.data-tbl tr:hover td{background:var(--bg-b)}
-
 /* Collapsible */
-.coll{border:1px solid var(--border);border-radius:9px;overflow:hidden;margin-bottom:14px;box-shadow:var(--shadow-sm)}
+.coll{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--r);overflow:hidden;margin-bottom:10px;
+  box-shadow:var(--shadow);
+}
 .coll-hdr{
   display:flex;justify-content:space-between;align-items:center;
-  padding:11px 14px;background:var(--surface);cursor:pointer;font-size:12.5px;
-  font-weight:500;color:var(--ink);border-bottom:1px solid transparent;
-  transition:background .1s;user-select:none;
+  padding:12px 16px;font-size:13px;font-weight:500;color:var(--ink);
+  cursor:pointer;user-select:none;transition:background .1s;
+  border-bottom:1px solid transparent;
 }
-.coll-hdr:hover{background:var(--bg-b)}
-.coll-hdr.open{border-bottom-color:var(--border)}
-.coll-arrow{font-size:10px;color:var(--ink-4);transition:transform .18s}
+.coll-hdr:hover{background:var(--surface-2)}
+.coll-hdr.open{border-bottom-color:var(--border-2)}
+.coll-arrow{font-size:10px;color:var(--ink-4);transition:transform .15s}
 .coll-hdr.open .coll-arrow{transform:rotate(180deg)}
-.coll-body{display:none;padding:14px;background:var(--surface)}
+.coll-body{display:none;padding:14px 16px;background:var(--surface)}
 .coll-body.open{display:block}
 
-/* Download button */
+/* Table */
+.data-tbl{width:100%;border-collapse:collapse;font-size:12px}
+.data-tbl th{text-align:left;padding:6px 8px;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--ink-4);border-bottom:1px solid var(--border);background:var(--surface-2);font-family:var(--ff-mono)}
+.data-tbl td{padding:7px 8px;border-bottom:1px solid var(--border-2);font-family:var(--ff-mono);font-size:12px;color:var(--ink)}
+.data-tbl tr:last-child td{border-bottom:none}
+.data-tbl tr:hover td{background:var(--surface-2)}
+
+/* Bridge */
+.bridge{border:1px solid var(--border);border-radius:var(--r);overflow:hidden;margin:10px 0}
+.br-row{display:flex;justify-content:space-between;align-items:center;padding:9px 14px;font-size:12.5px;border-bottom:1px solid var(--border-2);background:var(--surface)}
+.br-row:last-child{border-bottom:none;font-weight:600;background:var(--surface-2);border-top:1px solid var(--border)}
+.br-lbl{color:var(--ink-3)}.br-val{font-family:var(--ff-mono);font-size:12px;color:var(--ink)}
+
+/* Download btn */
 .btn-dl{
-  padding:6px 14px;background:var(--surface);border:1px solid var(--border);
-  border-radius:6px;font-size:11.5px;font-weight:500;color:var(--accent);
-  cursor:pointer;transition:all .12s;display:inline-flex;align-items:center;gap:5px;
-  box-shadow:var(--shadow-sm);
+  padding:7px 14px;background:var(--surface-2);border:1px solid var(--border);
+  border-radius:6px;font-size:12px;font-weight:500;color:var(--blue);
+  display:inline-flex;align-items:center;gap:5px;transition:all .1s;
 }
-.btn-dl:hover{background:var(--accent-bg);border-color:var(--accent)}
+.btn-dl:hover{background:var(--blue-bg);border-color:var(--blue)}
 
-/* Heatmap */
-.hm-legend{
-  display:flex;align-items:center;gap:10px;padding:10px 13px;
-  background:var(--surface);border:1px solid var(--border);border-radius:9px;
-  margin-bottom:14px;box-shadow:var(--shadow-sm);
+/* ═══════════════════════════════════════
+   REVERSE DCF
+═══════════════════════════════════════ */
+.irr-hero{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--r);padding:20px;margin-bottom:12px;
+  box-shadow:var(--shadow);
+  display:flex;align-items:center;gap:20px;
 }
-.hm-bar{flex:1;height:8px;border-radius:4px;background:linear-gradient(90deg,#7f1d1d 0%,#dc2626 15%,#fca5a5 28%,#fef9f0 44%,#fef9f0 50%,#dbeafe 60%,#3b82f6 78%,#1e3a8a 100%)}
-.hm-end{font-size:10.5px;font-family:var(--ff-mono);color:var(--ink-3);white-space:nowrap}
-.hm-ticks{display:flex;justify-content:space-between;font-size:8.5px;color:var(--ink-4);margin-top:2px;font-family:var(--ff-mono)}
-.hm-hurdle-label{
-  display:flex;align-items:center;gap:8px;font-size:10px;font-family:var(--ff-mono);
-  color:var(--ink-4);padding:0 13px;margin-bottom:8px;
+.irr-big{flex-shrink:0}
+.irr-num{font-size:44px;font-weight:700;letter-spacing:-2px;font-family:var(--ff-mono);line-height:1}
+.irr-lbl{font-size:11px;font-weight:500;color:var(--ink-4);text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px}
+.irr-context{flex:1;border-left:1px solid var(--border-2);padding-left:20px}
+.irr-hurdle{
+  display:flex;align-items:center;gap:10px;margin-bottom:10px;
+  padding:10px 14px;border-radius:var(--r-sm);
 }
-.hm-hurdle-label::before{content:'';flex:1;height:1px;background:var(--dn);opacity:.4}
-.hm-hurdle-label::after{content:'';flex:1;height:1px;background:var(--accent);opacity:.4}
+.irr-hurdle.good{background:var(--green-bg)}
+.irr-hurdle.bad{background:var(--red-bg)}
+.ih-icon{font-size:20px}
+.ih-text{font-size:13px;font-weight:500}
+.ih-text.good{color:var(--green-dk)}
+.ih-text.bad{color:var(--red-dk)}
+[data-theme="dark"] .ih-text.good{color:var(--green)}
+[data-theme="dark"] .ih-text.bad{color:var(--red)}
+.ih-sub{font-size:11px;color:var(--ink-4);margin-top:1px}
+.irr-meta{display:flex;gap:16px;flex-wrap:wrap}
+.im-item{font-size:12px;color:var(--ink-3)}
+.im-item span{font-family:var(--ff-mono);font-weight:600;color:var(--ink);margin-left:4px}
 
-.sc-tag{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:5px;font-size:11px;font-weight:500;margin:10px 0 5px}
-.sc-base{background:var(--bg-b);color:var(--ink-2);border:1px solid var(--border)}
-.sc-bear{background:var(--dn-bg);color:var(--dn);border:1px solid var(--dn-border)}
-.sc-bull{background:var(--up-bg);color:var(--up);border:1px solid var(--up-border)}
+/* ═══════════════════════════════════════
+   MATRIX
+═══════════════════════════════════════ */
 
-/* Scenario comparison strip */
-.sc-compare{
-  background:var(--surface);border:1px solid var(--border);border-radius:9px;
-  padding:13px 16px;margin-bottom:18px;box-shadow:var(--shadow-sm);
+/* Scenario summary strip */
+.sc-strip{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--r);padding:14px 16px;margin-bottom:10px;
+  box-shadow:var(--shadow);
 }
-.sc-compare-title{font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.8px;color:var(--ink-4);margin-bottom:10px;font-family:var(--ff-mono)}
-.sc-compare-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
-.sc-compare-cell{text-align:center;padding:8px;border-radius:7px}
-.sc-compare-lbl{font-size:9.5px;color:var(--ink-3);margin-bottom:4px}
-.sc-compare-val{font-family:var(--ff-mono);font-size:15px;font-weight:600}
-
-.hm-tbl{border-collapse:collapse;width:100%;margin-bottom:5px}
-.hm-tbl th{
-  padding:6px 8px;font-size:9px;font-weight:600;font-family:var(--ff-mono);
-  color:var(--ink-4);background:var(--bg-b);text-align:center;border:1px solid var(--border);
-}
-.hm-tbl th.rh{text-align:left}
-.hm-tbl td{padding:0;border:1px solid rgba(255,255,255,.25);text-align:center}
-.hm-cell{padding:7px 5px;font-family:var(--ff-mono);font-size:11px;font-weight:500;min-width:54px}
+.sc-strip-title{font-size:11px;font-weight:600;color:var(--ink-4);text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px}
+.sc-strip-sub{font-size:12px;color:var(--ink-3);margin-bottom:12px;line-height:1.5}
+.sc-cols{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.sc-col{border-radius:var(--r-sm);padding:12px 14px;border:1px solid transparent}
+.sc-col-bear{background:var(--red-bg);border-color:rgba(255,59,48,.15)}
+.sc-col-base{background:var(--surface-2);border-color:var(--border)}
+.sc-col-bull{background:var(--green-bg);border-color:rgba(52,199,89,.15)}
+.sc-col-name{font-size:11px;font-weight:600;color:var(--ink-3);margin-bottom:2px}
+.sc-col-desc{font-size:10px;color:var(--ink-4);margin-bottom:8px}
+.sc-col-irr{font-size:20px;font-weight:700;font-family:var(--ff-mono);letter-spacing:-.5px}
+.sc-col-bear .sc-col-irr{color:var(--red-dk)}
+.sc-col-base .sc-col-irr{color:var(--ink)}
+.sc-col-bull .sc-col-irr{color:var(--green-dk)}
+[data-theme="dark"] .sc-col-bear .sc-col-irr{color:var(--red)}
+[data-theme="dark"] .sc-col-bull .sc-col-irr{color:var(--green)}
+.sc-col-meta{font-size:10.5px;color:var(--ink-4);margin-top:4px;font-family:var(--ff-mono)}
+.sc-col-badge{display:inline-block;font-size:9.5px;font-weight:600;padding:2px 6px;border-radius:20px;margin-top:4px;font-family:var(--ff-mono)}
+.sc-col-badge.good{background:rgba(52,199,89,.2);color:var(--green-dk)}
+.sc-col-badge.bad{background:rgba(255,59,48,.15);color:var(--red-dk)}
+[data-theme="dark"] .sc-col-badge.good{color:var(--green)}
+[data-theme="dark"] .sc-col-badge.bad{color:var(--red)}
 
 /* Matrix controls */
-.mc{
-  background:var(--surface);border:1px solid var(--border);border-radius:9px;
-  padding:14px 16px;margin-bottom:18px;
-  display:grid;grid-template-columns:1fr 1fr;gap:18px;
-  box-shadow:var(--shadow-sm);
+.mc-ctrl{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--r);padding:14px 16px;margin-bottom:10px;
+  display:grid;grid-template-columns:1fr 1fr;gap:14px;
+  box-shadow:var(--shadow);
 }
-.mc-lbl{font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.8px;color:var(--ink-4);margin-bottom:8px}
-.mc-row{display:flex;gap:7px}
-.mc-row .field{flex:1;margin-bottom:7px}
+.mc-group-label{font-size:11px;font-weight:600;color:var(--ink-4);text-transform:uppercase;letter-spacing:.4px;margin-bottom:8px}
+.mc-inputs{display:flex;gap:6px}
+.mc-inputs .field{flex:1;margin-bottom:0}
 
-/* Toast */
+/* Heatmap legend */
+.hm-legend{
+  display:flex;align-items:center;gap:10px;
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--r);padding:10px 14px;margin-bottom:10px;
+  box-shadow:var(--shadow);
+}
+.hm-bar{flex:1;height:6px;border-radius:3px;background:linear-gradient(90deg,#b91c1c 0%,#fca5a5 25%,#fef3f2 45%,#fef3f2 50%,#dcfce7 60%,#86efac 78%,#166534 100%)}
+.hm-end{font-size:10.5px;font-family:var(--ff-mono);font-weight:500;white-space:nowrap}
+.hm-end.bad{color:var(--red-dk)}.hm-end.good{color:var(--green-dk)}
+[data-theme="dark"] .hm-end.bad{color:var(--red)}
+[data-theme="dark"] .hm-end.good{color:var(--green)}
+.hm-tick-row{display:flex;justify-content:space-between;font-size:9px;color:var(--ink-4);margin-top:2px;font-family:var(--ff-mono)}
+
+.sc-tag{
+  display:inline-flex;align-items:center;gap:5px;padding:4px 10px;
+  border-radius:20px;font-size:11.5px;font-weight:600;margin:10px 0 6px;
+}
+.sc-tag-bear{background:var(--red-bg);color:var(--red-dk)}
+.sc-tag-base{background:var(--surface-2);color:var(--ink-2);border:1px solid var(--border)}
+.sc-tag-bull{background:var(--green-bg);color:var(--green-dk)}
+[data-theme="dark"] .sc-tag-bear{color:var(--red)}
+[data-theme="dark"] .sc-tag-bull{color:var(--green)}
+
+.hm-tbl{border-collapse:collapse;width:100%;margin-bottom:6px}
+.hm-tbl th{padding:6px 8px;font-size:9.5px;font-weight:600;font-family:var(--ff-mono);color:var(--ink-4);background:var(--surface-2);text-align:center;border:1px solid var(--border)}
+.hm-tbl th.rh{text-align:left;min-width:70px}
+.hm-tbl td{padding:0;border:1px solid rgba(0,0,0,.04);text-align:center}
+[data-theme="dark"] .hm-tbl td{border-color:rgba(255,255,255,.04)}
+.hm-cell{padding:8px 6px;font-family:var(--ff-mono);font-size:11px;font-weight:600;min-width:54px}
+
+/* ═══════════════════════════════════════
+   METHODOLOGY
+═══════════════════════════════════════ */
+#methodology{display:none;flex:1;overflow-y:auto;padding:32px 36px;max-width:720px}
+.mth-tag{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--blue);margin-bottom:10px}
+.mth-h1{font-size:28px;font-weight:700;color:var(--ink);letter-spacing:-.8px;margin-bottom:10px;line-height:1.2}
+.mth-intro{font-size:15px;color:var(--ink-3);line-height:1.7;margin-bottom:32px;font-weight:400}
+.mth-sec{margin-bottom:30px;padding-bottom:30px;border-bottom:1px solid var(--border)}
+.mth-sec:last-child{border-bottom:none}
+.mth-h2{font-size:17px;font-weight:600;color:var(--ink);margin-bottom:8px;letter-spacing:-.3px}
+.mth-p{font-size:13.5px;color:var(--ink-3);line-height:1.75;margin-bottom:8px}
+.mth-formula{background:var(--surface-2);border:1px solid var(--border);border-radius:var(--r-sm);padding:12px 16px;font-family:var(--ff-mono);font-size:12.5px;color:var(--blue);margin:10px 0;line-height:2}
+.mth-note{background:var(--blue-bg);border-left:3px solid var(--blue);border-radius:4px;padding:10px 14px;font-size:12.5px;color:var(--ink-3);line-height:1.6;margin-top:10px}
+[data-theme="dark"] .mth-note{background:rgba(10,132,255,.08)}
+.mth-back{
+  height:32px;padding:0 14px;border-radius:6px;font-size:12.5px;font-weight:500;
+  background:var(--blue);color:#fff;display:inline-flex;align-items:center;gap:6px;
+  margin-top:8px;transition:background .1s;
+}
+.mth-back:hover{background:var(--blue-b)}
+
+/* ═══════════════════════════════════════
+   TOAST / MOBILE / OVERLAY
+═══════════════════════════════════════ */
 #toast{
-  position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(20px);
-  background:var(--ink);color:var(--bg);
-  padding:9px 20px;border-radius:8px;font-size:12.5px;font-weight:500;
-  opacity:0;transition:all .22s;z-index:999;pointer-events:none;white-space:nowrap;
-  box-shadow:var(--shadow-md);
+  position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(16px);
+  background:var(--ink);color:var(--bg);padding:8px 18px;border-radius:20px;
+  font-size:13px;font-weight:500;opacity:0;transition:all .2s;
+  z-index:999;pointer-events:none;white-space:nowrap;box-shadow:var(--shadow-md);
 }
 #toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 
-/* Mobile sticky result bar */
 #mobile-bar{
   display:none;position:fixed;bottom:0;left:0;right:0;z-index:60;
-  background:var(--surface);border-top:1px solid var(--border);
-  padding:10px 16px;backdrop-filter:blur(12px);
-  box-shadow:0 -4px 20px rgba(0,0,0,.12);
+  background:rgba(242,242,247,.9);backdrop-filter:blur(20px);
+  border-top:1px solid var(--border);padding:10px 16px 14px;
 }
-.mb-inner{display:flex;align-items:center;gap:12px}
-.mb-label{font-size:10px;font-weight:500;color:var(--ink-3)}
-.mb-val{font-family:var(--ff-mono);font-size:16px;font-weight:700;color:var(--ink)}
-.mb-badge{font-family:var(--ff-mono);font-size:11px;font-weight:600;padding:3px 8px;border-radius:4px}
-.mb-badge.up{background:var(--up-bg);color:var(--up)}
-.mb-badge.dn{background:var(--dn-bg);color:var(--dn)}
-.mb-sep{width:1px;height:28px;background:var(--border)}
+[data-theme="dark"] #mobile-bar{background:rgba(28,28,30,.9)}
+.mb-row{display:flex;align-items:center;gap:10px}
+.mb-lbl{font-size:10px;font-weight:500;color:var(--ink-4);margin-bottom:1px}
+.mb-val{font-family:var(--ff-mono);font-size:15px;font-weight:700;color:var(--ink)}
+.mb-div{width:1px;height:30px;background:var(--border)}
+.mb-badge{font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;font-family:var(--ff-mono)}
+.mb-badge.good{background:var(--green-bg);color:var(--green-dk)}
+.mb-badge.bad{background:var(--red-bg);color:var(--red-dk)}
+[data-theme="dark"] .mb-badge.good{color:var(--green)}
+[data-theme="dark"] .mb-badge.bad{color:var(--red)}
 
-/* Mobile menu button */
-#menu-btn{
-  display:none;padding:6px 10px;border-radius:6px;border:1px solid var(--border);
-  color:var(--ink-3);background:var(--surface);box-shadow:var(--shadow-sm);
-  align-items:center;gap:5px;font-size:12px;font-weight:500;
-}
-#menu-btn:hover{color:var(--ink);border-color:var(--border-b)}
+#overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:40;backdrop-filter:blur(4px)}
 
-/* Overlay */
-#overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:40;backdrop-filter:blur(2px)}
-
-/* ── METHODOLOGY ── */
-#methodology{display:none;flex:1;overflow-y:auto;padding:36px 40px}
-.meth-hero{margin-bottom:40px}
-.meth-tag{font-family:var(--ff-mono);font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--gold);margin-bottom:10px}
-.meth-title{font-family:var(--ff-head);font-size:clamp(26px,3vw,36px);font-weight:700;color:var(--ink);letter-spacing:-1px;line-height:1.1;margin-bottom:12px}
-.meth-intro{font-size:15px;color:var(--ink-3);line-height:1.7;max-width:560px;font-weight:300}
-.meth-section{margin-bottom:36px;padding-bottom:36px;border-bottom:1px solid var(--border)}
-.meth-section:last-child{border-bottom:none}
-.meth-sec-title{font-family:var(--ff-head);font-size:20px;font-weight:600;color:var(--ink);margin-bottom:12px;letter-spacing:-.3px}
-.meth-body{font-size:13.5px;color:var(--ink-3);line-height:1.75;margin-bottom:10px}
-.meth-formula{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:14px 18px;font-family:var(--ff-mono);font-size:13px;color:var(--accent);margin:14px 0;line-height:2}
-.meth-note{background:var(--gold-bg);border-left:3px solid var(--gold);border-radius:4px;padding:10px 14px;font-size:12.5px;color:var(--ink-3);line-height:1.6;margin-top:10px}
-
-/* ── RESPONSIVE ── */
-@media(max-width:900px){
-  .kpi-grid{grid-template-columns:repeat(2,1fr)}
-  .two-col{grid-template-columns:1fr}
-  .sc-compare-grid{grid-template-columns:1fr 1fr 1fr}
-}
+/* ═══════════════════════════════════════
+   RESPONSIVE
+═══════════════════════════════════════ */
+@media(max-width:900px){.result-hero{grid-template-columns:1fr;gap:12px}.rh-left{padding-right:0;border-right:none;border-bottom:1px solid var(--border-2);padding-bottom:12px}.rh-right{padding-left:0}}
 @media(max-width:700px){
-  :root{--sidebar-w:284px}
+  :root{--sidebar-w:272px}
   #sidebar{position:fixed;top:var(--header-h);left:0;bottom:0;z-index:45;transform:translateX(-100%)}
   #sidebar.open{transform:translateX(0)}
-  #overlay{display:block;opacity:0;pointer-events:none;transition:opacity .22s}
+  #overlay{display:block;opacity:0;pointer-events:none;transition:opacity .2s}
   #overlay.show{opacity:1;pointer-events:auto}
   #menu-btn{display:inline-flex}
-  .h-disclaimer{display:none}
-  .tab-panel{padding:14px}
+  .h-note{display:none}
+  .tab-panel{padding:12px}
   #main{width:100%;padding-bottom:72px}
   #mobile-bar{display:block}
-  .mc{grid-template-columns:1fr}
-  .company-grid{grid-template-columns:1fr 1fr 1fr}
+  .mc-ctrl{grid-template-columns:1fr}
+  .irr-hero{flex-direction:column}
+  .irr-context{border-left:none;border-top:1px solid var(--border-2);padding-left:0;padding-top:14px}
+  .sc-cols{grid-template-columns:1fr}
 }
 @media(max-width:480px){
-  .kpi-grid{grid-template-columns:1fr 1fr}
   #tabbar{padding:0 12px}
   .tab-btn{margin-right:14px;font-size:12px}
-  .sc-compare-grid{grid-template-columns:1fr}
 }
 </style>
 </head>
 <body>
 <div id="shell">
 
-<!-- HEADER -->
 <header id="header">
   <button id="menu-btn" onclick="toggleMobile()">☰ Inputs</button>
   <a href="index.html" class="h-logo">
-    <div class="h-logo-mark">
+    <div class="h-mark">
       <svg viewBox="0 0 20 20" fill="none"><path d="M3 15l4-6 4 4 3-4 3 3" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
     </div>
-    <span class="h-logo-name">Valuation Studio</span>
+    <span class="h-name">Valuation Studio</span>
   </a>
   <div class="h-sep"></div>
-  <button id="dark-btn" onclick="toggleDark()" title="Toggle dark mode">🌙</button>
-  <button class="h-btn" onclick="showMethodology()" id="meth-btn">Methodology</button>
+  <button id="dark-btn" onclick="toggleDark()" title="Dark mode">🌙</button>
+  <button class="h-btn" onclick="showMethodology()" id="meth-btn">How it works</button>
   <button class="h-btn" onclick="shareURL()">⬆ Share</button>
-  <div class="h-disclaimer">Illustrative only — not financial advice</div>
+  <div class="h-note">Not financial advice</div>
 </header>
 
 <div id="overlay" onclick="closeMobile()"></div>
-
 <div id="body">
 
 <!-- SIDEBAR -->
 <aside id="sidebar">
 
-  <div class="sb-hdr">Company</div>
-  <div class="company-grid" id="company-grid">
-    <button class="co-pill" onclick="loadPreset('AAPL')"><span class="pill-ticker">AAPL</span><span class="pill-date">Sep '25</span></button>
-    <button class="co-pill" onclick="loadPreset('MSFT')"><span class="pill-ticker">MSFT</span><span class="pill-date">Jun '25</span></button>
-    <button class="co-pill" onclick="loadPreset('NVDA')"><span class="pill-ticker">NVDA</span><span class="pill-date">Jan '25</span></button>
-    <button class="co-pill" onclick="loadPreset('META')"><span class="pill-ticker">META</span><span class="pill-date">Dec '24</span></button>
-    <button class="co-pill" onclick="loadPreset('TSLA')"><span class="pill-ticker">TSLA</span><span class="pill-date">Dec '25</span></button>
-    <button class="co-pill" onclick="loadPreset('NFLX')"><span class="pill-ticker">NFLX</span><span class="pill-date">Dec '25</span></button>
+  <div class="sb-lbl">Quick start</div>
+  <div class="co-grid" id="co-grid">
+    <button class="co-pill" onclick="loadPreset('AAPL')"><span class="pt">AAPL</span><span class="pd">Sep '25</span></button>
+    <button class="co-pill" onclick="loadPreset('MSFT')"><span class="pt">MSFT</span><span class="pd">Jun '25</span></button>
+    <button class="co-pill" onclick="loadPreset('NVDA')"><span class="pt">NVDA</span><span class="pd">Jan '25</span></button>
+    <button class="co-pill" onclick="loadPreset('META')"><span class="pt">META</span><span class="pd">Dec '24</span></button>
+    <button class="co-pill" onclick="loadPreset('TSLA')"><span class="pt">TSLA</span><span class="pd">Dec '25</span></button>
+    <button class="co-pill" onclick="loadPreset('NFLX')"><span class="pt">NFLX</span><span class="pd">Dec '25</span></button>
   </div>
 
   <div class="field">
-    <label>Company Name</label>
-    <input type="text" id="inp-company" placeholder="e.g. Netflix (NFLX)"/>
+    <label>Company name</label>
+    <input type="text" id="inp-company" placeholder="e.g. Netflix"/>
   </div>
   <div class="field">
-    <label>Stock Price <span class="label-note" id="price-ccy-note">USD</span></label>
+    <label>Stock price <span class="note" id="price-ccy-note">USD</span></label>
     <input type="text" id="inp-price" placeholder="e.g. 78.00"/>
   </div>
 
-  <div class="sb-hdr">Currency</div>
-  <div class="currency-row">
+  <div class="sb-lbl" style="margin-top:4px">Currency</div>
+  <div class="ccy-row" style="margin-bottom:8px">
     <div class="field">
       <label>Financials in</label>
       <select id="sel-fccy" onchange="onCurrencyChange()">
         <option>USD</option><option>EUR</option><option>GBP</option><option>JPY</option>
         <option>CNY</option><option>KRW</option><option>INR</option><option>CAD</option>
-        <option>AUD</option><option>NOK</option><option>SEK</option><option>DKK</option><option>CHF</option>
+        <option>AUD</option><option>NOK</option><option>SEK</option><option>CHF</option>
       </select>
     </div>
     <div class="field">
@@ -629,89 +652,86 @@ input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.2)}
       <select id="sel-pccy" onchange="onCurrencyChange()">
         <option>USD</option><option>EUR</option><option>GBP</option><option>JPY</option>
         <option>CNY</option><option>KRW</option><option>INR</option><option>CAD</option>
-        <option>AUD</option><option>NOK</option><option>SEK</option><option>DKK</option><option>CHF</option>
+        <option>AUD</option><option>NOK</option><option>SEK</option><option>CHF</option>
       </select>
     </div>
   </div>
   <div id="fx-rate-row" style="display:none">
-    <div class="fx-wrap">
-      <label>FX Rate (1 <span id="fccy-lbl">USD</span> = ? <span id="pccy-lbl">USD</span>)</label>
-      <div class="fx-inner">
-        <input type="number" id="inp-fxrate" placeholder="1.0" step="0.0001" oninput="update()"/>
-      </div>
+    <div class="fx-box">
+      <label>1 <span id="fccy-lbl">USD</span> = ? <span id="pccy-lbl">USD</span></label>
+      <input type="number" id="inp-fxrate" placeholder="1.0" step="0.0001" oninput="update()"/>
     </div>
   </div>
 
-  <div class="sb-hdr">Financials (millions)</div>
+  <div class="sb-lbl">Financials (all in millions)</div>
   <div class="field">
-    <label>Shares Outstanding (M)</label>
+    <label>Shares outstanding</label>
     <input type="text" id="inp-shares" placeholder="e.g. 4317"/>
   </div>
   <div class="field">
-    <label>Revenue (M)</label>
+    <label>Revenue</label>
     <input type="text" id="inp-revenue" placeholder="e.g. 45183"/>
   </div>
   <div class="field">
-    <label>Free Cash Flow (M)</label>
+    <label>Free cash flow</label>
     <input type="text" id="inp-fcf" placeholder="e.g. 9461"/>
   </div>
   <div class="field">
-    <label>Net Cash / (Net Debt) (M) <span class="label-note">+ cash · − debt</span></label>
+    <label>Net cash <span class="note">+ = cash · − = debt</span></label>
     <input type="text" id="inp-netcash" placeholder="e.g. -4500"/>
   </div>
 
-  <div id="margin-pill" style="display:none">
-    <div class="margin-pill">
-      <span class="mp-lbl">FCF Margin</span>
-      <span class="mp-val" id="mp-val">—</span>
+  <div id="margin-chip" style="display:none">
+    <div class="margin-chip">
+      <span class="mc-lbl">Cash margin</span>
+      <span class="mc-val" id="mc-val">—</span>
     </div>
   </div>
-  <div id="warn-fcf" class="warn">⚠ Negative FCF — results may be unreliable.</div>
+  <div id="warn-fcf" class="warn">⚠ Negative cash flow — results may not be reliable.</div>
   <div id="err-rev" class="err">Revenue must be a positive number.</div>
 
-  <div class="sb-hdr">Projection</div>
+  <div class="sb-lbl" style="margin-top:4px">Growth assumptions</div>
   <div class="field">
-    <label>Forecast Horizon (years)</label>
+    <label>Years to forecast</label>
     <input type="number" id="inp-years" value="8" min="3" max="30" step="1" oninput="update()"/>
   </div>
-  <div class="sl-wrap">
-    <label>Revenue Growth (%/yr)<span id="lbl-cagr">10%</span></label>
+  <div class="sl-row">
+    <div class="sl-top"><span>Revenue growth per year</span><span id="lbl-cagr">10%</span></div>
     <input type="range" id="sl-cagr" min="-30" max="100" step="1" value="10" oninput="onSl('cagr')"/>
   </div>
-  <div class="sl-wrap">
-    <label>FCF Margin Change (pp/yr)<span id="lbl-dpp">0.0pp</span></label>
+  <div class="sl-row">
+    <div class="sl-top"><span>Margin change per year</span><span id="lbl-dpp">0.0pp</span></div>
     <input type="range" id="sl-dpp" min="-5" max="5" step="0.1" value="0" oninput="onSl('dpp')"/>
   </div>
 
-  <div class="sb-hdr">Terminal Value</div>
-  <div class="radio-row">
-    <button class="rb active" id="rb-tg" onclick="setTerm('growth')">Terminal Growth</button>
-    <button class="rb" id="rb-tm" onclick="setTerm('multiple')">Exit Multiple</button>
+  <div class="sb-lbl" style="margin-top:4px">Terminal value method</div>
+  <div class="seg">
+    <button class="seg-btn active" id="rb-tg" onclick="setTerm('growth')">Growth rate</button>
+    <button class="seg-btn" id="rb-tm" onclick="setTerm('multiple')">Exit multiple</button>
   </div>
   <div id="tg-wrap">
-    <div class="sl-wrap">
-      <label>Terminal Growth (%/yr)<span id="lbl-tg">2.0%</span></label>
+    <div class="sl-row">
+      <div class="sl-top"><span>Long-run growth rate</span><span id="lbl-tg">2.0%</span></div>
       <input type="range" id="sl-tg" min="-10" max="10" step="0.5" value="2" oninput="onSl('tg')"/>
     </div>
   </div>
   <div id="tm-wrap" style="display:none">
     <div class="field">
-      <label>Exit Multiple (× final FCF)</label>
-      <input type="text" id="inp-tmult" placeholder="e.g. 15" oninput="update()"/>
+      <label>Exit multiple (× final FCF)</label>
+      <input type="text" id="inp-tmult" placeholder="e.g. 15"/>
     </div>
   </div>
 
   <div id="sb-sum-wrap" style="display:none">
     <div class="sb-sum">
-      <div class="sb-sum-title">Summary</div>
-      <div class="sb-sum-row"><span class="sb-sum-lbl" id="sum-co">—</span><span class="sb-sum-val" id="sum-px">—</span></div>
-      <div class="sb-sum-row"><span class="sb-sum-lbl">Market Cap</span><span class="sb-sum-val" id="sum-mktcap">—</span></div>
-      <div class="sb-sum-row"><span class="sb-sum-lbl">FCF Margin</span><span class="sb-sum-val" id="sum-margin">—</span></div>
-      <div class="sb-sum-row"><span class="sb-sum-lbl">Growth · Horizon</span><span class="sb-sum-val" id="sum-growth">—</span></div>
-      <div class="sb-sum-row"><span class="sb-sum-lbl">Terminal</span><span class="sb-sum-val" id="sum-terminal">—</span></div>
+      <div class="ss-row"><span class="ss-lbl" id="sum-co">—</span><span class="ss-val" id="sum-px">—</span></div>
+      <div class="ss-row"><span class="ss-lbl">Market cap</span><span class="ss-val" id="sum-mktcap">—</span></div>
+      <div class="ss-row"><span class="ss-lbl">Cash margin</span><span class="ss-val" id="sum-margin">—</span></div>
+      <div class="ss-row"><span class="ss-lbl">Growth · years</span><span class="ss-val" id="sum-growth">—</span></div>
+      <div class="ss-row"><span class="ss-lbl">Terminal</span><span class="ss-val" id="sum-terminal">—</span></div>
     </div>
   </div>
-  <button class="sb-btn light" id="btn-reset" style="display:none" onclick="resetInputs()">✕  Reset All Inputs</button>
+  <button class="sb-reset" id="btn-reset" style="display:none" onclick="resetInputs()">Clear all inputs</button>
 
 </aside>
 
@@ -720,117 +740,113 @@ input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.2)}
 
   <!-- Methodology -->
   <div id="methodology">
-    <div class="meth-hero">
-      <div class="meth-tag">Methodology</div>
-      <h1 class="meth-title">How Valuation Studio works</h1>
-      <p class="meth-intro">All three tools share the same discounted cash flow engine. Here's the exact math behind every output.</p>
-    </div>
-    <div class="meth-section">
-      <h2 class="meth-sec-title">1. Normal DCF — Fair Value per Share</h2>
-      <p class="meth-body">We project free cash flow year-by-year using your revenue growth and FCF margin assumptions, then discount each year back to present value at your required return rate. We add a terminal value for cash flows beyond the horizon.</p>
-      <div class="meth-formula">
-        FCF<sub>t</sub> = Revenue<sub>t</sub> × Margin<sub>t</sub><br>
-        Revenue<sub>t</sub> = Revenue<sub>0</sub> × (1 + g)<sup>t</sup><br>
-        Margin<sub>t</sub> = Margin<sub>0</sub> + (Δpp × t)<br>
-        PV(FCF<sub>t</sub>) = FCF<sub>t</sub> / (1 + r)<sup>t</sup>
+    <div class="mth-tag">How it works</div>
+    <h1 class="mth-h1">The math behind every number</h1>
+    <p class="mth-intro">All three tools use the same engine: discounted cash flow. Here's exactly what happens when you change an input.</p>
+
+    <div class="mth-sec">
+      <h2 class="mth-h2">1. Fair Value — what is the stock worth?</h2>
+      <p class="mth-p">We estimate how much cash the company will generate each year, then shrink those future cash flows back to today's value (because $1 today is worth more than $1 in 10 years). The sum is the company's equity value. Divide by shares to get fair value per share.</p>
+      <div class="mth-formula">
+        Cash flow year t = Revenue × Margin<br>
+        Today's value = Cash flow ÷ (1 + your required return)^t<br>
+        Terminal value = last cash flow × (1 + long-run growth) ÷ (return − growth)<br>
+        Fair value per share = (sum of all PVs − net debt) ÷ shares
       </div>
-      <div class="meth-formula">
-        TV (Gordon Growth) = FCF<sub>n</sub> × (1 + g<sub>∞</sub>) / (r − g<sub>∞</sub>)<br>
-        TV (Exit Multiple) = FCF<sub>n</sub> × EV/FCF<br>
-        Equity Value = Σ PV(FCF) + PV(TV) − Net Debt<br>
-        Fair Value/Share = Equity Value / Shares Outstanding
-      </div>
-      <div class="meth-note"><strong>Net Debt</strong> = Total Debt − Cash. Positive net cash <em>adds</em> to fair value; net debt <em>reduces</em> it.</div>
+      <div class="mth-note">Net cash <em>adds</em> to fair value. Net debt <em>reduces</em> it.</div>
     </div>
-    <div class="meth-section">
-      <h2 class="meth-sec-title">2. Reverse DCF — Implied IRR</h2>
-      <p class="meth-body">We invert the model: solve for the discount rate r that makes fair value equal the market price. This is the annual return the market is pricing in given your assumptions.</p>
-      <div class="meth-formula">Find r such that: FairValue(r) = Market Price<br>Solved via bisection over r ∈ [0.1%, 200%]</div>
-      <div class="meth-note">IRR ≥ 10% → market may be pricing in adequate returns. Below 10% → price may imply lower-than-typical returns. The 10% hurdle is illustrative.</div>
+
+    <div class="mth-sec">
+      <h2 class="mth-h2">2. Implied return — what does the price say?</h2>
+      <p class="mth-p">Instead of solving for fair value, we flip the question: what annual return would make the fair value equal to today's price? If that number is above 10%, the market may be pricing in a decent return. Below 10% means the price implies a lower return.</p>
+      <div class="mth-formula">Find the return rate where: fair value = market price</div>
+      <div class="mth-note">10% is a common rule-of-thumb hurdle rate, not a guarantee.</div>
     </div>
-    <div class="meth-section">
-      <h2 class="meth-sec-title">3. IRR Matrix — Scenario Grid</h2>
-      <p class="meth-body">We run the Reverse DCF across every combination of revenue growth (rows) and terminal value (columns), for three margin scenarios: Bear (−1pp/yr), Base (unchanged), Bull (+1pp/yr).</p>
-      <div class="meth-note"><strong>Reading the heatmap:</strong> Red = IRR below 10% hurdle. Blue = IRR above 10% hurdle. Scale is anchored at 10%.</div>
+
+    <div class="mth-sec">
+      <h2 class="mth-h2">3. Scenario grid — what if growth is different?</h2>
+      <p class="mth-p">We run the implied return calculation across every combination of revenue growth and terminal value — all at once. Three versions run in parallel: one where margins shrink 1pp/year (Bear), one unchanged (Base), and one where margins improve 1pp/year (Bull). Red cells mean the implied return is below 10%. Blue means above.</p>
+      <div class="mth-note"><strong>The summary strip at the top</strong> shows the median implied return across all cells in the grid — Bear, Base, and Bull — so you can see the typical outcome rather than just one scenario.</div>
     </div>
-    <div class="meth-section">
-      <h2 class="meth-sec-title">4. Currency Conversion</h2>
-      <p class="meth-body">When financials are in one currency and the stock trades in another, enter an FX rate and the app converts fair value automatically.</p>
-      <div class="meth-formula">Fair Value (price ccy) = Fair Value (financial ccy) × FX Rate</div>
-    </div>
-    <div class="meth-section">
-      <h2 class="meth-sec-title">5. Limitations</h2>
-      <p class="meth-body">DCF is highly sensitive to assumptions. Small changes in growth or terminal value produce large swings in output. This is an illustrative tool, not financial advice.</p>
-      <ul style="font-size:13px;color:var(--ink-3);line-height:2.2;margin-left:18px">
-        <li>Not investment advice — consult a professional</li>
-        <li>Pre-loaded data is manually maintained and may be outdated</li>
-        <li>Does not account for dilution, debt covenants, or one-off items</li>
-        <li>Always stress-test with the IRR Matrix before drawing conclusions</li>
+
+    <div class="mth-sec">
+      <h2 class="mth-h2">4. Limitations</h2>
+      <p class="mth-p">Small changes to growth or terminal value can swing the output significantly. Treat this as a thinking tool, not a precise answer.</p>
+      <ul style="font-size:13px;color:var(--ink-3);line-height:2.2;padding-left:16px">
+        <li>Not investment advice</li>
+        <li>Pre-loaded numbers are manually updated and may be out of date</li>
+        <li>Does not account for dilution or one-off items</li>
       </ul>
     </div>
-    <button class="sb-btn dark" style="max-width:180px" onclick="hideMethodology()">← Back to App</button>
+    <button class="mth-back" onclick="hideMethodology()">← Back</button>
   </div>
 
   <!-- App view -->
   <div id="app-view" style="display:flex;flex-direction:column;flex:1">
     <nav id="tabbar">
-      <button class="tab-btn active" onclick="switchTab('dcf')">Normal DCF</button>
-      <button class="tab-btn" onclick="switchTab('rev')">Reverse DCF</button>
-      <button class="tab-btn" onclick="switchTab('matrix')">IRR Matrix</button>
+      <button class="tab-btn active" onclick="switchTab('dcf')">Fair Value</button>
+      <button class="tab-btn" onclick="switchTab('rev')">Implied Return</button>
+      <button class="tab-btn" onclick="switchTab('matrix')">Scenario Grid</button>
       <div class="tab-sep"></div>
     </nav>
 
     <!-- DCF Tab -->
     <div class="tab-panel active" id="tab-dcf">
       <div id="dcf-empty" class="empty">
-        <div class="empty-icon">📊</div>
-        <div class="empty-title">Select a company to begin</div>
-        <div class="empty-body">Click any ticker pill in the sidebar — data loads instantly.</div>
+        <svg viewBox="0 0 40 40" fill="none"><path d="M6 30l8-12 8 8 6-8 6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <div class="empty-title">Pick a company to start</div>
+        <div class="empty-body">Tap any ticker on the left — data loads in one click.</div>
       </div>
       <div id="dcf-content" style="display:none">
-        <div class="two-col">
-          <div>
-            <div class="sec-hdr">Discount Rate</div>
-            <div class="disc-sl-wrap">
-              <label>Required Return (%)<span id="lbl-disc">12%</span></label>
-              <div id="sl-disc-track">
-                <input type="range" id="sl-disc" min="1" max="50" step="1" value="12" oninput="onDiscChange()"/>
-                <div class="disc-thumb" id="disc-thumb"></div>
-              </div>
+
+        <!-- Big result card -->
+        <div class="result-hero" id="dcf-hero"></div>
+
+        <!-- Stats row -->
+        <div class="stat-row" id="dcf-stat-row"></div>
+
+        <!-- Comparison bars -->
+        <div class="cmp-bar" id="dcf-cmp"></div>
+
+        <!-- Discount rate control -->
+        <div class="disc-area">
+          <div class="disc-top">
+            <div>
+              <div style="font-size:11px;font-weight:500;color:var(--ink-4);margin-bottom:2px">Your required return</div>
+              <div style="font-size:13px;font-weight:500;color:var(--ink)">This is how much you want to earn per year. Higher = stricter = lower fair value.</div>
             </div>
-            <div class="hint">
-              <div class="hint-title">Choosing a rate</div>
-              <div class="hint-body">
-                <strong>8–10%</strong> Aggressive<br>
-                <strong>10–15%</strong> Moderate<br>
-                <strong>15–20%</strong> Conservative<br>
-                <strong>20%+</strong> Very conservative<br><br>
-                Higher rate → lower fair value → more margin of safety.
-              </div>
-            </div>
+            <div class="disc-val" id="lbl-disc">12%</div>
           </div>
-          <div>
-            <div class="sec-hdr">Result</div>
-            <div class="kpi-grid" id="dcf-kpis"></div>
-            <div class="bars" id="dcf-bars"></div>
+          <div class="disc-track">
+            <input type="range" id="sl-disc" min="1" max="50" step="1" value="12" oninput="onDiscChange()"/>
+            <div class="disc-thumb" id="disc-thumb"></div>
+          </div>
+          <div class="disc-hint">
+            <div class="dh-item" onclick="setDisc(8)"><div class="dh-rate">8%</div><div class="dh-lbl">Aggressive</div></div>
+            <div class="dh-item" onclick="setDisc(12)"><div class="dh-rate">12%</div><div class="dh-lbl">Moderate</div></div>
+            <div class="dh-item" onclick="setDisc(15)"><div class="dh-rate">15%</div><div class="dh-lbl">Careful</div></div>
+            <div class="dh-item" onclick="setDisc(20)"><div class="dh-rate">20%</div><div class="dh-lbl">Very strict</div></div>
           </div>
         </div>
+
+        <!-- Chart -->
         <div class="chart-card">
-          <div class="chart-title">Fair Value vs Discount Rate</div>
-          <div class="chart-sub">How intrinsic value changes as your required return shifts. Green = stock appears undervalued at that rate.</div>
-          <canvas id="chart-sens" height="200" style="width:100%"></canvas>
+          <div class="chart-card-title">Fair value at every discount rate</div>
+          <div class="chart-card-sub">The green region shows where fair value is above the market price — meaning the stock looks cheap at that return target.</div>
+          <canvas id="chart-sens" height="180" style="width:100%"></canvas>
           <div class="chart-legend">
-            <div class="leg-item"><div class="leg-dot" style="background:var(--accent)"></div>Fair value</div>
-            <div class="leg-item"><div class="leg-dot" style="background:var(--ink-4);width:18px;height:2px;border-radius:0"></div>Market price</div>
-            <div class="leg-item"><div class="leg-dot" style="background:rgba(22,163,74,.12)"></div>Undervalued region</div>
+            <div class="leg"><div class="leg-dot" style="background:var(--blue)"></div>Fair value</div>
+            <div class="leg"><div class="leg-dot" style="background:var(--ink-4);width:18px;height:2px;border-radius:0"></div>Market price</div>
+            <div class="leg"><div class="leg-dot" style="background:rgba(52,199,89,.12)"></div>Stock looks cheap</div>
           </div>
         </div>
+
         <div class="coll">
-          <div class="coll-hdr" onclick="toggleColl(this)">Year-by-year forecast &amp; valuation bridge <span class="coll-arrow">▼</span></div>
+          <div class="coll-hdr" onclick="toggleColl(this)">Year-by-year numbers &amp; value breakdown <span class="coll-arrow">▼</span></div>
           <div class="coll-body">
             <div style="overflow-x:auto"><table class="data-tbl" id="forecast-tbl"></table></div>
             <div id="bridge-wrap"></div>
-            <button class="btn-dl" onclick="downloadForecast()">⬇ Download CSV</button>
+            <button class="btn-dl" onclick="downloadForecast()" style="margin-top:8px">⬇ Download CSV</button>
           </div>
         </div>
       </div>
@@ -839,28 +855,27 @@ input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.2)}
     <!-- Reverse DCF Tab -->
     <div class="tab-panel" id="tab-rev">
       <div id="rev-empty" class="empty">
-        <div class="empty-icon">🔄</div>
-        <div class="empty-title">Enter data to see implied return</div>
-        <div class="empty-body">The Reverse DCF shows what annual return the current price implies.</div>
+        <svg viewBox="0 0 40 40" fill="none"><circle cx="20" cy="20" r="12" stroke="currentColor" stroke-width="2"/><path d="M20 14v6l4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        <div class="empty-title">Enter data to see the implied return</div>
+        <div class="empty-body">The implied return tells you what annual gain the current price is pricing in.</div>
       </div>
       <div id="rev-content" style="display:none">
-        <div class="sec-hdr">Implied Return at Current Price</div>
-        <div class="kpi-grid" id="rev-kpis"></div>
+        <div class="irr-hero" id="irr-hero"></div>
         <div class="chart-card">
-          <div class="chart-title">Implied IRR vs Stock Price</div>
-          <div class="chart-sub">What return does each price level imply? Green shading = above 10% hurdle.</div>
-          <canvas id="chart-irr" height="200" style="width:100%"></canvas>
+          <div class="chart-card-title">Implied return at different prices</div>
+          <div class="chart-card-sub">Move the price up or down — see how the implied annual return changes. The green band is above the 10% hurdle.</div>
+          <canvas id="chart-irr" height="180" style="width:100%"></canvas>
           <div class="chart-legend">
-            <div class="leg-item"><div class="leg-dot" style="background:var(--accent)"></div>Implied IRR</div>
-            <div class="leg-item"><div class="leg-dot" style="background:rgba(22,163,74,.12)"></div>Above 10% hurdle</div>
-            <div class="leg-item"><div class="leg-dot" style="background:var(--ink-4);width:18px;height:2px;border-radius:0"></div>10% hurdle</div>
+            <div class="leg"><div class="leg-dot" style="background:var(--blue)"></div>Implied return</div>
+            <div class="leg"><div class="leg-dot" style="background:rgba(52,199,89,.12)"></div>Above 10% hurdle</div>
+            <div class="leg"><div class="leg-dot" style="background:var(--ink-4);width:18px;height:2px;border-radius:0"></div>10% line</div>
           </div>
         </div>
         <div class="coll">
-          <div class="coll-hdr" onclick="toggleColl(this)">Price sensitivity table <span class="coll-arrow">▼</span></div>
+          <div class="coll-hdr" onclick="toggleColl(this)">Return at different prices <span class="coll-arrow">▼</span></div>
           <div class="coll-body">
             <div style="overflow-x:auto"><table class="data-tbl" id="rev-tbl"></table></div>
-            <button class="btn-dl" style="margin-top:7px" onclick="downloadRevDCF()">⬇ Download CSV</button>
+            <button class="btn-dl" style="margin-top:8px" onclick="downloadRevDCF()">⬇ Download CSV</button>
           </div>
         </div>
       </div>
@@ -869,60 +884,60 @@ input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.2)}
     <!-- Matrix Tab -->
     <div class="tab-panel" id="tab-matrix">
       <div id="matrix-empty" class="empty">
-        <div class="empty-icon">🗂️</div>
-        <div class="empty-title">Enter data to generate the matrix</div>
-        <div class="empty-body">Maps every growth + terminal combination across Bear, Base, and Bull scenarios.</div>
+        <svg viewBox="0 0 40 40" fill="none"><rect x="6" y="6" width="11" height="11" rx="2" stroke="currentColor" stroke-width="1.8"/><rect x="23" y="6" width="11" height="11" rx="2" stroke="currentColor" stroke-width="1.8"/><rect x="6" y="23" width="11" height="11" rx="2" stroke="currentColor" stroke-width="1.8"/><rect x="23" y="23" width="11" height="11" rx="2" stroke="currentColor" stroke-width="1.8"/></svg>
+        <div class="empty-title">Enter data to see the scenario grid</div>
+        <div class="empty-body">The grid shows implied returns across every growth rate and exit assumption.</div>
       </div>
       <div id="matrix-content" style="display:none">
+
+        <!-- Scenario summary strip -->
+        <div class="sc-strip" id="sc-strip"></div>
+
+        <!-- Colour legend -->
         <div class="hm-legend">
-          <span class="hm-end" style="color:var(--dn)">Low IRR</span>
+          <span class="hm-end bad">Low return</span>
           <div style="flex:1">
             <div class="hm-bar"></div>
-            <div class="hm-ticks"><span>0%</span><span>5%</span><span>10% hurdle</span><span>15%</span><span>20%</span><span>25%+</span></div>
+            <div class="hm-tick-row"><span>0%</span><span>5%</span><span>10% line</span><span>15%</span><span>20%+</span></div>
           </div>
-          <span class="hm-end" style="color:var(--accent)">High IRR</span>
+          <span class="hm-end good">High return</span>
         </div>
-        <div class="hm-hurdle-label">← below 10% hurdle &nbsp;|&nbsp; above 10% hurdle →</div>
-        <div id="sc-compare-wrap"></div>
-        <div class="mc" id="mc">
+
+        <!-- Matrix controls -->
+        <div class="mc-ctrl" id="mc-ctrl">
           <div>
-            <div class="mc-lbl">Rows — Revenue Growth</div>
-            <div class="mc-row">
-              <div class="field"><label>Min (%)</label><input type="number" id="mc-gmin" value="0" step="1" oninput="renderMatrix()"/></div>
-              <div class="field"><label>Max (%)</label><input type="number" id="mc-gmax" value="20" step="1" oninput="renderMatrix()"/></div>
-              <div class="field"><label>Rows</label><input type="number" id="mc-grows" value="6" min="2" max="12" step="1" oninput="renderMatrix()"/></div>
+            <div class="mc-group-label">Rows — revenue growth range</div>
+            <div class="mc-inputs">
+              <div class="field"><label>Min %</label><input type="number" id="mc-gmin" value="0" step="1" oninput="renderMatrix()"/></div>
+              <div class="field"><label>Max %</label><input type="number" id="mc-gmax" value="20" step="1" oninput="renderMatrix()"/></div>
+              <div class="field"><label>Rows</label><input type="number" id="mc-grows" value="6" min="2" max="12" oninput="renderMatrix()"/></div>
             </div>
           </div>
-          <div id="mc-right">
-            <div class="mc-lbl" id="mc-col-lbl">Columns — Terminal Growth</div>
-            <div class="mc-row">
-              <div class="field"><label id="mc-min-lbl">Min (%)</label><input type="number" id="mc-tmin" value="0" step="0.5" oninput="renderMatrix()"/></div>
-              <div class="field"><label id="mc-max-lbl">Max (%)</label><input type="number" id="mc-tmax" value="4" step="0.5" oninput="renderMatrix()"/></div>
-              <div class="field"><label>Cols</label><input type="number" id="mc-tcols" value="5" min="2" max="10" step="1" oninput="renderMatrix()"/></div>
+          <div>
+            <div class="mc-group-label" id="mc-col-lbl">Columns — terminal growth range</div>
+            <div class="mc-inputs">
+              <div class="field"><label id="mc-min-lbl">Min %</label><input type="number" id="mc-tmin" value="0" step="0.5" oninput="renderMatrix()"/></div>
+              <div class="field"><label id="mc-max-lbl">Max %</label><input type="number" id="mc-tmax" value="4" step="0.5" oninput="renderMatrix()"/></div>
+              <div class="field"><label>Cols</label><input type="number" id="mc-tcols" value="5" min="2" max="10" oninput="renderMatrix()"/></div>
             </div>
           </div>
         </div>
+
         <div id="matrix-tables"></div>
       </div>
     </div>
   </div>
 </main>
-</div><!-- /body -->
-</div><!-- /shell -->
+</div>
+</div>
 
-<!-- Mobile sticky bar -->
+<!-- Mobile bar -->
 <div id="mobile-bar">
-  <div class="mb-inner">
-    <div>
-      <div class="mb-label">Fair Value</div>
-      <div class="mb-val" id="mb-fv">—</div>
-    </div>
-    <div class="mb-sep"></div>
-    <div>
-      <div class="mb-label">Market Price</div>
-      <div class="mb-val" id="mb-px">—</div>
-    </div>
-    <div class="mb-sep"></div>
+  <div class="mb-row">
+    <div><div class="mb-lbl">Fair Value</div><div class="mb-val" id="mb-fv">—</div></div>
+    <div class="mb-div"></div>
+    <div><div class="mb-lbl">Price</div><div class="mb-val" id="mb-px">—</div></div>
+    <div class="mb-div"></div>
     <div id="mb-badge-wrap"></div>
   </div>
 </div>
@@ -930,23 +945,23 @@ input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.2)}
 <div id="toast"></div>
 
 <script>
-/* ═══════════════════════════════════════════
+/* ══════════════════════════════════════════
    PRESETS
-═══════════════════════════════════════════ */
+══════════════════════════════════════════ */
 const PRESETS={
   NFLX:{company:'Netflix (NFLX)',price:'78',shares:'4317',revenue:'45183',fcf:'9461',netcash:'-4500',cagr:12,dpp:0,years:8,termMode:'growth',tg:3,tmult:'15',fccy:'USD',pccy:'USD'},
   AAPL:{company:'Apple (AAPL)',price:'227',shares:'14773',revenue:'416161',fcf:'98767',netcash:'34000',cagr:8,dpp:0.2,years:8,termMode:'growth',tg:2.5,tmult:'20',fccy:'USD',pccy:'USD'},
   MSFT:{company:'Microsoft (MSFT)',price:'415',shares:'7433',revenue:'281724',fcf:'71611',netcash:'27000',cagr:15,dpp:0.1,years:8,termMode:'growth',tg:3,tmult:'20',fccy:'USD',pccy:'USD'},
   NVDA:{company:'Nvidia (NVDA)',price:'131',shares:'24400',revenue:'130497',fcf:'60853',netcash:'38000',cagr:30,dpp:0,years:8,termMode:'growth',tg:3,tmult:'25',fccy:'USD',pccy:'USD'},
-  META:{company:'Meta Platforms (META)',price:'640',shares:'2530',revenue:'164501',fcf:'52100',netcash:'52000',cagr:15,dpp:0.2,years:8,termMode:'growth',tg:3,tmult:'18',fccy:'USD',pccy:'USD'},
+  META:{company:'Meta (META)',price:'640',shares:'2530',revenue:'164501',fcf:'52100',netcash:'52000',cagr:15,dpp:0.2,years:8,termMode:'growth',tg:3,tmult:'18',fccy:'USD',pccy:'USD'},
   TSLA:{company:'Tesla (TSLA)',price:'340',shares:'3200',revenue:'94830',fcf:'6200',netcash:'44100',cagr:20,dpp:0.5,years:8,termMode:'growth',tg:3,tmult:'20',fccy:'USD',pccy:'USD'},
 };
 
-/* ═══════════════════════════════════════════
-   DCF ENGINE
-═══════════════════════════════════════════ */
+/* ══════════════════════════════════════════
+   ENGINE
+══════════════════════════════════════════ */
 function pf(s){if(s===null||s===undefined||s==='')return NaN;const n=parseFloat(String(s).replace(/,/g,''));return isNaN(n)?NaN:n}
-function linspace(a,b,n){if(n<2)return[a];const r=[];for(let i=0;i<n;i++)r.push(a+(b-a)*i/(n-1));return r}
+function linspace(a,b,n){const r=[];for(let i=0;i<n;i++)r.push(a+(b-a)*i/Math.max(n-1,1));return r}
 
 function projectFCFs(inp){
   const rows=[];let rev=inp.revLTM,marg=inp.fcfMargin;
@@ -957,14 +972,12 @@ function projectFCFs(inp){
   }
   return rows;
 }
-
 function terminalPV(inp,lastFCF){
   let tv;
-  if(inp.termMode==='multiple'){tv=lastFCF*inp.tmult}
+  if(inp.termMode==='multiple')tv=lastFCF*inp.tmult;
   else{const gap=Math.max(inp.disc-inp.tg,.001);tv=lastFCF*(1+inp.tg)/gap}
   return tv/Math.pow(1+inp.disc,inp.years);
 }
-
 function fairValue(inp){
   const rows=projectFCFs(inp);
   const pvFCFs=rows.reduce((s,r)=>s+r.discFcf,0);
@@ -974,32 +987,44 @@ function fairValue(inp){
   const equityPV=pvFCFs+pvTV-inp.netDebt;
   if(equityPV<=0)return{ok:false,pvFCFs,pvTV,equityPV,lastFCF,rows};
   const fvLocal=equityPV/inp.shares;
-  const fvps=fvLocal*inp.fxRate;
-  return{ok:true,pvFCFs,pvTV,equityPV,fvLocal,fvps,lastFCF,rows};
+  return{ok:true,pvFCFs,pvTV,equityPV,fvLocal,fvps:fvLocal*inp.fxRate,lastFCF,rows};
 }
-
 function impliedIRR(inp,price){
-  const priceLocal=price/inp.fxRate;
+  const pl=price/inp.fxRate;
   let lo=.001,hi=2;
   for(let i=0;i<80;i++){
     const mid=(lo+hi)/2;
-    const res=fairValue({...inp,disc:mid});
-    if(!res.ok){hi=mid;continue}
-    if(res.fvLocal>priceLocal)lo=mid;else hi=mid;
+    const r=fairValue({...inp,disc:mid});
+    if(!r.ok){hi=mid;continue}
+    if(r.fvLocal>pl)lo=mid;else hi=mid;
     if(hi-lo<1e-7)break;
   }
   const mid=(lo+hi)/2;
-  const res=fairValue({...inp,disc:mid});
-  if(!res.ok)return null;
-  if(Math.abs(res.fvLocal-priceLocal)/Math.max(priceLocal,.01)>0.02)return null;
+  const r=fairValue({...inp,disc:mid});
+  if(!r.ok||Math.abs(r.fvLocal-pl)/Math.max(pl,.01)>.02)return null;
   return mid;
 }
 
-/* ═══════════════════════════════════════════
-   STATE
-═══════════════════════════════════════════ */
+/* ══════════════════════════════════════════
+   STATE & HELPERS
+══════════════════════════════════════════ */
 let termMode='growth',activeTab='dcf';
 let _sensData=[],_revData=[],_forecastRows=[];
+
+function fmt(n,d=2){if(!isFinite(n))return'—';return n.toLocaleString('en-US',{minimumFractionDigits:d,maximumFractionDigits:d})}
+function fmtPct(n,d=1){if(!isFinite(n))return'—';return(n>=0?'+':'')+fmt(n*100,d)+'%'}
+function fmtPctPlain(n,d=1){return fmt(n*100,d)+'%'}
+function cssVar(v){return getComputedStyle(document.documentElement).getPropertyValue(v).trim()}
+
+function irrColor(v){
+  if(!isFinite(v))return{bg:'var(--surface-2)',fg:'var(--ink-4)'};
+  const H=.10;let r,g,b,fg;
+  if(v<0){const t=Math.min(-v/.25,1);r=Math.round(252+(127-252)*t);g=Math.round(165+(29-165)*t);b=Math.round(165+(29-165)*t);fg=t>.5?'#fff':'#7f1d1d'}
+  else if(v<H){const t=v/H;r=Math.round(252+(254-252)*t);g=Math.round(165+(249-165)*t);b=Math.round(165+(240-165)*t);fg='#c0392b'}
+  else if(v<.15){const t=(v-H)/.05;r=Math.round(254+(220-254)*t);g=Math.round(249+(252-249)*t);b=Math.round(240+(220-240)*t);fg='#1a7a30'}
+  else{const t=Math.min((v-.15)/.15,1);r=Math.round(220+(20-220)*t);g=Math.round(252+(120-252)*t);b=Math.round(220+(60-220)*t);fg=t>.4?'#fff':'#166534'}
+  return{bg:`rgb(${r},${g},${b})`,fg};
+}
 
 function getInputs(){
   return{
@@ -1021,7 +1046,6 @@ function getInputs(){
     fxRate:pf(document.getElementById('inp-fxrate').value)||1,
   };
 }
-
 function buildInp(raw){
   if(!isFinite(raw.revLTM)||raw.revLTM<=0)return null;
   if(!isFinite(raw.fcfLTM))return null;
@@ -1035,48 +1059,44 @@ function buildInp(raw){
   return{...raw,fcfMargin:margin,netDebt,fxRate};
 }
 
-/* ═══════════════════════════════════════════
-   SLIDER UPDATES
-═══════════════════════════════════════════ */
+/* ══════════════════════════════════════════
+   CONTROLS
+══════════════════════════════════════════ */
 function clearPills(){document.querySelectorAll('.co-pill').forEach(b=>b.classList.remove('active'))}
 
 function onSl(k){
   clearPills();
-  if(k==='cagr'){document.getElementById('lbl-cagr').textContent=document.getElementById('sl-cagr').value+'%'}
-  else if(k==='dpp'){document.getElementById('lbl-dpp').textContent=parseFloat(document.getElementById('sl-dpp').value).toFixed(1)+'pp'}
-  else if(k==='tg'){document.getElementById('lbl-tg').textContent=parseFloat(document.getElementById('sl-tg').value).toFixed(1)+'%'}
+  if(k==='cagr')document.getElementById('lbl-cagr').textContent=document.getElementById('sl-cagr').value+'%';
+  else if(k==='dpp')document.getElementById('lbl-dpp').textContent=parseFloat(document.getElementById('sl-dpp').value).toFixed(1)+'pp';
+  else if(k==='tg')document.getElementById('lbl-tg').textContent=parseFloat(document.getElementById('sl-tg').value).toFixed(1)+'%';
   update();
 }
 
 function onDiscChange(){
   const v=parseInt(document.getElementById('sl-disc').value);
   document.getElementById('lbl-disc').textContent=v+'%';
-  // Move thumb
-  const pct=(v-1)/(50-1)*100;
+  const pct=(v-1)/49*100;
   document.getElementById('disc-thumb').style.left=pct+'%';
   renderDCF();
+}
+function setDisc(v){
+  document.getElementById('sl-disc').value=v;
+  onDiscChange();
 }
 
 ['inp-company','inp-price','inp-shares','inp-revenue','inp-fcf','inp-netcash','inp-years','inp-tmult']
   .forEach(id=>document.getElementById(id).addEventListener('input',()=>{clearPills();update()}));
 
-/* ═══════════════════════════════════════════
-   CURRENCY
-═══════════════════════════════════════════ */
 function onCurrencyChange(){
-  const fccy=document.getElementById('sel-fccy').value;
-  const pccy=document.getElementById('sel-pccy').value;
-  const diff=fccy!==pccy;
+  const f=document.getElementById('sel-fccy').value,p=document.getElementById('sel-pccy').value;
+  const diff=f!==p;
   document.getElementById('fx-rate-row').style.display=diff?'':'none';
-  document.getElementById('fccy-lbl').textContent=fccy;
-  document.getElementById('pccy-lbl').textContent=pccy;
-  document.getElementById('price-ccy-note').textContent=pccy;
+  document.getElementById('fccy-lbl').textContent=f;
+  document.getElementById('pccy-lbl').textContent=p;
+  document.getElementById('price-ccy-note').textContent=p;
   update();
 }
 
-/* ═══════════════════════════════════════════
-   TERMINAL MODE
-═══════════════════════════════════════════ */
 function setTerm(mode){
   termMode=mode;
   document.getElementById('rb-tg').classList.toggle('active',mode==='growth');
@@ -1084,36 +1104,26 @@ function setTerm(mode){
   document.getElementById('tg-wrap').style.display=mode==='growth'?'':'none';
   document.getElementById('tm-wrap').style.display=mode==='multiple'?'':'none';
   const isM=mode==='multiple';
-  document.getElementById('mc-col-lbl').textContent=isM?'Columns — Exit Multiple':'Columns — Terminal Growth';
-  document.getElementById('mc-min-lbl').textContent=isM?'Min (×)':'Min (%)';
-  document.getElementById('mc-max-lbl').textContent=isM?'Max (×)':'Max (%)';
+  document.getElementById('mc-col-lbl').textContent=isM?'Columns — exit multiple range':'Columns — terminal growth range';
+  document.getElementById('mc-min-lbl').textContent=isM?'Min ×':'Min %';
+  document.getElementById('mc-max-lbl').textContent=isM?'Max ×':'Max %';
   if(isM){document.getElementById('mc-tmin').value=8;document.getElementById('mc-tmax').value=16}
   else{document.getElementById('mc-tmin').value=0;document.getElementById('mc-tmax').value=4}
   update();
 }
 
-/* ═══════════════════════════════════════════
-   DARK MODE
-═══════════════════════════════════════════ */
 function toggleDark(){
-  const dark=document.documentElement.getAttribute('data-theme')==='dark';
-  document.documentElement.setAttribute('data-theme',dark?'light':'dark');
-  document.getElementById('dark-btn').textContent=dark?'🌙':'☀️';
-  localStorage.setItem('vs-theme',dark?'light':'dark');
-  setTimeout(()=>{
-    const inp=buildInp(getInputs());if(!inp)return;
-    if(activeTab==='dcf')drawSensChart(inp.price,inp.disc*100);
-    else if(activeTab==='rev'){const irr=impliedIRR(inp,inp.price);drawIRRChart(inp.price,irr)}
-  },50);
+  const d=document.documentElement.getAttribute('data-theme')==='dark';
+  document.documentElement.setAttribute('data-theme',d?'light':'dark');
+  document.getElementById('dark-btn').textContent=d?'🌙':'☀️';
+  localStorage.setItem('vs-theme',d?'light':'dark');
+  setTimeout(()=>{const inp=buildInp(getInputs());if(!inp)return;if(activeTab==='dcf')drawSensChart(inp.price,inp.disc*100);else if(activeTab==='rev'){const irr=impliedIRR(inp,inp.price);drawIRRChart(inp.price,irr)}},50);
 }
 
-/* ═══════════════════════════════════════════
-   PRESETS
-═══════════════════════════════════════════ */
 function loadPreset(key){
   const p=PRESETS[key];if(!p)return;
   document.querySelectorAll('.co-pill').forEach(b=>{
-    b.classList.toggle('active',b.querySelector('.pill-ticker').textContent.trim()===key);
+    b.classList.toggle('active',b.querySelector('.pt').textContent.trim()===key);
   });
   document.getElementById('inp-company').value=p.company;
   document.getElementById('inp-price').value=p.price;
@@ -1136,158 +1146,78 @@ function loadPreset(key){
 
 function resetInputs(){
   clearPills();
-  ['inp-company','inp-price','inp-shares','inp-revenue','inp-fcf','inp-netcash','inp-tmult']
-    .forEach(id=>document.getElementById(id).value='');
+  ['inp-company','inp-price','inp-shares','inp-revenue','inp-fcf','inp-netcash','inp-tmult'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('inp-years').value=8;
   document.getElementById('sl-cagr').value=10;document.getElementById('lbl-cagr').textContent='10%';
   document.getElementById('sl-dpp').value=0;document.getElementById('lbl-dpp').textContent='0.0pp';
   document.getElementById('sl-tg').value=2;document.getElementById('lbl-tg').textContent='2.0%';
   document.getElementById('sl-disc').value=12;onDiscChange();
   document.getElementById('sel-fccy').value='USD';document.getElementById('sel-pccy').value='USD';
-  onCurrencyChange();
+  onCurrencyChange();setTerm('growth');
   document.getElementById('btn-reset').style.display='none';
-  setTerm('growth');
   update();
 }
 
-/* ═══════════════════════════════════════════
-   TABS
-═══════════════════════════════════════════ */
 function switchTab(t){
   activeTab=t;
-  document.querySelectorAll('.tab-btn').forEach((b,i)=>{
-    b.classList.toggle('active',['dcf','rev','matrix'][i]===t);
-  });
+  document.querySelectorAll('.tab-btn').forEach((b,i)=>b.classList.toggle('active',['dcf','rev','matrix'][i]===t));
   document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
   document.getElementById('tab-'+t).classList.add('active');
   update();
 }
 
-/* ═══════════════════════════════════════════
-   COLLAPSIBLE
-═══════════════════════════════════════════ */
-function toggleColl(hdr){hdr.classList.toggle('open');hdr.nextElementSibling.classList.toggle('open')}
-
-/* ═══════════════════════════════════════════
-   METHODOLOGY
-═══════════════════════════════════════════ */
-function showMethodology(){
-  document.getElementById('app-view').style.display='none';
-  document.getElementById('methodology').style.display='block';
-  document.getElementById('meth-btn').textContent='← App';
-  document.getElementById('meth-btn').onclick=hideMethodology;
-}
-function hideMethodology(){
-  document.getElementById('app-view').style.display='flex';
-  document.getElementById('methodology').style.display='none';
-  document.getElementById('meth-btn').textContent='Methodology';
-  document.getElementById('meth-btn').onclick=showMethodology;
-}
-
-/* ═══════════════════════════════════════════
-   MOBILE
-═══════════════════════════════════════════ */
-function toggleMobile(){
-  document.getElementById('sidebar').classList.toggle('open');
-  document.getElementById('overlay').classList.toggle('show');
-}
-function closeMobile(){
-  document.getElementById('sidebar').classList.remove('open');
-  document.getElementById('overlay').classList.remove('show');
-}
-
-/* ═══════════════════════════════════════════
-   URL SHARING
-═══════════════════════════════════════════ */
+function toggleColl(h){h.classList.toggle('open');h.nextElementSibling.classList.toggle('open')}
+function showMethodology(){document.getElementById('app-view').style.display='none';document.getElementById('methodology').style.display='block';document.getElementById('meth-btn').textContent='← App';document.getElementById('meth-btn').onclick=hideMethodology}
+function hideMethodology(){document.getElementById('app-view').style.display='flex';document.getElementById('methodology').style.display='none';document.getElementById('meth-btn').textContent='How it works';document.getElementById('meth-btn').onclick=showMethodology}
+function toggleMobile(){document.getElementById('sidebar').classList.toggle('open');document.getElementById('overlay').classList.toggle('show')}
+function closeMobile(){document.getElementById('sidebar').classList.remove('open');document.getElementById('overlay').classList.remove('show')}
+function showToast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2600)}
 function shareURL(){
   const raw=getInputs();
-  const p=new URLSearchParams({
-    co:raw.company,px:raw.price,sh:raw.shares,
-    rev:raw.revLTM,fcf:raw.fcfLTM,nc:raw.netCashRaw,
-    cagr:document.getElementById('sl-cagr').value,
-    dpp:document.getElementById('sl-dpp').value,
-    yr:raw.years,disc:document.getElementById('sl-disc').value,
-    tm:termMode,tg:document.getElementById('sl-tg').value,
-    tmult:raw.tmult||'',fccy:raw.fccy,pccy:raw.pccy,fxr:raw.fxRate,
-  });
+  const p=new URLSearchParams({co:raw.company,px:raw.price,sh:raw.shares,rev:raw.revLTM,fcf:raw.fcfLTM,nc:raw.netCashRaw,cagr:document.getElementById('sl-cagr').value,dpp:document.getElementById('sl-dpp').value,yr:raw.years,disc:document.getElementById('sl-disc').value,tm:termMode,tg:document.getElementById('sl-tg').value,tmult:raw.tmult||'',fccy:raw.fccy,pccy:raw.pccy,fxr:raw.fxRate});
   const url=window.location.origin+window.location.pathname+'?'+p.toString();
-  navigator.clipboard.writeText(url).then(()=>showToast('Link copied to clipboard ✓')).catch(()=>prompt('Copy this link:',url));
+  navigator.clipboard.writeText(url).then(()=>showToast('Link copied ✓')).catch(()=>prompt('Copy this link:',url));
 }
-
 function loadFromURL(){
   const p=new URLSearchParams(window.location.search);
   if(!p.has('co')&&!p.has('px'))return;
   clearPills();
-  const set=(id,v)=>{if(v!==null&&v!=='null'&&v!=='')document.getElementById(id).value=v};
-  set('inp-company',p.get('co'));set('inp-price',p.get('px'));
-  set('inp-shares',p.get('sh'));set('inp-revenue',p.get('rev'));
-  set('inp-fcf',p.get('fcf'));set('inp-netcash',p.get('nc'));
+  const set=(id,v)=>{if(v&&v!=='null')document.getElementById(id).value=v};
+  set('inp-company',p.get('co'));set('inp-price',p.get('px'));set('inp-shares',p.get('sh'));
+  set('inp-revenue',p.get('rev'));set('inp-fcf',p.get('fcf'));set('inp-netcash',p.get('nc'));
   set('inp-years',p.get('yr'));set('inp-tmult',p.get('tmult'));
-  if(p.get('cagr')){const v=parseInt(p.get('cagr'));document.getElementById('sl-cagr').value=v;document.getElementById('lbl-cagr').textContent=v+'%'}
-  if(p.get('dpp')){const v=parseFloat(p.get('dpp'));document.getElementById('sl-dpp').value=v;document.getElementById('lbl-dpp').textContent=v.toFixed(1)+'pp'}
-  if(p.get('tg')){const v=parseFloat(p.get('tg'));document.getElementById('sl-tg').value=v;document.getElementById('lbl-tg').textContent=v.toFixed(1)+'%'}
-  if(p.get('disc')){const v=parseInt(p.get('disc'));document.getElementById('sl-disc').value=v;onDiscChange()}
+  if(p.get('cagr')){const v=+p.get('cagr');document.getElementById('sl-cagr').value=v;document.getElementById('lbl-cagr').textContent=v+'%'}
+  if(p.get('dpp')){const v=+p.get('dpp');document.getElementById('sl-dpp').value=v;document.getElementById('lbl-dpp').textContent=v.toFixed(1)+'pp'}
+  if(p.get('tg')){const v=+p.get('tg');document.getElementById('sl-tg').value=v;document.getElementById('lbl-tg').textContent=v.toFixed(1)+'%'}
+  if(p.get('disc')){const v=+p.get('disc');document.getElementById('sl-disc').value=v;onDiscChange()}
   if(p.get('fccy'))document.getElementById('sel-fccy').value=p.get('fccy');
   if(p.get('pccy'))document.getElementById('sel-pccy').value=p.get('pccy');
   if(p.get('fxr'))document.getElementById('inp-fxrate').value=p.get('fxr');
-  onCurrencyChange();
-  if(p.get('tm'))setTerm(p.get('tm'));
+  onCurrencyChange();if(p.get('tm'))setTerm(p.get('tm'));
   document.getElementById('btn-reset').style.display='';
   update();
 }
 
-/* ═══════════════════════════════════════════
-   TOAST
-═══════════════════════════════════════════ */
-function showToast(msg){
-  const t=document.getElementById('toast');
-  t.textContent=msg;t.classList.add('show');
-  setTimeout(()=>t.classList.remove('show'),2800);
-}
-
-/* ═══════════════════════════════════════════
-   FORMAT HELPERS
-═══════════════════════════════════════════ */
-function fmt(n,d=2){if(!isFinite(n))return'—';return n.toLocaleString('en-US',{minimumFractionDigits:d,maximumFractionDigits:d})}
-function fmtPct(n,d=1){if(!isFinite(n))return'—';return(n>=0?'+':'')+fmt(n*100,d)+'%'}
-function fmtPctPlain(n,d=1){if(!isFinite(n))return'—';return fmt(n*100,d)+'%'}
-
-function irrColor(v){
-  if(!isFinite(v))return{bg:'var(--bg)',fg:'var(--ink-4)'};
-  let r,g,b,fg;
-  const H=.10;
-  if(v<0){const t=Math.min(-v/.25,1);r=Math.round(252+(127-252)*t);g=Math.round(165+(29-165)*t);b=Math.round(165+(29-165)*t);fg=t>.5?'#fff':'#7f1d1d'}
-  else if(v<H){const t=v/H;r=Math.round(252+(254-252)*t);g=Math.round(165+(249-165)*t);b=Math.round(165+(240-165)*t);fg='#7f1d1d'}
-  else if(v<.15){const t=(v-H)/.05;r=Math.round(254+(219-254)*t);g=Math.round(249+(234-249)*t);b=Math.round(240+(254-240)*t);fg='#1e3a5f'}
-  else{const t=Math.min((v-.15)/.15,1);r=Math.round(219+(15-219)*t);g=Math.round(234+(32-234)*t);b=Math.round(254+(80-254)*t);fg=t>.35?'#fff':'#1e3a5f'}
-  return{bg:`rgb(${r},${g},${b})`,fg};
-}
-
-/* CSS var to hex helper for canvas */
-function cssVar(v){return getComputedStyle(document.documentElement).getPropertyValue(v).trim()}
-
-/* ═══════════════════════════════════════════
+/* ══════════════════════════════════════════
    MAIN UPDATE
-═══════════════════════════════════════════ */
+══════════════════════════════════════════ */
 function update(){
   const raw=getInputs();
   const hasFCF=isFinite(raw.fcfLTM),hasRev=isFinite(raw.revLTM)&&raw.revLTM>0;
   document.getElementById('warn-fcf').style.display=(hasFCF&&raw.fcfLTM<0)?'block':'none';
   document.getElementById('err-rev').style.display=(raw.price&&raw.shares&&!hasRev)?'block':'none';
-  document.getElementById('margin-pill').style.display=(hasFCF&&hasRev)?'':'none';
+  document.getElementById('margin-chip').style.display=(hasFCF&&hasRev)?'':'none';
   if(hasFCF&&hasRev){
-    const margin=raw.fcfLTM/raw.revLTM;
-    const mv=document.getElementById('mp-val');
-    mv.textContent=fmt(margin*100,1)+'%';
-    mv.style.color=margin>0?'var(--up)':'var(--dn)';
+    const m=raw.fcfLTM/raw.revLTM;
+    document.getElementById('mc-val').textContent=fmt(m*100,1)+'%';
+    document.getElementById('mc-val').style.color=m>0?'var(--green-dk)':'var(--red-dk)';
   }
   const inp=buildInp(raw);
-  const showSum=inp!==null;
-  document.getElementById('sb-sum-wrap').style.display=showSum?'':'none';
-  if(showSum){
+  document.getElementById('sb-sum-wrap').style.display=inp?'':'none';
+  if(inp){
     document.getElementById('sum-co').textContent=inp.company||'—';
     document.getElementById('sum-px').textContent=fmt(inp.price)+' '+inp.pccy;
-    document.getElementById('sum-mktcap').textContent=fmt(inp.price*inp.shares/inp.fxRate,0)+'M '+inp.fccy;
+    document.getElementById('sum-mktcap').textContent=fmt(inp.price*inp.shares/inp.fxRate,0)+'M';
     document.getElementById('sum-margin').textContent=fmt(inp.fcfMargin*100,1)+'%';
     document.getElementById('sum-growth').textContent=fmt(inp.cagr*100,0)+'%/yr · '+inp.years+'y';
     document.getElementById('sum-terminal').textContent=inp.termMode==='multiple'?fmt(inp.tmult,1)+'×':fmt(inp.tg*100,1)+'%/yr';
@@ -1298,35 +1228,24 @@ function update(){
   updateMobileBar(inp);
 }
 
-/* ═══════════════════════════════════════════
-   MOBILE BAR
-═══════════════════════════════════════════ */
 function updateMobileBar(inp){
-  if(!inp){
-    document.getElementById('mb-fv').textContent='—';
-    document.getElementById('mb-px').textContent='—';
-    document.getElementById('mb-badge-wrap').innerHTML='';
-    return;
-  }
+  if(!inp){document.getElementById('mb-fv').textContent='—';document.getElementById('mb-px').textContent='—';document.getElementById('mb-badge-wrap').innerHTML='';return}
   const res=fairValue(inp);
   document.getElementById('mb-px').textContent=fmt(inp.price)+' '+inp.pccy;
   if(res.ok){
     const up=res.fvps/inp.price-1;
     document.getElementById('mb-fv').textContent=fmt(res.fvps)+' '+inp.pccy;
-    const cls=up>=0?'up':'dn';
+    const cls=up>=0?'good':'bad';
     document.getElementById('mb-badge-wrap').innerHTML=`<div class="mb-badge ${cls}">${up>=0?'+':''}${fmt(up*100,1)}%</div>`;
-  } else {
-    document.getElementById('mb-fv').textContent='N/A';
-    document.getElementById('mb-badge-wrap').innerHTML='';
   }
 }
 
-/* ═══════════════════════════════════════════
-   TAB 1 — DCF
-═══════════════════════════════════════════ */
+/* ══════════════════════════════════════════
+   TAB 1 — FAIR VALUE
+══════════════════════════════════════════ */
 function renderDCF(inp){
   if(!inp)inp=buildInp(getInputs());
-  const show=inp!==null;
+  const show=!!inp;
   document.getElementById('dcf-empty').style.display=show?'none':'';
   document.getElementById('dcf-content').style.display=show?'':'none';
   if(!show)return;
@@ -1335,109 +1254,82 @@ function renderDCF(inp){
   const pCcy=inp.pccy;
   if(res.ok){
     const up=res.fvps/inp.price-1;
-    const upCls=up>=0?'up':'dn';
-    const kpiClass=up>=0?'kpi-up':'kpi-dn';
-    document.getElementById('dcf-kpis').innerHTML=`
-      <div class="kpi ${kpiClass}">
-        <div class="kpi-lbl">Fair Value / Share</div>
-        <div class="kpi-val ${upCls}">${fmt(res.fvps)}</div>
-        <div class="kpi-sub">${pCcy}</div>
-        <div class="kpi-badge ${upCls}">${up>=0?'▲ UNDERVALUED':'▼ OVERVALUED'}</div>
+    const good=up>=0;
+    // Hero card
+    document.getElementById('dcf-hero').innerHTML=`
+      <div class="rh-left">
+        <div class="rh-label">Fair value per share</div>
+        <div class="rh-value ${good?'good':'bad'}">${fmt(res.fvps)}</div>
+        <div class="rh-sub">${pCcy}</div>
+        <div class="rh-badge ${good?'good':'bad'}">${good?'▲ Stock looks cheap':'▼ Stock looks expensive'}</div>
       </div>
-      <div class="kpi kpi-neutral">
-        <div class="kpi-lbl">Market Price</div>
-        <div class="kpi-val accent">${fmt(inp.price)}</div>
-        <div class="kpi-sub">${pCcy}</div>
-      </div>
-      <div class="kpi ${kpiClass}">
-        <div class="kpi-lbl">Implied Upside</div>
-        <div class="kpi-val ${upCls}">${up>=0?'+':''}${fmt(up*100,1)}%</div>
-        <div class="kpi-sub">vs market price</div>
-      </div>
-      <div class="kpi kpi-neutral">
-        <div class="kpi-lbl">Discount Rate</div>
-        <div class="kpi-val">${fmt(inp.disc*100,0)}%</div>
-        <div class="kpi-sub">required return</div>
+      <div class="rh-right">
+        <div class="rh-label">Implied upside / downside</div>
+        <div class="rh-value ${good?'good':'bad'}">${up>=0?'+':''}${fmt(up*100,1)}%</div>
+        <div class="rh-sub">vs market price of ${fmt(inp.price)} ${pCcy}</div>
       </div>`;
+    // Stat row
+    document.getElementById('dcf-stat-row').innerHTML=`
+      <div class="stat-card">
+        <div class="sc-lbl">Market price</div>
+        <div class="sc-val">${fmt(inp.price)}</div>
+        <div class="sc-sub">${pCcy} per share</div>
+      </div>
+      <div class="stat-card">
+        <div class="sc-lbl">Your required return</div>
+        <div class="sc-val">${fmt(inp.disc*100,0)}%</div>
+        <div class="sc-sub">per year</div>
+      </div>`;
+    // Comparison bars
     const mx=Math.max(res.fvps,inp.price);
-    const fw=Math.max(res.fvps/mx*100,5),pw=Math.max(inp.price/mx*100,5);
-    document.getElementById('dcf-bars').innerHTML=`
-      <div class="bar-item">
-        <div class="bar-meta"><span>Fair Value</span><span class="bar-meta-val">${fmt(res.fvps)} ${pCcy}</span></div>
-        <div class="bar-track"><div class="bar-fill bar-fv" style="width:${fw.toFixed(1)}%">${fmt(res.fvps)}</div></div>
-      </div>
-      <div class="bar-item">
-        <div class="bar-meta"><span>Market Price</span><span class="bar-meta-val">${fmt(inp.price)} ${pCcy}</span></div>
-        <div class="bar-track"><div class="bar-fill bar-px" style="width:${pw.toFixed(1)}%">${fmt(inp.price)}</div></div>
-      </div>
-      <span class="upside-tag ${upCls}">${up>=0?'▲':'▼'} ${up>=0?'+':''}${fmt(up*100,1)}% implied ${up>=0?'upside':'downside'}</span>`;
+    const fw=Math.max(res.fvps/mx*96,4),pw=Math.max(inp.price/mx*96,4);
+    document.getElementById('dcf-cmp').innerHTML=`
+      <div class="cmp-lbl"><span>Fair value</span><span>${fmt(res.fvps)} ${pCcy}</span></div>
+      <div class="cmp-track"><div class="cmp-fill fv${good?'':' bad'}" style="width:${fw.toFixed(1)}%">${fmt(res.fvps)}</div></div>
+      <div class="cmp-lbl"><span>Market price</span><span>${fmt(inp.price)} ${pCcy}</span></div>
+      <div class="cmp-track"><div class="cmp-fill px" style="width:${pw.toFixed(1)}%">${fmt(inp.price)}</div></div>
+      <span class="upside-pill ${good?'good':'bad'}" style="margin-top:4px">${good?'▲':'▼'} ${up>=0?'+':''}${fmt(up*100,1)}% implied ${good?'upside':'downside'}</span>`;
   } else {
-    document.getElementById('dcf-kpis').innerHTML=`<div class="kpi" style="grid-column:1/-1;text-align:center;color:var(--ink-3);padding:16px;font-size:12.5px">⚠ Equity PV ≤ 0 — try a lower discount rate, higher growth, or improved margins.</div>`;
-    document.getElementById('dcf-bars').innerHTML='';
+    document.getElementById('dcf-hero').innerHTML=`<div style="grid-column:1/-1;text-align:center;padding:20px;color:var(--ink-3);font-size:13px">⚠ Could not calculate fair value. Try a lower required return, higher growth, or check that cash flow is positive.</div>`;
+    document.getElementById('dcf-stat-row').innerHTML='';
+    document.getElementById('dcf-cmp').innerHTML='';
   }
-  // Sensitivity data
+  // Sens data
   _sensData=[];
-  for(let rr=5;rr<=30;rr++){
-    const r2=fairValue({...inp,disc:rr/100});
-    _sensData.push({rate:rr,fv:r2.ok?r2.fvps:null});
-  }
+  for(let r=5;r<=30;r++){const v=fairValue({...inp,disc:r/100});_sensData.push({rate:r,fv:v.ok?v.fvps:null})}
   drawSensChart(inp.price,inp.disc*100);
-  renderForecastTable(inp);
+  renderForecastTable();
   renderBridge(inp,res);
 }
 
 function drawSensChart(price,selRate){
-  const canvas=document.getElementById('chart-sens');
-  const ctx=canvas.getContext('2d');
-  const dpr=window.devicePixelRatio||1;
-  const W=canvas.offsetWidth,H=200;
-  canvas.width=W*dpr;canvas.height=H*dpr;ctx.scale(dpr,dpr);
-  const PAD={t:10,r:16,b:32,l:54},cw=W-PAD.l-PAD.r,ch=H-PAD.t-PAD.b;
+  const cv=document.getElementById('chart-sens'),ctx=cv.getContext('2d');
+  const dpr=window.devicePixelRatio||1,W=cv.offsetWidth,H=180;
+  cv.width=W*dpr;cv.height=H*dpr;ctx.scale(dpr,dpr);
+  const PAD={t:8,r:14,b:28,l:50},cw=W-PAD.l-PAD.r,ch=H-PAD.t-PAD.b;
   const valid=_sensData.filter(d=>d.fv!==null);
   if(valid.length<2)return;
   const fvs=valid.map(d=>d.fv);
   const minFV=Math.min(...fvs,price)*.9,maxFV=Math.max(...fvs,price)*1.08;
-  const xp=r=>PAD.l+(r-5)/(30-5)*cw;
-  const yp=v=>PAD.t+ch-(v-minFV)/(maxFV-minFV)*ch;
-  const gridClr=cssVar('--border')||'#dbd6ce';
-  const textClr=cssVar('--ink-4')||'#a1a1aa';
-  ctx.strokeStyle=gridClr;ctx.lineWidth=1;
-  for(let i=0;i<=4;i++){
-    const y=PAD.t+i*ch/4;ctx.beginPath();ctx.moveTo(PAD.l,y);ctx.lineTo(PAD.l+cw,y);ctx.stroke();
-    ctx.fillStyle=textClr;ctx.font='9px DM Mono';ctx.textAlign='right';
-    ctx.fillText(fmt(minFV+(maxFV-minFV)*(1-i/4),0),PAD.l-5,y+3);
-  }
-  for(let r=5;r<=30;r+=5){
-    const x=xp(r);ctx.beginPath();ctx.moveTo(x,PAD.t);ctx.lineTo(x,PAD.t+ch);ctx.stroke();
-    ctx.fillStyle=textClr;ctx.font='9px DM Mono';ctx.textAlign='center';ctx.fillText(r+'%',x,PAD.t+ch+14);
-  }
+  const xp=r=>PAD.l+(r-5)/25*cw,yp=v=>PAD.t+ch-(v-minFV)/(maxFV-minFV)*ch;
+  const gc=cssVar('--border')||'rgba(0,0,0,.08)',tc=cssVar('--ink-4')||'#aeaeb2';
+  ctx.strokeStyle=gc;ctx.lineWidth=1;
+  for(let i=0;i<=4;i++){const y=PAD.t+i*ch/4;ctx.beginPath();ctx.moveTo(PAD.l,y);ctx.lineTo(PAD.l+cw,y);ctx.stroke();ctx.fillStyle=tc;ctx.font='9px DM Mono';ctx.textAlign='right';ctx.fillText(fmt(minFV+(maxFV-minFV)*(1-i/4),0),PAD.l-4,y+3)}
+  for(let r=5;r<=30;r+=5){const x=xp(r);ctx.beginPath();ctx.moveTo(x,PAD.t);ctx.lineTo(x,PAD.t+ch);ctx.stroke();ctx.fillStyle=tc;ctx.font='9px DM Mono';ctx.textAlign='center';ctx.fillText(r+'%',x,PAD.t+ch+14)}
   const above=valid.filter(d=>d.fv>=price);
-  if(above.length){
-    ctx.beginPath();const py=yp(price);ctx.moveTo(xp(above[0].rate),py);
-    above.forEach(d=>ctx.lineTo(xp(d.rate),yp(d.fv)));
-    ctx.lineTo(xp(above[above.length-1].rate),py);ctx.closePath();
-    ctx.fillStyle='rgba(22,163,74,0.1)';ctx.fill();
-  }
-  ctx.setLineDash([5,4]);ctx.strokeStyle=textClr;ctx.lineWidth=1;
-  ctx.beginPath();ctx.moveTo(PAD.l,yp(price));ctx.lineTo(PAD.l+cw,yp(price));ctx.stroke();
-  ctx.setLineDash([]);ctx.fillStyle=textClr;ctx.font='9px DM Sans';ctx.textAlign='left';
-  ctx.fillText('Market price',PAD.l+4,yp(price)-5);
-  ctx.strokeStyle='#2563eb';ctx.lineWidth=2;ctx.lineJoin='round';ctx.beginPath();
-  valid.forEach((d,i)=>{if(i===0)ctx.moveTo(xp(d.rate),yp(d.fv));else ctx.lineTo(xp(d.rate),yp(d.fv))});
-  ctx.stroke();
+  if(above.length){ctx.beginPath();const py=yp(price);ctx.moveTo(xp(above[0].rate),py);above.forEach(d=>ctx.lineTo(xp(d.rate),yp(d.fv)));ctx.lineTo(xp(above[above.length-1].rate),py);ctx.closePath();ctx.fillStyle='rgba(52,199,89,0.1)';ctx.fill()}
+  ctx.setLineDash([4,4]);ctx.strokeStyle=tc;ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(PAD.l,yp(price));ctx.lineTo(PAD.l+cw,yp(price));ctx.stroke();
+  ctx.setLineDash([]);ctx.fillStyle=tc;ctx.font='9px DM Sans';ctx.textAlign='left';ctx.fillText('Market price',PAD.l+4,yp(price)-5);
+  ctx.strokeStyle='#0071e3';ctx.lineWidth=2;ctx.lineJoin='round';ctx.beginPath();valid.forEach((d,i)=>{if(i===0)ctx.moveTo(xp(d.rate),yp(d.fv));else ctx.lineTo(xp(d.rate),yp(d.fv))});ctx.stroke();
   const sel=valid.find(d=>d.rate===Math.round(selRate));
-  if(sel){
-    ctx.beginPath();ctx.arc(xp(sel.rate),yp(sel.fv),4,0,Math.PI*2);
-    ctx.fillStyle='#2563eb';ctx.fill();ctx.strokeStyle='#fff';ctx.lineWidth=2;ctx.stroke();
-  }
-  ctx.fillStyle=textClr;ctx.font='10px DM Sans';ctx.textAlign='center';
-  ctx.fillText('Discount Rate (%)',PAD.l+cw/2,H-3);
+  if(sel){ctx.beginPath();ctx.arc(xp(sel.rate),yp(sel.fv),4,0,Math.PI*2);ctx.fillStyle='#0071e3';ctx.fill();ctx.strokeStyle=cssVar('--surface')||'#fff';ctx.lineWidth=2;ctx.stroke()}
+  ctx.fillStyle=tc;ctx.font='10px DM Sans';ctx.textAlign='center';ctx.fillText('Required return (%)',PAD.l+cw/2,H-2);
 }
 
-function renderForecastTable(inp){
+function renderForecastTable(){
   const t=document.getElementById('forecast-tbl');
   if(!_forecastRows.length){t.innerHTML='';return}
-  let h=`<thead><tr><th>Year</th><th>Revenue (M)</th><th>FCF Margin</th><th>FCF (M)</th><th>Disc. Factor</th><th>PV of FCF (M)</th></tr></thead><tbody>`;
+  let h=`<thead><tr><th>Year</th><th>Revenue (M)</th><th>Cash margin</th><th>Free cash flow (M)</th><th>Discount factor</th><th>Value today (M)</th></tr></thead><tbody>`;
   _forecastRows.forEach(r=>{h+=`<tr><td>${r.year}</td><td>${fmt(r.rev,0)}</td><td>${fmtPctPlain(r.marg,2)}</td><td>${fmt(r.fcf,0)}</td><td>${fmt(r.df,4)}</td><td>${fmt(r.discFcf,0)}</td></tr>`});
   t.innerHTML=h+'</tbody>';
 }
@@ -1445,147 +1337,99 @@ function renderForecastTable(inp){
 function renderBridge(inp,res){
   const el=document.getElementById('bridge-wrap');
   if(!res.ok){el.innerHTML='';return}
-  const pCcy=inp.pccy,fCcy=inp.fccy;
-  const fxNote=inp.fxRate!==1?` × ${fmt(inp.fxRate,4)} FX`:'';
-  el.innerHTML=`<div class="bridge" style="margin-top:12px">
-    <div class="br-row"><span class="br-lbl">PV of FCFs (Yrs 1–${inp.years})</span><span class="br-val">${fmt(res.pvFCFs,0)} M ${fCcy}</span></div>
-    <div class="br-row"><span class="br-lbl">PV of Terminal Value</span><span class="br-val">${fmt(res.pvTV,0)} M ${fCcy}</span></div>
-    <div class="br-row"><span class="br-lbl">Less: Net Debt</span><span class="br-val">(${fmt(inp.netDebt,0)} M)</span></div>
-    <div class="br-row"><span class="br-lbl">Equity PV</span><span class="br-val">${fmt(res.equityPV,0)} M ${fCcy}</span></div>
-    <div class="br-row"><span class="br-lbl">÷ Shares Outstanding</span><span class="br-val">${fmt(inp.shares,0)} M</span></div>
-    <div class="br-row"><span class="br-lbl">Fair Value / Share${fxNote}</span><span class="br-val">${fmt(res.fvps,2)} ${pCcy}</span></div>
+  el.innerHTML=`<div class="bridge" style="margin-top:10px">
+    <div class="br-row"><span class="br-lbl">Value of forecast cash flows</span><span class="br-val">${fmt(res.pvFCFs,0)} M</span></div>
+    <div class="br-row"><span class="br-lbl">Value of terminal (beyond forecast)</span><span class="br-val">${fmt(res.pvTV,0)} M</span></div>
+    <div class="br-row"><span class="br-lbl">Less: net debt</span><span class="br-val">(${fmt(inp.netDebt,0)} M)</span></div>
+    <div class="br-row"><span class="br-lbl">Total equity value</span><span class="br-val">${fmt(res.equityPV,0)} M</span></div>
+    <div class="br-row"><span class="br-lbl">÷ Shares outstanding</span><span class="br-val">${fmt(inp.shares,0)} M</span></div>
+    <div class="br-row"><span class="br-lbl">Fair value per share</span><span class="br-val">${fmt(res.fvps,2)} ${inp.pccy}</span></div>
   </div>`;
 }
 
-/* ═══════════════════════════════════════════
-   TAB 2 — REVERSE DCF
-═══════════════════════════════════════════ */
+/* ══════════════════════════════════════════
+   TAB 2 — IMPLIED RETURN
+══════════════════════════════════════════ */
 function renderRev(inp){
   if(!inp)inp=buildInp(getInputs());
-  const show=inp!==null;
+  const show=!!inp;
   document.getElementById('rev-empty').style.display=show?'none':'';
   document.getElementById('rev-content').style.display=show?'':'none';
   if(!show)return;
   const irr=impliedIRR(inp,inp.price);
-  const pCcy=inp.pccy;
+  const good=irr!==null&&irr>=.10;
+  const termStr=inp.termMode==='multiple'?fmt(inp.tmult,1)+'×':fmt(inp.tg*100,1)+'%/yr growth';
   if(irr!==null){
-    const irrCls=irr>=.10?'up':irr<.06?'dn':'accent';
-    const kpiClass=irr>=.10?'kpi-up':irr<.06?'kpi-dn':'kpi-neutral';
-    const termStr=inp.termMode==='multiple'?fmt(inp.tmult,1)+'×':fmt(inp.tg*100,1)+'%/yr';
-    const irrLabel=irr>=.10?'▲ ABOVE HURDLE':'▼ BELOW HURDLE';
-    document.getElementById('rev-kpis').innerHTML=`
-      <div class="kpi ${kpiClass}">
-        <div class="kpi-lbl">Implied IRR</div>
-        <div class="kpi-val ${irrCls}">${fmt(irr*100,2)}%</div>
-        <div class="kpi-sub">annual return implied</div>
-        <div class="kpi-badge ${irr>=.10?'up':'dn'}">${irrLabel}</div>
+    document.getElementById('irr-hero').innerHTML=`
+      <div class="irr-big">
+        <div class="irr-lbl">Implied annual return</div>
+        <div class="irr-num" style="color:${good?'var(--green-dk)':'var(--red-dk)'}">${fmt(irr*100,1)}%</div>
       </div>
-      <div class="kpi kpi-neutral">
-        <div class="kpi-lbl">Stock Price</div>
-        <div class="kpi-val accent">${fmt(inp.price)}</div>
-        <div class="kpi-sub">${pCcy}</div>
-      </div>
-      <div class="kpi kpi-neutral">
-        <div class="kpi-lbl">Rev. Growth</div>
-        <div class="kpi-val">${fmt(inp.cagr*100,0)}%</div>
-        <div class="kpi-sub">${inp.years}-yr horizon</div>
-      </div>
-      <div class="kpi kpi-neutral">
-        <div class="kpi-lbl">Terminal</div>
-        <div class="kpi-val" style="font-size:17px">${termStr}</div>
-        <div class="kpi-sub">${inp.termMode==='multiple'?'exit multiple':'Gordon growth'}</div>
+      <div class="irr-context">
+        <div class="irr-hurdle ${good?'good':'bad'}">
+          <div class="ih-icon">${good?'✅':'⚠️'}</div>
+          <div>
+            <div class="ih-text ${good?'good':'bad'}">${good?'Above the 10% hurdle':'Below the 10% hurdle'}</div>
+            <div class="ih-sub">${good?'The price implies a decent annual return.':'The price implies a lower return than 10% per year.'}</div>
+          </div>
+        </div>
+        <div class="irr-meta">
+          <div class="im-item">Assumptions<span>${fmt(inp.cagr*100,0)}% growth · ${termStr}</span></div>
+          <div class="im-item">Price<span>${fmt(inp.price)} ${inp.pccy}</span></div>
+        </div>
       </div>`;
   } else {
-    document.getElementById('rev-kpis').innerHTML=`<div class="kpi" style="grid-column:1/-1;text-align:center;color:var(--ink-3);padding:16px">⚠ Could not solve for IRR. Adjust growth or terminal assumptions.</div>`;
+    document.getElementById('irr-hero').innerHTML=`<div style="padding:16px;color:var(--ink-3)">⚠ Could not solve for implied return. Check your inputs.</div>`;
   }
   _revData=[];
   const pMin=inp.price*.35,pMax=inp.price*1.65;
-  for(let i=0;i<=50;i++){
-    const p=pMin+(pMax-pMin)*i/50;
-    const r=impliedIRR(inp,p);
-    if(r!==null)_revData.push({price:p,irr:r});
-  }
+  for(let i=0;i<=50;i++){const p=pMin+(pMax-pMin)*i/50;const r=impliedIRR(inp,p);if(r!==null)_revData.push({price:p,irr:r})}
   drawIRRChart(inp.price,irr);
   renderRevTable(inp);
 }
 
 function drawIRRChart(curPrice,curIRR){
-  const canvas=document.getElementById('chart-irr');
-  const ctx=canvas.getContext('2d');
-  const dpr=window.devicePixelRatio||1;
-  const W=canvas.offsetWidth,H=200;
-  canvas.width=W*dpr;canvas.height=H*dpr;ctx.scale(dpr,dpr);
+  const cv=document.getElementById('chart-irr'),ctx=cv.getContext('2d');
+  const dpr=window.devicePixelRatio||1,W=cv.offsetWidth,H=180;
+  cv.width=W*dpr;cv.height=H*dpr;ctx.scale(dpr,dpr);
   if(_revData.length<2)return;
-  const PAD={t:10,r:16,b:32,l:50},cw=W-PAD.l-PAD.r,ch=H-PAD.t-PAD.b;
+  const PAD={t:8,r:14,b:28,l:46},cw=W-PAD.l-PAD.r,ch=H-PAD.t-PAD.b;
   const prices=_revData.map(d=>d.price),irrs=_revData.map(d=>d.irr*100);
   const minP=Math.min(...prices),maxP=Math.max(...prices);
   const minI=Math.min(...irrs,-5)*1.05,maxI=Math.max(...irrs,25)*1.05;
-  const xp=p=>PAD.l+(p-minP)/(maxP-minP)*cw;
-  const yp=v=>PAD.t+ch-(v-minI)/(maxI-minI)*ch;
-  const gridClr=cssVar('--border')||'#dbd6ce';
-  const textClr=cssVar('--ink-4')||'#a1a1aa';
-  ctx.strokeStyle=gridClr;ctx.lineWidth=1;
-  for(let i=0;i<=4;i++){
-    const y=PAD.t+i*ch/4;ctx.beginPath();ctx.moveTo(PAD.l,y);ctx.lineTo(PAD.l+cw,y);ctx.stroke();
-    ctx.fillStyle=textClr;ctx.font='9px DM Mono';ctx.textAlign='right';
-    ctx.fillText(fmt(minI+(maxI-minI)*(1-i/4),0)+'%',PAD.l-4,y+3);
-  }
-  for(let i=0;i<=4;i++){
-    const x=PAD.l+i*cw/4;ctx.beginPath();ctx.moveTo(x,PAD.t);ctx.lineTo(x,PAD.t+ch);ctx.stroke();
-    ctx.fillStyle=textClr;ctx.font='9px DM Mono';ctx.textAlign='center';
-    ctx.fillText(fmt(minP+(maxP-minP)*i/4,0),x,PAD.t+ch+14);
-  }
+  const xp=p=>PAD.l+(p-minP)/(maxP-minP)*cw,yp=v=>PAD.t+ch-(v-minI)/(maxI-minI)*ch;
+  const gc=cssVar('--border')||'rgba(0,0,0,.08)',tc=cssVar('--ink-4')||'#aeaeb2';
+  ctx.strokeStyle=gc;ctx.lineWidth=1;
+  for(let i=0;i<=4;i++){const y=PAD.t+i*ch/4;ctx.beginPath();ctx.moveTo(PAD.l,y);ctx.lineTo(PAD.l+cw,y);ctx.stroke();ctx.fillStyle=tc;ctx.font='9px DM Mono';ctx.textAlign='right';ctx.fillText(fmt(minI+(maxI-minI)*(1-i/4),0)+'%',PAD.l-3,y+3)}
+  for(let i=0;i<=4;i++){const x=PAD.l+i*cw/4;ctx.beginPath();ctx.moveTo(x,PAD.t);ctx.lineTo(x,PAD.t+ch);ctx.stroke();ctx.fillStyle=tc;ctx.font='9px DM Mono';ctx.textAlign='center';ctx.fillText(fmt(minP+(maxP-minP)*i/4,0),x,PAD.t+ch+14)}
   const aH=_revData.filter(d=>d.irr*100>=10);
-  if(aH.length){
-    const hy=yp(10);ctx.beginPath();ctx.moveTo(xp(aH[0].price),hy);
-    aH.forEach(d=>ctx.lineTo(xp(d.price),yp(d.irr*100)));
-    ctx.lineTo(xp(aH[aH.length-1].price),hy);ctx.closePath();
-    ctx.fillStyle='rgba(22,163,74,0.1)';ctx.fill();
-  }
-  ctx.setLineDash([5,4]);ctx.strokeStyle=textClr;ctx.lineWidth=1;
-  const hly=yp(10);ctx.beginPath();ctx.moveTo(PAD.l,hly);ctx.lineTo(PAD.l+cw,hly);ctx.stroke();
-  ctx.setLineDash([]);ctx.fillStyle=textClr;ctx.font='9px DM Sans';ctx.textAlign='left';ctx.fillText('10% hurdle',PAD.l+4,hly-5);
-  ctx.strokeStyle='#2563eb';ctx.lineWidth=2;ctx.lineJoin='round';ctx.beginPath();
-  _revData.forEach((d,i)=>{if(i===0)ctx.moveTo(xp(d.price),yp(d.irr*100));else ctx.lineTo(xp(d.price),yp(d.irr*100))});
-  ctx.stroke();
-  if(curIRR!==null){
-    const cx=xp(curPrice),cy=yp(curIRR*100);
-    ctx.beginPath();ctx.arc(cx,cy,5,0,Math.PI*2);
-    ctx.fillStyle='#2563eb';ctx.fill();ctx.strokeStyle='#fff';ctx.lineWidth=2;ctx.stroke();
-    ctx.fillStyle='#2563eb';ctx.font='bold 10px DM Mono';ctx.textAlign='center';
-    ctx.fillText(fmt(curIRR*100,1)+'%',cx,cy-10);
-  }
-  ctx.fillStyle=textClr;ctx.font='10px DM Sans';ctx.textAlign='center';
-  ctx.fillText('Stock Price',PAD.l+cw/2,H-3);
+  if(aH.length){ctx.beginPath();const hy=yp(10);ctx.moveTo(xp(aH[0].price),hy);aH.forEach(d=>ctx.lineTo(xp(d.price),yp(d.irr*100)));ctx.lineTo(xp(aH[aH.length-1].price),hy);ctx.closePath();ctx.fillStyle='rgba(52,199,89,0.1)';ctx.fill()}
+  ctx.setLineDash([4,4]);ctx.strokeStyle=tc;ctx.lineWidth=1;const hly=yp(10);ctx.beginPath();ctx.moveTo(PAD.l,hly);ctx.lineTo(PAD.l+cw,hly);ctx.stroke();ctx.setLineDash([]);
+  ctx.fillStyle=tc;ctx.font='9px DM Sans';ctx.textAlign='left';ctx.fillText('10% hurdle',PAD.l+4,hly-5);
+  ctx.strokeStyle='#0071e3';ctx.lineWidth=2;ctx.lineJoin='round';ctx.beginPath();_revData.forEach((d,i)=>{if(i===0)ctx.moveTo(xp(d.price),yp(d.irr*100));else ctx.lineTo(xp(d.price),yp(d.irr*100))});ctx.stroke();
+  if(curIRR!==null){const cx=xp(curPrice),cy=yp(curIRR*100);ctx.beginPath();ctx.arc(cx,cy,5,0,Math.PI*2);ctx.fillStyle='#0071e3';ctx.fill();ctx.strokeStyle=cssVar('--surface')||'#fff';ctx.lineWidth=2;ctx.stroke();ctx.fillStyle='#0071e3';ctx.font='bold 10px DM Mono';ctx.textAlign='center';ctx.fillText(fmt(curIRR*100,1)+'%',cx,cy-9)}
+  ctx.fillStyle=tc;ctx.font='10px DM Sans';ctx.textAlign='center';ctx.fillText('Stock price',PAD.l+cw/2,H-2);
 }
 
 function renderRevTable(inp){
   const t=document.getElementById('rev-tbl');
-  const prices=[];
-  for(let i=-5;i<=5;i++){const p=inp.price*(1+.1*i);if(p>0)prices.push(p)}
-  let h=`<thead><tr><th>Price</th><th>vs Current</th><th>Implied IRR</th><th>vs Hurdle</th></tr></thead><tbody>`;
+  const prices=[];for(let i=-5;i<=5;i++){const p=inp.price*(1+.1*i);if(p>0)prices.push(p)}
+  let h=`<thead><tr><th>Price</th><th>vs today</th><th>Implied return</th><th>vs 10% hurdle</th></tr></thead><tbody>`;
   prices.forEach(p=>{
-    const r=impliedIRR(inp,p);
-    const vs=p/inp.price-1;
-    const isCur=Math.abs(p-inp.price)<.01;
-    const{bg,fg}=r!==null?irrColor(r):{bg:'var(--bg)',fg:'var(--ink-4)'};
-    const vsH=r!==null?(r>=.10?`<span style="color:var(--up)">+${fmt((r-.10)*100,1)}pp</span>`:`<span style="color:var(--dn)">${fmt((r-.10)*100,1)}pp</span>`):'—';
-    h+=`<tr ${isCur?'style="font-weight:700;background:var(--accent-bg)"':''}>
-      <td>${fmt(p,2)}</td>
-      <td>${fmtPct(vs)}</td>
-      <td style="background:${bg};color:${fg};text-align:center">${r!==null?fmt(r*100,2)+'%':'—'}</td>
-      <td>${vsH}</td>
-    </tr>`;
+    const r=impliedIRR(inp,p);const vs=p/inp.price-1;const isCur=Math.abs(p-inp.price)<.01;
+    const{bg,fg}=r!==null?irrColor(r):{bg:'var(--surface-2)',fg:'var(--ink-4)'};
+    const vsH=r!==null?(r>=.10?`<span style="color:var(--green-dk)">+${fmt((r-.10)*100,1)}pp</span>`:`<span style="color:var(--red-dk)">${fmt((r-.10)*100,1)}pp</span>`):'—';
+    h+=`<tr ${isCur?'style="font-weight:700;background:var(--blue-bg)"':''}><td>${fmt(p,2)}</td><td>${fmtPct(vs)}</td><td style="background:${bg};color:${fg};text-align:center">${r!==null?fmt(r*100,2)+'%':'—'}</td><td>${vsH}</td></tr>`;
   });
   t.innerHTML=h+'</tbody>';
 }
 
-/* ═══════════════════════════════════════════
-   TAB 3 — MATRIX
-═══════════════════════════════════════════ */
+/* ══════════════════════════════════════════
+   TAB 3 — SCENARIO GRID
+══════════════════════════════════════════ */
 function renderMatrix(inp){
   if(!inp)inp=buildInp(getInputs());
-  const show=inp!==null;
+  const show=!!inp;
   document.getElementById('matrix-empty').style.display=show?'none':'';
   document.getElementById('matrix-content').style.display=show?'':'none';
   if(!show)return;
@@ -1599,128 +1443,106 @@ function renderMatrix(inp){
   const growths=linspace(gMin/100,gMax/100,gRows);
   const terminals=linspace(isM?tMin:tMin/100,isM?tMax:tMax/100,tCols);
   const scenarios=[
-    {label:'Bear — margin −1pp/yr',cls:'sc-bear',icon:'▼',dpp:-.01},
-    {label:'Base',cls:'sc-base',icon:'●',dpp:0},
-    {label:'Bull — margin +1pp/yr',cls:'sc-bull',icon:'▲',dpp:+.01},
+    {key:'bear',label:'Bear',desc:'Margins fall 1% per year',dpp:-.01},
+    {key:'base',label:'Base',desc:'Margins stay the same',dpp:0},
+    {key:'bull',label:'Bull',desc:'Margins rise 1% per year',dpp:+.01},
   ];
 
-  // Scenario comparison strip — IRR at current inputs for each scenario
-  const compareIRRs=scenarios.map(sc=>{
-    const ci={...inp,dpp:inp.dpp+sc.dpp};
-    return{...sc,irr:impliedIRR(ci,ci.price)};
-  });
-  const compareHTML=`<div class="sc-compare">
-    <div class="sc-compare-title">Implied IRR at current price — Bear / Base / Bull</div>
-    <div class="sc-compare-grid">
-      ${compareIRRs.map(s=>{
-        const irr=s.irr;
-        const cls=irr===null?'':irr>=.10?'up':'dn';
-        const{bg,fg}=irr!==null?irrColor(irr):{bg:'var(--bg-b)',fg:'var(--ink-4)'};
-        return `<div class="sc-compare-cell" style="background:${bg}">
-          <div class="sc-compare-lbl" style="color:${fg};opacity:.7">${s.label.split('—')[0].trim()}</div>
-          <div class="sc-compare-val" style="color:${fg}">${irr!==null?fmt(irr*100,1)+'%':'—'}</div>
-        </div>`;
-      }).join('')}
-    </div>
-  </div>`;
-  document.getElementById('sc-compare-wrap').innerHTML=compareHTML;
-
-  let html='';
-  scenarios.forEach(sc=>{
-    html+=`<div class="sc-tag ${sc.cls}">${sc.icon} ${sc.label}</div>`;
-    html+=`<div style="overflow-x:auto;margin-bottom:7px"><table class="hm-tbl">`;
-    html+=`<thead><tr><th class="rh">Growth ↓ · Terminal →</th>`;
-    terminals.forEach(tv=>html+=`<th>${isM?fmt(tv,1)+'×':fmt(tv*100,1)+'%'}</th>`);
-    html+=`</tr></thead><tbody>`;
+  // Compute medians for the strip
+  const medians=scenarios.map(sc=>{
+    const irrs=[];
     growths.forEach(g=>{
-      html+=`<tr><th class="rh" style="background:var(--bg-b);text-align:left;padding:5px 8px;color:var(--ink-3)">${fmt(g*100,1)}%</th>`;
       terminals.forEach(tv=>{
         const ci={...inp,cagr:g,dpp:inp.dpp+sc.dpp};
         if(isM){ci.termMode='multiple';ci.tmult=tv}else{ci.termMode='growth';ci.tg=tv}
         const lastFCF=ci.revLTM*Math.pow(1+ci.cagr,ci.years)*(ci.fcfMargin+ci.dpp*ci.years);
-        if(!isFinite(lastFCF)||lastFCF<=0){html+=`<td><div class="hm-cell" style="background:var(--bg);color:var(--ink-4)">—</div></td>`;return}
+        if(!isFinite(lastFCF)||lastFCF<=0)return;
         const irr=impliedIRR(ci,ci.price);
-        if(irr===null){html+=`<td><div class="hm-cell" style="background:var(--bg);color:var(--ink-4)">—</div></td>`;return}
+        if(irr!==null)irrs.push(irr);
+      });
+    });
+    irrs.sort((a,b)=>a-b);
+    const median=irrs.length?irrs[Math.floor(irrs.length/2)]:null;
+    return{...sc,median,count:irrs.length,above:irrs.filter(v=>v>=.10).length};
+  });
+
+  const termLabel=isM?'exit multiple':'terminal growth';
+  const termRange=isM?`${fmt(tMin,0)}–${fmt(tMax,0)}×`:`${fmt(tMin,1)}–${fmt(tMax,1)}%`;
+  const growRange=`${fmt(gMin,0)}–${fmt(gMax,0)}% revenue growth`;
+
+  document.getElementById('sc-strip').innerHTML=`
+    <div class="sc-strip-title">Median implied return — across all ${gRows}×${tCols} combinations</div>
+    <div class="sc-strip-sub">Each number is the middle result from every row and column combination, at ${growRange} and ${termRange} ${termLabel}.</div>
+    <div class="sc-cols">
+      ${medians.map(s=>{
+        const good=s.median!==null&&s.median>=.10;
+        const pct=s.count>0?Math.round(s.above/s.count*100):0;
+        return `<div class="sc-col sc-col-${s.key}">
+          <div class="sc-col-name">${s.label}</div>
+          <div class="sc-col-desc">${s.desc}</div>
+          <div class="sc-col-irr">${s.median!==null?fmt(s.median*100,1)+'%':'—'}</div>
+          <div class="sc-col-meta">${pct}% of cells above 10%</div>
+          ${s.median!==null?`<div class="sc-col-badge ${good?'good':'bad'}">${good?'Above hurdle':'Below hurdle'}</div>`:''}
+        </div>`;
+      }).join('')}
+    </div>`;
+
+  let html='';
+  scenarios.forEach(sc=>{
+    html+=`<div class="sc-tag sc-tag-${sc.key}">${sc.label} — ${sc.desc}</div>`;
+    html+=`<div style="overflow-x:auto;margin-bottom:6px"><table class="hm-tbl">`;
+    html+=`<thead><tr><th class="rh">Growth ↓ / Terminal →</th>`;
+    terminals.forEach(tv=>html+=`<th>${isM?fmt(tv,1)+'×':fmt(tv*100,1)+'%'}</th>`);
+    html+=`</tr></thead><tbody>`;
+    growths.forEach(g=>{
+      html+=`<tr><th class="rh" style="background:var(--surface-2);text-align:left;padding:6px 8px;color:var(--ink-3);font-weight:500">${fmt(g*100,1)}%</th>`;
+      terminals.forEach(tv=>{
+        const ci={...inp,cagr:g,dpp:inp.dpp+sc.dpp};
+        if(isM){ci.termMode='multiple';ci.tmult=tv}else{ci.termMode='growth';ci.tg=tv}
+        const lastFCF=ci.revLTM*Math.pow(1+ci.cagr,ci.years)*(ci.fcfMargin+ci.dpp*ci.years);
+        if(!isFinite(lastFCF)||lastFCF<=0){html+=`<td><div class="hm-cell" style="background:var(--surface-2);color:var(--ink-4)">—</div></td>`;return}
+        const irr=impliedIRR(ci,ci.price);
+        if(irr===null){html+=`<td><div class="hm-cell" style="background:var(--surface-2);color:var(--ink-4)">—</div></td>`;return}
         const{bg,fg}=irrColor(irr);
         html+=`<td><div class="hm-cell" style="background:${bg};color:${fg}">${fmt(irr*100,1)}%</div></td>`;
       });
       html+=`</tr>`;
     });
     html+=`</tbody></table></div>`;
-    html+=`<button class="btn-dl" onclick="downloadMatrix(${JSON.stringify(sc.label)})">⬇ Download CSV</button><div style="height:10px"></div>`;
+    html+=`<button class="btn-dl" onclick="downloadMatrix(${JSON.stringify(sc.label)})">⬇ Download CSV</button><div style="height:8px"></div>`;
   });
   document.getElementById('matrix-tables').innerHTML=html;
   window._matrixState={inp,growths,terminals,scenarios,isM};
 }
 
-/* ═══════════════════════════════════════════
-   CSV DOWNLOADS
-═══════════════════════════════════════════ */
-function dlCSV(filename,rows){
-  const csv=rows.map(r=>r.map(c=>`"${String(c).replace(/"/g,'""')}"`).join(',')).join('\n');
-  const a=document.createElement('a');a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv);a.download=filename;a.click();
-}
-function downloadForecast(){
-  const rows=[['Year','Revenue (M)','FCF Margin','FCF (M)','Disc. Factor','PV of FCF (M)']];
-  _forecastRows.forEach(r=>rows.push([r.year,fmt(r.rev,0),fmtPctPlain(r.marg,2),fmt(r.fcf,0),fmt(r.df,4),fmt(r.discFcf,0)]));
-  dlCSV('forecast.csv',rows);
-}
-function downloadRevDCF(){
-  const inp=buildInp(getInputs());if(!inp)return;
-  const rows=[['Price','vs Current','Implied IRR','vs 10% Hurdle']];
-  for(let i=-5;i<=5;i++){
-    const p=inp.price*(1+.1*i);if(p>0){
-      const r=impliedIRR(inp,p);
-      rows.push([fmt(p,2),fmtPct(p/inp.price-1),r!==null?fmt(r*100,2)+'%':'—',r!==null?fmt((r-.10)*100,1)+'pp':'—']);
-    }
-  }
-  dlCSV('reverse_dcf.csv',rows);
-}
+/* ══════════════════════════════════════════
+   CSV
+══════════════════════════════════════════ */
+function dlCSV(fn,rows){const c=rows.map(r=>r.map(c=>`"${String(c).replace(/"/g,'""')}"`).join(',')).join('\n');const a=document.createElement('a');a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(c);a.download=fn;a.click()}
+function downloadForecast(){const rows=[['Year','Revenue (M)','Cash margin','Free cash flow (M)','Discount factor','Value today (M)']];_forecastRows.forEach(r=>rows.push([r.year,fmt(r.rev,0),fmtPctPlain(r.marg,2),fmt(r.fcf,0),fmt(r.df,4),fmt(r.discFcf,0)]));dlCSV('forecast.csv',rows)}
+function downloadRevDCF(){const inp=buildInp(getInputs());if(!inp)return;const rows=[['Price','vs today','Implied return','vs 10% hurdle']];for(let i=-5;i<=5;i++){const p=inp.price*(1+.1*i);if(p>0){const r=impliedIRR(inp,p);rows.push([fmt(p,2),fmtPct(p/inp.price-1),r!==null?fmt(r*100,2)+'%':'—',r!==null?fmt((r-.10)*100,1)+'pp':'—'])}}dlCSV('reverse_dcf.csv',rows)}
 function downloadMatrix(scLabel){
   if(!window._matrixState)return;
   const{inp,growths,terminals,scenarios,isM}=window._matrixState;
   const sc=scenarios.find(s=>s.label===scLabel);if(!sc)return;
   const hdr=['Growth \\ Terminal'].concat(terminals.map(tv=>isM?fmt(tv,1)+'×':fmt(tv*100,1)+'%'));
   const rows=[hdr];
-  growths.forEach(g=>{
-    const row=[fmt(g*100,1)+'%'];
-    terminals.forEach(tv=>{
-      const ci={...inp,cagr:g,dpp:inp.dpp+sc.dpp};
-      if(isM){ci.termMode='multiple';ci.tmult=tv}else{ci.termMode='growth';ci.tg=tv}
-      const irr=impliedIRR(ci,ci.price);
-      row.push(irr!==null?fmt(irr*100,2)+'%':'—');
-    });
-    rows.push(row);
-  });
-  dlCSV(`irr_matrix_${sc.label.split(' ')[0].toLowerCase()}.csv`,rows);
+  growths.forEach(g=>{const row=[fmt(g*100,1)+'%'];terminals.forEach(tv=>{const ci={...inp,cagr:g,dpp:inp.dpp+sc.dpp};if(isM){ci.termMode='multiple';ci.tmult=tv}else{ci.termMode='growth';ci.tg=tv}const irr=impliedIRR(ci,ci.price);row.push(irr!==null?fmt(irr*100,2)+'%':'—')});rows.push(row)});
+  dlCSV(`irr_matrix_${sc.label.toLowerCase()}.csv`,rows);
 }
 
-/* ═══════════════════════════════════════════
-   RESIZE
-═══════════════════════════════════════════ */
+/* ══════════════════════════════════════════
+   RESIZE & INIT
+══════════════════════════════════════════ */
 let _rt;
-window.addEventListener('resize',()=>{
-  clearTimeout(_rt);_rt=setTimeout(()=>{
-    const inp=buildInp(getInputs());if(!inp)return;
-    if(activeTab==='dcf')drawSensChart(inp.price,inp.disc*100);
-    else if(activeTab==='rev'){const irr=impliedIRR(inp,inp.price);drawIRRChart(inp.price,irr)}
-  },100);
-});
+window.addEventListener('resize',()=>{clearTimeout(_rt);_rt=setTimeout(()=>{const inp=buildInp(getInputs());if(!inp)return;if(activeTab==='dcf')drawSensChart(inp.price,inp.disc*100);else if(activeTab==='rev'){const irr=impliedIRR(inp,inp.price);drawIRRChart(inp.price,irr)}},100)});
 
-/* ═══════════════════════════════════════════
-   INIT
-═══════════════════════════════════════════ */
 // Restore theme
 const savedTheme=localStorage.getItem('vs-theme');
-if(savedTheme){
-  document.documentElement.setAttribute('data-theme',savedTheme);
-  document.getElementById('dark-btn').textContent=savedTheme==='dark'?'☀️':'🌙';
-}
-// Init disc thumb position
+if(savedTheme){document.documentElement.setAttribute('data-theme',savedTheme);document.getElementById('dark-btn').textContent=savedTheme==='dark'?'☀️':'🌙'}
 onDiscChange();
-// Load
 loadFromURL();
-if(!window.location.search){loadPreset('NFLX')}
+if(!window.location.search)loadPreset('NFLX');
 </script>
 </body>
 </html>
