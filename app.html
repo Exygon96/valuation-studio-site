@@ -874,8 +874,8 @@ function setTerm(mode){
 function loadPreset(key){
   const p=PRESETS[key];if(!p)return;
   activePreset=key;
-  document.querySelectorAll('.co-pill').forEach((b,i)=>{
-    b.classList.toggle('active',Object.keys(PRESETS)[i]===key);
+  document.querySelectorAll('.co-pill').forEach(b=>{
+    b.classList.toggle('active',b.textContent.trim()===key);
   });
   document.getElementById('inp-company').value=p.company;
   document.getElementById('inp-price').value=p.price;
