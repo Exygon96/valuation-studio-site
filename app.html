@@ -52,14 +52,14 @@
   --bg:        #0f0e0c;
   --surface:   #1a1814;
   --surface-2: #242018;
-  --border:    rgba(244,240,232,.1);
-  --border-2:  rgba(244,240,232,.06);
+  --border:    rgba(244,240,232,.13);
+  --border-2:  rgba(244,240,232,.07);
 
   --ink:       #f4f0e8;
-  --ink-2:     #e0dbd2;
-  --ink-3:     #9a9488;
-  --ink-4:     #68635a;
-  --ink-5:     #38342c;
+  --ink-2:     #e2ddd4;
+  --ink-3:     #c8c2b8;
+  --ink-4:     #a8a29a;
+  --ink-5:     #807b72;
 
   --blue:      #5a9fd4;
   --blue-b:    #7ab8e8;
@@ -72,7 +72,7 @@
   --red-bg:    #1e0808;
   --red-dk:    #f87171;
 
-  --gold:      #c8952a;
+  --gold:      #d4a030;
   --gold-bg:   #1a1200;
 }
 
@@ -728,12 +728,12 @@ input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.15)}
 
 <header id="header">
   <button id="menu-btn" onclick="toggleMobile()">☰ Inputs</button>
-  <a href="index.html" class="h-logo">
+  <div class="h-logo">
     <div class="h-mark">
       <svg viewBox="0 0 20 20" fill="none"><path d="M3 15l4-6 4 4 3-4 3 3" stroke="#f4f0e8" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
     </div>
     <span class="h-name">Valuation Studio</span>
-  </a>
+  </div>
   <div class="h-sep"></div>
   <button id="dark-btn" onclick="toggleDark()" title="Dark mode">🌙</button>
   <button class="h-btn" onclick="showMethodology()" id="meth-btn">How it works</button>
@@ -747,7 +747,7 @@ input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.15)}
 <!-- SIDEBAR -->
 <aside id="sidebar">
 
-  <div class="sb-lbl">Quick start <span id="onboard-hint" style="font-size:9px;font-weight:500;color:var(--gold);text-transform:none;letter-spacing:0;margin-left:4px;animation:pulse-hint 2s ease-in-out 3">← pick one to begin</span></div>
+  <div class="sb-lbl">Quick start <span id="onboard-hint" style="font-size:9px;font-weight:500;color:var(--gold);text-transform:none;letter-spacing:0;margin-left:4px;animation:pulse-hint 1.8s ease-in-out infinite">← pick one to begin</span></div>
   <div class="co-grid" id="co-grid">
     <button class="co-pill" onclick="loadPreset('AAPL')"><span class="pt">AAPL</span></button>
     <button class="co-pill" onclick="loadPreset('MSFT')"><span class="pt">MSFT</span></button>
@@ -766,7 +766,7 @@ input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.15)}
     <input type="text" id="inp-company" placeholder="e.g. Netflix"/>
   </div>
   <div class="field">
-    <label>Stock price <span class="note" id="price-ccy-note">USD</span><a id="price-check-link" href="#" target="_blank" rel="noopener noreferrer" style="display:none;margin-left:auto;font-size:10px;font-weight:500;color:var(--gold);text-decoration:none;font-family:var(--ff-mono);letter-spacing:.1px;white-space:nowrap;border-bottom:1px dashed var(--gold);padding-bottom:1px" title="Opens Google Finance in a new tab so you can check the current market price — the price in this tool may be out of date">Verify on Google Finance ↗</a></label>
+    <label>Stock price <span class="note" id="price-ccy-note">USD</span><a id="price-check-link" href="#" target="_blank" rel="noopener noreferrer" onclick="return !!this.dataset.ready" style="display:none;margin-left:auto;font-size:10px;font-weight:500;color:var(--gold);text-decoration:none;font-family:var(--ff-mono);letter-spacing:.1px;white-space:nowrap;border-bottom:1px dashed currentColor;padding-bottom:1px" title="Opens a Google search for the current stock price in a new tab — the price stored here may be out of date">Check price on Google ↗</a></label>
     <input type="text" id="inp-price" placeholder="e.g. 78.00"/>
   </div>
 
@@ -844,23 +844,23 @@ input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.15)}
   </div>
   <div id="tg-wrap">
     <div class="sl-row">
-      <div class="sl-top"><span>Long-run growth rate</span><span id="lbl-tg">2.0%</span></div>
+      <div class="sl-top"><span>Terminal growth rate</span><span id="lbl-tg">2.0%</span></div>
       <input type="range" id="sl-tg" min="-10" max="10" step="0.5" value="2" oninput="onSl('tg')"/>
     </div>
   </div>
   <div id="tm-wrap" style="display:none">
-    <div class="field">
-      <label>Exit multiple (× final FCF)</label>
-      <input type="text" id="inp-tmult" placeholder="e.g. 15"/>
+    <div class="sl-row">
+      <div class="sl-top"><span>Exit multiple (× FCF)</span><span id="lbl-tmult">15.0×</span></div>
+      <input type="range" id="sl-tmult" min="3" max="40" step="0.5" value="15" oninput="onSl('tmult')"/>
     </div>
   </div>
 
   <div id="sb-sum-wrap" style="display:none">
     <div class="sb-sum">
       <div class="ss-row"><span class="ss-lbl" id="sum-co">—</span><span class="ss-val" id="sum-px">—</span></div>
-      <div class="ss-row"><span class="ss-lbl">Market cap</span><span class="ss-val" id="sum-mktcap">—</span></div>
       <div class="ss-row"><span class="ss-lbl">FCF margin</span><span class="ss-val" id="sum-margin">—</span></div>
-      <div class="ss-row"><span class="ss-lbl">Growth · years</span><span class="ss-val" id="sum-growth">—</span></div>
+      <div class="ss-row"><span class="ss-lbl">Revenue growth</span><span class="ss-val" id="sum-growth">—</span></div>
+      <div class="ss-row"><span class="ss-lbl">Forecast period</span><span class="ss-val" id="sum-years">—</span></div>
       <div class="ss-row"><span class="ss-lbl">Terminal</span><span class="ss-val" id="sum-terminal">—</span></div>
     </div>
   </div>
@@ -931,7 +931,7 @@ input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.15)}
       <div id="dcf-empty" class="empty">
         <svg viewBox="0 0 40 40" fill="none"><path d="M6 30l8-12 8 8 6-8 6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
         <div class="empty-title">Pick a company to start</div>
-        <div class="empty-body">Tap any ticker on the left — data loads in one click.</div>
+        <div class="empty-body" id="dcf-empty-body">Tap any ticker on the left — data loads in one click. Or fill in the fields manually.</div>
       </div>
       <div id="dcf-content" style="display:none">
 
@@ -997,7 +997,7 @@ input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.15)}
       <div id="rev-empty" class="empty">
         <svg viewBox="0 0 40 40" fill="none"><circle cx="20" cy="20" r="12" stroke="currentColor" stroke-width="2"/><path d="M20 14v6l4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
         <div class="empty-title">Enter data to see the implied return</div>
-        <div class="empty-body">The implied return answers: what annual gain does the current price assume?</div>
+        <div class="empty-body" id="rev-empty-body">The implied return answers: what annual gain does the current price assume?</div>
       </div>
       <div id="rev-content" style="display:none">
 
@@ -1061,9 +1061,12 @@ input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.15)}
       <div id="matrix-empty" class="empty">
         <svg viewBox="0 0 40 40" fill="none"><rect x="6" y="6" width="11" height="11" rx="2" stroke="currentColor" stroke-width="1.8"/><rect x="23" y="6" width="11" height="11" rx="2" stroke="currentColor" stroke-width="1.8"/><rect x="6" y="23" width="11" height="11" rx="2" stroke="currentColor" stroke-width="1.8"/><rect x="23" y="23" width="11" height="11" rx="2" stroke="currentColor" stroke-width="1.8"/></svg>
         <div class="empty-title">Enter data to see the scenario grid</div>
-        <div class="empty-body">The grid shows implied returns across every growth rate and exit assumption.</div>
+        <div class="empty-body" id="matrix-empty-body">The grid shows implied returns across every growth rate and exit assumption.</div>
       </div>
       <div id="matrix-content" style="display:none">
+
+        <!-- Matrix-level warning banner (shown when many cells are blank) -->
+        <div id="matrix-warn" style="display:none" class="calc-warn" style="margin-bottom:12px"></div>
 
         <!-- Scenario summary strip -->
         <div class="sc-strip" id="sc-strip"></div>
@@ -1291,7 +1294,7 @@ function getInputs(){
     disc:parseInt(document.getElementById('sl-disc').value)/100,
     termMode,
     tg:parseFloat(document.getElementById('sl-tg').value)/100,
-    tmult:pf(document.getElementById('inp-tmult').value),
+    tmult:parseFloat(document.getElementById('sl-tmult').value),
     fccy:document.getElementById('sel-fccy').value,
     pccy:document.getElementById('sel-pccy').value,
     fxRate:pf(document.getElementById('inp-fxrate').value)||1,
@@ -1321,6 +1324,7 @@ function onSl(k){
   if(k==='cagr')document.getElementById('lbl-cagr').textContent=document.getElementById('sl-cagr').value+'%';
   else if(k==='dpp')document.getElementById('lbl-dpp').textContent=parseFloat(document.getElementById('sl-dpp').value).toFixed(1)+'pp';
   else if(k==='tg')document.getElementById('lbl-tg').textContent=parseFloat(document.getElementById('sl-tg').value).toFixed(1)+'%';
+  else if(k==='tmult')document.getElementById('lbl-tmult').textContent=parseFloat(document.getElementById('sl-tmult').value).toFixed(1)+'×';
   update();
 }
 
@@ -1337,7 +1341,7 @@ function onDiscChange(){
 }
 function setDisc(v){document.getElementById('sl-disc').value=v;onDiscChange();}
 
-['inp-company','inp-price','inp-shares','inp-revenue','inp-fcf','inp-netcash','inp-years','inp-tmult']
+['inp-company','inp-price','inp-shares','inp-revenue','inp-fcf','inp-netcash','inp-years']
   .forEach(id=>document.getElementById(id).addEventListener('input',()=>{clearPills();update()}));
 
 function onCurrencyChange(){
@@ -1373,9 +1377,9 @@ function toggleDark(){
   setTimeout(()=>{const inp=buildInp(getInputs());if(!inp)return;if(activeTab==='dcf')drawSensChart(inp.price,inp.disc*100);else if(activeTab==='rev'){const irr=impliedIRR(inp,inp.price);drawIRRChart(inp.price,irr,inp.disc)}},50);
 }
 
-function loadPreset(key){
+function loadPreset(key,isAuto){
   const p=PRESETS[key];if(!p)return;
-  hideOnboardHint();
+  if(!isAuto)hideOnboardHint();
   document.querySelectorAll('.co-pill').forEach(b=>{
     b.classList.toggle('active',b.querySelector('.pt').textContent.trim()===key);
   });
@@ -1390,7 +1394,7 @@ function loadPreset(key){
   document.getElementById('inp-years').value=p.years;
   setTerm(p.termMode);
   document.getElementById('sl-tg').value=p.tg;document.getElementById('lbl-tg').textContent=p.tg.toFixed(1)+'%';
-  document.getElementById('inp-tmult').value=p.tmult;
+  document.getElementById('sl-tmult').value=p.tmult;document.getElementById('lbl-tmult').textContent=parseFloat(p.tmult).toFixed(1)+'×';
   document.getElementById('sel-fccy').value=p.fccy||'USD';
   document.getElementById('sel-pccy').value=p.pccy||'USD';
   onCurrencyChange();
@@ -1400,11 +1404,12 @@ function loadPreset(key){
 
 function resetInputs(){
   clearPills();
-  ['inp-company','inp-price','inp-shares','inp-revenue','inp-fcf','inp-netcash','inp-tmult'].forEach(id=>document.getElementById(id).value='');
+  ['inp-company','inp-price','inp-shares','inp-revenue','inp-fcf','inp-netcash'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('inp-years').value=8;
   document.getElementById('sl-cagr').value=10;document.getElementById('lbl-cagr').textContent='10%';
   document.getElementById('sl-dpp').value=0;document.getElementById('lbl-dpp').textContent='0.0pp';
   document.getElementById('sl-tg').value=2;document.getElementById('lbl-tg').textContent='2.0%';
+  document.getElementById('sl-tmult').value=15;document.getElementById('lbl-tmult').textContent='15.0×';
   document.getElementById('sl-disc').value=12;onDiscChange();
   document.getElementById('sel-fccy').value='USD';document.getElementById('sel-pccy').value='USD';
   onCurrencyChange();setTerm('growth');
@@ -1434,12 +1439,17 @@ function shareURL(){
 }
 function loadFromURL(){
   const p=new URLSearchParams(window.location.search);
+  // ?blank=1 → open empty, show onboarding hint, don't auto-load NFLX
+  if(p.get('blank')==='1'){update();return;}
+  // ?preset=AAPL → load a specific preset from landing page ticker pills
+  if(p.has('preset')&&PRESETS[p.get('preset')]){loadPreset(p.get('preset'));return;}
   if(!p.has('co')&&!p.has('px'))return;
   clearPills();
   const set=(id,v)=>{if(v&&v!=='null')document.getElementById(id).value=v};
   set('inp-company',p.get('co'));set('inp-price',p.get('px'));set('inp-shares',p.get('sh'));
   set('inp-revenue',p.get('rev'));set('inp-fcf',p.get('fcf'));set('inp-netcash',p.get('nc'));
-  set('inp-years',p.get('yr'));set('inp-tmult',p.get('tmult'));
+  set('inp-years',p.get('yr'));
+  if(p.get('tmult')){const v=+p.get('tmult');if(v>0){document.getElementById('sl-tmult').value=v;document.getElementById('lbl-tmult').textContent=v.toFixed(1)+'×';}}
   if(p.get('cagr')){const v=+p.get('cagr');document.getElementById('sl-cagr').value=v;document.getElementById('lbl-cagr').textContent=v+'%'}
   if(p.get('dpp')){const v=+p.get('dpp');document.getElementById('sl-dpp').value=v;document.getElementById('lbl-dpp').textContent=v.toFixed(1)+'pp'}
   if(p.get('tg')){const v=+p.get('tg');document.getElementById('sl-tg').value=v;document.getElementById('lbl-tg').textContent=v.toFixed(1)+'%'}
@@ -1452,9 +1462,37 @@ function loadFromURL(){
   update();
 }
 
-/* ══════════════════════════════════════════
-   MAIN UPDATE
-══════════════════════════════════════════ */
+function diagnoseMissing(raw){
+  // Returns an array of {field, fix} objects explaining what's missing/wrong
+  const issues=[];
+  if(!isFinite(raw.price)||raw.price<=0)
+    issues.push({field:'Stock price',fix:'Enter the current share price in the sidebar.'});
+  if(!isFinite(raw.shares)||raw.shares<=0)
+    issues.push({field:'Shares outstanding',fix:'Enter the total shares outstanding in millions.'});
+  if(!isFinite(raw.revLTM)||raw.revLTM<=0)
+    issues.push({field:'Revenue',fix:'Enter last twelve months revenue in millions. Must be a positive number.'});
+  if(!isFinite(raw.fcfLTM))
+    issues.push({field:'Free cash flow',fix:'Enter last twelve months free cash flow in millions. Use a negative number if FCF is negative.'});
+  return issues;
+}
+
+function updateEmptyStates(raw){
+  const issues=diagnoseMissing(raw);
+  const ids=['dcf-empty-body','rev-empty-body','matrix-empty-body'];
+  if(issues.length===0){
+    ids.forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=''});
+    return;
+  }
+  const fieldNames=issues.map(i=>i.field);
+  const fixHtml=issues.map(i=>`<div class="cw-item" style="margin:3px 0"><span class="cw-item-icon">→</span><span><strong>${i.field}:</strong> ${i.fix}</span></div>`).join('');
+  const summary=`Still needed: ${fieldNames.join(', ')}.`;
+  ids.forEach(id=>{
+    const el=document.getElementById(id);
+    if(el)el.innerHTML=`${summary}<div class="cw-list" style="margin-top:8px;text-align:left">${fixHtml}</div>`;
+  });
+}
+
+
 function update(){
   const raw=getInputs();
   const hasFCF=isFinite(raw.fcfLTM),hasRev=isFinite(raw.revLTM)&&raw.revLTM>0;
@@ -1467,32 +1505,31 @@ function update(){
     document.getElementById('mc-val').style.color='';
   }
 
-  // ── Price check link: extract ticker from company name and link to Google Finance
+  // ── Price check link → Google search (shows price widget inline)
   const priceLink=document.getElementById('price-check-link');
   const coName=raw.company||'';
-  // Match a ticker in parens e.g. "Apple (AAPL)" or standalone e.g. "TSLA"
   const tickerMatch=coName.match(/\(([A-Z]{1,5})\)/)||coName.match(/^([A-Z]{2,5})$/);
-  if(tickerMatch){
-    const ticker=tickerMatch[1];
-    // Google Finance uses EXCHANGE:TICKER — default to generic search which handles all exchanges
-    priceLink.href=`https://www.google.com/finance/search?q=${ticker}`;
-    priceLink.style.display='inline';
-  } else if(coName.length>1){
-    priceLink.href=`https://www.google.com/finance/search?q=${encodeURIComponent(coName)}`;
+  if(tickerMatch||coName.length>1){
+    const q=tickerMatch?`${tickerMatch[1]} stock price`:`${coName} stock price`;
+    priceLink.setAttribute('href','https://www.google.com/search?q='+encodeURIComponent(q));
+    priceLink.dataset.ready='1';
     priceLink.style.display='inline';
   } else {
     priceLink.style.display='none';
+    priceLink.dataset.ready='';
   }
 
   const inp=buildInp(raw);
+  // Update empty-state help text based on what's missing
+  if(!inp)updateEmptyStates(raw);
   document.getElementById('sb-sum-wrap').style.display=inp?'':'none';
   if(inp){
     document.getElementById('sum-co').textContent=inp.company||'—';
     document.getElementById('sum-px').textContent=fmt(inp.price)+' '+inp.pccy;
-    document.getElementById('sum-mktcap').textContent=fmt(inp.price*inp.shares/inp.fxRate,0)+'M';
     document.getElementById('sum-margin').textContent=fmt(inp.fcfMargin*100,1)+'%';
-    document.getElementById('sum-growth').textContent=fmt(inp.cagr*100,0)+'%/yr · '+inp.years+'y';
-    document.getElementById('sum-terminal').textContent=inp.termMode==='multiple'?fmt(inp.tmult,1)+'×':fmt(inp.tg*100,1)+'%/yr';
+    document.getElementById('sum-growth').textContent=fmt(inp.cagr*100,0)+'% / yr';
+    document.getElementById('sum-years').textContent=inp.years+' years';
+    document.getElementById('sum-terminal').textContent=inp.termMode==='multiple'?fmt(inp.tmult,1)+'×':fmt(inp.tg*100,1)+'% / yr';
   }
   if(activeTab==='dcf')renderDCF(inp);
   else if(activeTab==='rev')renderRev(inp);
@@ -1591,19 +1628,28 @@ function renderDCF(inp){
         <div class="vg-upside-note">implied ${good?'upside — fair value exceeds market price':'downside — market price exceeds fair value'}</div>
       </div>`;
   } else {
-    // Detailed error diagnosis
+    // Detailed, actionable error diagnosis
     const diagnose=[];
-    if(inp.termMode==='growth'&&inp.tg>=inp.disc)diagnose.push({icon:'⚡',text:`Terminal growth (${fmt(inp.tg*100,1)}%) ≥ discount rate (${fmt(inp.disc*100,0)}%) — the Gordon Growth formula breaks down. Lower terminal growth or raise your required return.`});
+    if(inp.termMode==='growth'&&inp.tg>=inp.disc){
+      diagnose.push({icon:'⚡',text:`Terminal growth rate (${fmt(inp.tg*100,1)}%) must be strictly lower than your required return (${fmt(inp.disc*100,0)}%). The Gordon Growth formula becomes undefined when r ≤ g. → Reduce the "Terminal growth rate" slider below ${fmt(inp.disc*100,0)}%, or raise your required return.`});
+    }
     const finalMarg=inp.fcfMargin+inp.dpp*inp.years;
-    if(finalMarg<=0)diagnose.push({icon:'📉',text:`Margin falls to ${fmt(finalMarg*100,1)}% by year ${inp.years} — free cash flow turns negative. Reduce the margin decline or shorten the forecast.`});
-    if(inp.fcfMargin<=0)diagnose.push({icon:'⚠️',text:`Starting free cash flow margin is ${fmt(inp.fcfMargin*100,1)}% — DCF requires positive cash flow to produce a meaningful result.`});
-    const equityCheck=inp.netDebt>0&&(inp.netDebt/inp.shares)>inp.price;
-    if(equityCheck)diagnose.push({icon:'🏦',text:`Net debt per share (${fmt(inp.netDebt/inp.shares,2)}) exceeds the stock price — equity value turns negative. Check the net cash figure.`});
-    if(!diagnose.length)diagnose.push({icon:'🔧',text:'Could not calculate fair value. Try lowering your required return, increasing the growth rate, or verifying all inputs are positive.'});
+    if(finalMarg<=0){
+      diagnose.push({icon:'📉',text:`With a margin change of ${fmt(inp.dpp*100,1)}pp/yr, FCF margin reaches ${fmt(finalMarg*100,1)}% by year ${inp.years} — cash flow turns negative before the forecast ends. → Reduce the "Margin change per year" slider, shorten the forecast period, or start with a higher FCF.`});
+    }
+    if(inp.fcfMargin<=0){
+      diagnose.push({icon:'⚠️',text:`Starting FCF margin is ${fmt(inp.fcfMargin*100,1)}% — the company is not generating positive free cash flow. A standard DCF requires positive cash flows to produce a meaningful valuation. → Check the Revenue and Free Cash Flow inputs, or enter a forward estimate of positive FCF.`});
+    }
+    if(inp.netDebt>0&&(inp.netDebt/inp.shares)>(inp.price/inp.fxRate)){
+      diagnose.push({icon:'🏦',text:`Net debt per share (${fmt(inp.netDebt/inp.shares,2)}) exceeds the stock price — total equity value becomes negative, which produces no valid result. → Check the "Net cash" field. Use a positive value for net cash, negative for net debt.`});
+    }
+    if(!diagnose.length){
+      diagnose.push({icon:'🔧',text:`The model could not converge on a fair value with these inputs. → Try lowering your required return, raising the revenue growth rate, or confirm that Revenue and Free Cash Flow are both entered correctly.`});
+    }
     document.getElementById('dcf-hero').innerHTML=`<div style="grid-column:1/-1">
       <div class="calc-warn">
-        <div class="cw-head"><div class="cw-icon">⛔</div><div class="cw-title">Fair value could not be calculated</div></div>
-        <div class="cw-body">One or more of your inputs produces a mathematically invalid result. The most likely causes:</div>
+        <div class="cw-head"><div class="cw-icon">⛔</div><div class="cw-title">Fair value cannot be calculated</div></div>
+        <div class="cw-body">The current combination of inputs produces a mathematically invalid result. Here's what needs to change:</div>
         <div class="cw-list">${diagnose.map(d=>`<div class="cw-item"><span class="cw-item-icon">${d.icon}</span><span>${d.text}</span></div>`).join('')}</div>
       </div>
     </div>`;
@@ -1818,14 +1864,24 @@ function renderRev(inp){
       </div>`;
   } else {
     const diagnose2=[];
-    if(inp.termMode==='growth'&&inp.tg>=inp.disc)diagnose2.push('Terminal growth rate equals or exceeds the discount rate — the formula breaks down.');
+    if(inp.termMode==='growth'&&inp.tg>=inp.disc){
+      diagnose2.push({icon:'⚡',text:`Terminal growth rate (${fmt(inp.tg*100,1)}%) must be lower than the required return (${fmt(inp.disc*100,0)}%). The solver cannot find an implied return when g ≥ r. → Reduce the "Terminal growth rate" slider, or raise your required return on the Fair Value tab.`});
+    }
     const fm2=inp.fcfMargin+inp.dpp*inp.years;
-    if(fm2<=0)diagnose2.push(`Projected margin falls to ${fmt(fm2*100,1)}% — cash flow turns negative.`);
-    if(!diagnose2.length)diagnose2.push('Could not find an implied return. Try different assumptions.');
+    if(fm2<=0){
+      diagnose2.push({icon:'📉',text:`Projected FCF margin reaches ${fmt(fm2*100,1)}% by year ${inp.years} — cash flow turns negative under these assumptions. No valid implied return exists. → Reduce the margin decline or shorten the forecast period.`});
+    }
+    if(inp.fcfMargin<=0){
+      diagnose2.push({icon:'⚠️',text:`Starting FCF margin is ${fmt(inp.fcfMargin*100,1)}%. The implied return solver requires positive free cash flows. → Enter a positive FCF, or use a forward FCF estimate.`});
+    }
+    if(!diagnose2.length){
+      diagnose2.push({icon:'🔧',text:`The solver could not converge on an implied return at this price. The growth and terminal assumptions may produce a fair value that is always below the market price regardless of the return rate. → Try increasing the growth rate, raising the terminal value, or reducing the price being tested.`});
+    }
     hero.innerHTML=`<div class="irr-result-card">
-      <div class="calc-warn" style="margin:0;border:none;box-shadow:none">
-        <div class="cw-head"><div class="cw-icon">⛔</div><div class="cw-title">Implied return could not be calculated</div></div>
-        <div class="cw-list">${diagnose2.map(t=>`<div class="cw-item"><span class="cw-item-icon">⚡</span><span>${t}</span></div>`).join('')}</div>
+      <div class="calc-warn" style="margin:0;border:none;box-shadow:none;padding:12px 0 0">
+        <div class="cw-head"><div class="cw-icon">⛔</div><div class="cw-title">Implied return cannot be calculated</div></div>
+        <div class="cw-body">The current inputs produce no valid mathematical solution. Here's what to fix:</div>
+        <div class="cw-list">${diagnose2.map(d=>`<div class="cw-item"><span class="cw-item-icon">${d.icon}</span><span>${d.text}</span></div>`).join('')}</div>
       </div></div>`;
   }
 
@@ -2197,6 +2253,29 @@ function renderMatrix(inp){
       }).join('')}
     </div>`;
 
+  // ── Matrix warning banner: explain blank cells if many are invalid
+  const totalCells=gRows*tCols*3; // 3 scenarios
+  const computedCells=medians.reduce((s,m)=>s+m.count,0);
+  const blankFraction=1-(computedCells/totalCells);
+  const matrixWarn=document.getElementById('matrix-warn');
+  if(blankFraction>0.3){
+    const warnItems=[];
+    if(inp.termMode==='growth'){
+      const tooHigh=terminals.filter(tv=>tv>=inp.disc);
+      if(tooHigh.length)warnItems.push({icon:'⚡',text:`${tooHigh.length} terminal growth column${tooHigh.length>1?'s':''} (${tooHigh.map(v=>fmt(v*100,1)+'%').join(', ')}) meet or exceed the required return (${fmt(inp.disc*100,0)}%). Gordon Growth breaks down when g ≥ r — those cells show "—". → Reduce the terminal growth range, or raise the required return on the Fair Value tab.`});
+    }
+    const badGrowths=growths.filter(g=>{const fm=inp.fcfMargin+inp.dpp*g*inp.years;return fm<=0});
+    if(badGrowths.length)warnItems.push({icon:'📉',text:`At low growth rates, FCF margin falls negative before the forecast ends — those cells show "—". → Increase the minimum growth rate, reduce the margin decline, or shorten the forecast period.`});
+    if(!warnItems.length)warnItems.push({icon:'🔧',text:`Many cells cannot be solved with the current assumptions. → Try adjusting the terminal value range, growth range, or required return until fewer cells show "—".`});
+    matrixWarn.style.display='';
+    matrixWarn.innerHTML=`
+      <div class="cw-head"><div class="cw-icon">⚠️</div><div class="cw-title">${Math.round(blankFraction*100)}% of cells cannot be calculated</div></div>
+      <div class="cw-body">Cells showing "—" have no valid mathematical solution under these assumptions. Most common reasons:</div>
+      <div class="cw-list">${warnItems.map(w=>`<div class="cw-item"><span class="cw-item-icon">${w.icon}</span><span>${w.text}</span></div>`).join('')}</div>`;
+  } else {
+    matrixWarn.style.display='none';
+  }
+
   let html='';
   scenarios.forEach(sc=>{
     html+=`<div class="sc-tag sc-tag-${sc.key}">${sc.label} — ${sc.desc}</div>`;
@@ -2428,7 +2507,9 @@ onDiscChange();
 // Init drag after DOM is ready
 setTimeout(()=>initIRRDrag(),200);
 loadFromURL();
-if(!window.location.search)loadPreset('NFLX');
+if(!window.location.search||window.location.search==='?')loadPreset('NFLX',true);
+// If blank=1, keep fields empty and show onboarding
+
 </script>
 </body>
 </html>
