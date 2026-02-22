@@ -427,23 +427,47 @@
     @media(max-width:1000px) {
       .hero-inner { grid-template-columns: 1fr; gap: 48px; }
       .hero-card { max-width: 460px; }
+      .features-strip { grid-template-columns: 1fr 1fr; }
     }
     @media(max-width:800px) {
       .tools-grid { grid-template-columns: 1fr; }
       .tool-card { border-right: none; border-bottom: 1px solid var(--paper-4); }
       .tool-card:last-child { border-bottom: none; }
-      .features-strip { grid-template-columns: 1fr 1fr; }
       .stats-grid { grid-template-columns: 1fr 1fr; gap: 24px; }
       .stat-item { border-left: none; padding-left: 0; border-top: 1px solid var(--paper-4); padding-top: 24px; }
       .stat-item:first-child, .stat-item:nth-child(2) { border-top: none; padding-top: 0; }
       .steps-row { grid-template-columns: 1fr; gap: 40px; }
       .nav-links { display: none; }
+      /* Ticker strip: stack on mobile */
+      .ticker-row { flex-direction: column; align-items: flex-start; gap: 16px; }
+      .ticker-right { width: 100%; }
+      .provenance-card { flex-direction: row; flex-wrap: wrap; gap: 12px; padding: 12px 16px; }
+      .prov-divider { display: none; }
+      /* Hero: reduce padding */
+      .hero { padding: 56px 0 48px; }
+      .hero-headline { font-size: clamp(36px,7vw,56px); }
+      .section-body { font-size: 15px; margin-bottom: 40px; }
     }
     @media(max-width:560px) {
-      .hero { padding: 64px 0 56px; }
+      .container { padding: 0 1.25rem; }
       .features-strip { grid-template-columns: 1fr; }
-      .feat-cell { border-right: none; border-bottom: 1px solid var(--paper-4); }
+      .feat-cell { border-right: none; border-bottom: 1px solid var(--paper-4); padding: 18px 20px; }
       .feat-cell:last-child { border-bottom: none; }
+      /* Nav: tighter */
+      .nav-inner { padding: 0 1.25rem; }
+      .nav-cta { padding: 7px 14px; font-size: 13px; }
+      .nav-cta svg { display: none; }
+      /* Stats: 2-col stays fine */
+      /* Steps: tighten */
+      .steps-row { gap: 32px; margin-top: 36px; }
+      .step-num { font-size: 40px; margin-bottom: 14px; }
+      /* CTA */
+      .cta-section { padding: 72px 0; }
+      .cta-headline { font-size: clamp(34px,8vw,48px); }
+      /* Tools section */
+      .tools-section { padding: 64px 0; }
+      .how-section { padding: 64px 0; }
+      .section-title { font-size: clamp(28px,6vw,36px); }
     }
     /* ── Dark mode ── */
     [data-theme="dark"] {
@@ -676,7 +700,8 @@
         <div class="tool-title">Implied Return</div>
         <div class="tool-desc">Flip the model. Instead of asking what the company is worth, ask what return the current stock price implies. Compare to your own required return — you decide what's attractive.</div>
         <div class="tool-detail">
-          <span>→</span> Implied IRR across ±65% price range<br>
+          <span>→</span> Implied IRR across −90% to +200% price range<br>
+          <span>→</span> Interactive price slider with live readout<br>
           <span>→</span> Your required return as the reference line<br>
           <span>→</span> Sensitivity table at different prices<br>
           <span>→</span> CSV export
@@ -703,6 +728,11 @@
         <div class="feat-body">All inputs encoded in a URL. Copy, share — anyone lands on your exact analysis.</div>
       </div>
       <div class="feat-cell">
+        <div class="feat-icon">⬇</div>
+        <div class="feat-title">Save as report</div>
+        <div class="feat-body">Download a self-contained HTML report with visual cards, scenario grid, and all assumptions. Open in any browser and print to PDF.</div>
+      </div>
+      <div class="feat-cell">
         <div class="feat-icon">💱</div>
         <div class="feat-title">Multi-currency</div>
         <div class="feat-body">Financials in JPY, price in USD? Set an FX rate and fair value converts automatically.</div>
@@ -715,7 +745,7 @@
       <div class="feat-cell">
         <div class="feat-icon">📱</div>
         <div class="feat-title">Mobile ready</div>
-        <div class="feat-body">Full access on any device. Sticky fair value bar keeps results visible while you scroll.</div>
+        <div class="feat-body">Full access on any device. Sticky bar keeps results visible while scrolling. Share and save buttons always within reach.</div>
       </div>
     </div>
   </div>
@@ -746,7 +776,7 @@
         <div class="step-rule"></div>
         <div class="step-title">Read the output</div>
         <div class="step-body">Fair value tells you what the stock is worth at your return target. Implied return tells you what the current price is pricing in. The scenario grid maps every combination at once.</div>
-        <div class="step-note">Share via URL · Export CSV · Dark mode</div>
+        <div class="step-note">Share via URL · Save PDF report · Export CSV · Dark mode</div>
       </div>
     </div>
   </div>
