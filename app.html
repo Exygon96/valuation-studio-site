@@ -2117,40 +2117,34 @@ function loadPreset(key,isAuto){
   onCurrencyChange();
   document.getElementById('btn-reset').style.display='';
 
-  // Fetch live EOD price; fall back to preset price on any failure
-  document.getElementById('inp-price').value = '';
-  const co = DB_MAP[key];
-  const filingDate = co ? (co.filing || 'Annual report') : 'Annual report';
-  setDataDates(filingDate, 'Fetching…');
-  setPriceStatus('Fetching end-of-day price…', true);
+  // ── Set stored price immediately ──
+  var co = DB_MAP[key];
+  var filingDate = co ? (co.filing || 'Annual report') : 'Annual report';
+  // Use DB price if available, fall back to PRESETS price
+  var storedPrice = (co && co.px) ? String(co.px) : (p.price || '');
+  document.getElementById('inp-price').value = storedPrice;
+  setDataDates(filingDate, 'Stored price (21 Feb 2025)');
   update();
 
+  // ── Silently try to upgrade to live EOD price ──
   if (POLYGON_KEY && POLYGON_KEY !== 'REPLACE_WITH_YOUR_POLYGON_KEY') {
+    setPriceStatus('Fetching live price…', true);
     fetchPolygonPrice(key)
       .then(function(result) {
         document.getElementById('inp-price').value = fmt(result.price, 2);
-        setPriceStatus('Price: ' + result.dateStr, false);
+        setPriceStatus('', false);
         setDataDates(filingDate, result.dateStr + ' close');
         var prov = document.getElementById('provenance-text');
-        if (prov) prov.innerHTML = '<strong>' + p.company + '</strong> · Price: ' + result.dateStr +
+        if (prov) prov.innerHTML = '<strong>' + p.company + '</strong> &middot; Price: ' + result.dateStr +
           ' <span class="live-badge"><span class="live-dot"></span>EOD</span>';
         update();
       })
-      .catch(function(err) {
-        console.warn('Polygon price fetch failed:', err);
-        document.getElementById('inp-price').value = p.price;
-        var msg = (err && err.message === 'no_data')
-          ? 'Market closed — using stored price'
-          : 'Live price unavailable — using stored price';
-        setPriceStatus(msg, false);
-        setDataDates(filingDate, 'Stored price — verify before use');
-        update();
+      .catch(function() {
+        // Stored price already showing — just hide the spinner
+        setPriceStatus('', false);
+        var isWeekend = arguments[0] && arguments[0].message === 'no_data';
+        setDataDates(filingDate, isWeekend ? 'Stored price (market closed)' : 'Stored price (21 Feb 2025)');
       });
-  } else {
-    document.getElementById('inp-price').value = p.price;
-    setPriceStatus('', false);
-    setDataDates(filingDate, 'Stored price — verify before use');
-    update();
   }
 }
 
@@ -3550,63 +3544,63 @@ function setPriceStatus(msg, loading) {
 // sector codes: tech, semi, fin, con, hc, energy, ind
 const _RAW_DB = [
   // ── Mega-cap Tech ──────────────────────────────────────────────────
-  {t:'AAPL', n:'Apple', filing:'FY2024 (Sep 2024)',                rev:416161, fcf:98767,  sh:14773, nc:34000,   cagr:8,  cur:'USD', sec:'tech'},
-  {t:'MSFT', n:'Microsoft', filing:'FY2024 (Jun 2024)',            rev:281724, fcf:71611,  sh:7433,  nc:27000,   cagr:15, cur:'USD', sec:'tech'},
-  {t:'NVDA', n:'Nvidia', filing:'FY2025 (Jan 2025)',               rev:130497, fcf:60853,  sh:24400, nc:38000,   cagr:30, cur:'USD', sec:'semi'},
-  {t:'GOOG', n:'Alphabet', filing:'FY2024 (Dec 2024)',             rev:350018, fcf:72764,  sh:12140, nc:93000,   cagr:12, cur:'USD', sec:'tech'},
-  {t:'META', n:'Meta Platforms', filing:'FY2024 (Dec 2024)',       rev:164501, fcf:52100,  sh:2530,  nc:52000,   cagr:15, cur:'USD', sec:'tech'},
-  {t:'AMZN', n:'Amazon', filing:'FY2024 (Dec 2024)',               rev:637959, fcf:38521,  sh:10580, nc:78000,   cagr:15, cur:'USD', sec:'tech'},
-  {t:'TSLA', n:'Tesla', filing:'FY2024 (Dec 2024)',                rev:94830,  fcf:6200,   sh:3200,  nc:44100,   cagr:20, cur:'USD', sec:'tech'},
-  {t:'NFLX', n:'Netflix', filing:'FY2024 (Dec 2024)',              rev:45183,  fcf:9461,   sh:4317,  nc:-4500,   cagr:12, cur:'USD', sec:'tech'},
+  {t:'AAPL', n:'Apple', filing:'FY2024 (Sep 2024)', px:245.55,                rev:416161, fcf:98767,  sh:14773, nc:34000,   cagr:8,  cur:'USD', sec:'tech'},
+  {t:'MSFT', n:'Microsoft', filing:'FY2024 (Jun 2024)', px:399.72,            rev:281724, fcf:71611,  sh:7433,  nc:27000,   cagr:15, cur:'USD', sec:'tech'},
+  {t:'NVDA', n:'Nvidia', filing:'FY2025 (Jan 2025)', px:134.25,               rev:130497, fcf:60853,  sh:24400, nc:38000,   cagr:30, cur:'USD', sec:'semi'},
+  {t:'GOOG', n:'Alphabet', filing:'FY2024 (Dec 2024)', px:191.93,             rev:350018, fcf:72764,  sh:12140, nc:93000,   cagr:12, cur:'USD', sec:'tech'},
+  {t:'META', n:'Meta Platforms', filing:'FY2024 (Dec 2024)', px:719.32,       rev:164501, fcf:52100,  sh:2530,  nc:52000,   cagr:15, cur:'USD', sec:'tech'},
+  {t:'AMZN', n:'Amazon', filing:'FY2024 (Dec 2024)', px:228.85,               rev:637959, fcf:38521,  sh:10580, nc:78000,   cagr:15, cur:'USD', sec:'tech'},
+  {t:'TSLA', n:'Tesla', filing:'FY2024 (Dec 2024)', px:337.83,                rev:94830,  fcf:6200,   sh:3200,  nc:44100,   cagr:20, cur:'USD', sec:'tech'},
+  {t:'NFLX', n:'Netflix', filing:'FY2024 (Dec 2024)', px:1013.74,              rev:45183,  fcf:9461,   sh:4317,  nc:-4500,   cagr:12, cur:'USD', sec:'tech'},
   // ── Software / Cloud ───────────────────────────────────────────────
-  {t:'CRM',  n:'Salesforce', filing:'FY2025 (Jan 2025)',           rev:36472,  fcf:12386,  sh:960,   nc:4500,    cagr:12, cur:'USD', sec:'tech'},
-  {t:'ADBE', n:'Adobe', filing:'FY2024 (Nov 2024)',                rev:21507,  fcf:7852,   sh:430,   nc:4000,    cagr:10, cur:'USD', sec:'tech'},
-  {t:'NOW',  n:'ServiceNow', filing:'FY2024 (Dec 2024)',           rev:11516,  fcf:3482,   sh:204,   nc:4200,    cagr:20, cur:'USD', sec:'tech'},
-  {t:'SNOW', n:'Snowflake', filing:'FY2025 (Jan 2025)',            rev:3634,   fcf:338,    sh:340,   nc:3800,    cagr:25, cur:'USD', sec:'tech'},
-  {t:'PLTR', n:'Palantir', filing:'FY2024 (Dec 2024)',             rev:2865,   fcf:1142,   sh:2130,  nc:4600,    cagr:25, cur:'USD', sec:'tech'},
-  {t:'ORCL', n:'Oracle', filing:'FY2024 (May 2024)',               rev:57400,  fcf:11800,  sh:2740,  nc:-88000,  cagr:8,  cur:'USD', sec:'tech'},
-  {t:'INTU', n:'Intuit', filing:'FY2024 (Jul 2024)',               rev:17352,  fcf:4200,   sh:280,   nc:1200,    cagr:12, cur:'USD', sec:'tech'},
-  {t:'SHOP', n:'Shopify', filing:'FY2024 (Dec 2024)',              rev:8877,   fcf:1551,   sh:1260,  nc:5100,    cagr:25, cur:'USD', sec:'tech'},
+  {t:'CRM',  n:'Salesforce', filing:'FY2025 (Jan 2025)', px:316.40,           rev:36472,  fcf:12386,  sh:960,   nc:4500,    cagr:12, cur:'USD', sec:'tech'},
+  {t:'ADBE', n:'Adobe', filing:'FY2024 (Nov 2024)', px:462.50,                rev:21507,  fcf:7852,   sh:430,   nc:4000,    cagr:10, cur:'USD', sec:'tech'},
+  {t:'NOW',  n:'ServiceNow', filing:'FY2024 (Dec 2024)', px:1084.20,           rev:11516,  fcf:3482,   sh:204,   nc:4200,    cagr:20, cur:'USD', sec:'tech'},
+  {t:'SNOW', n:'Snowflake', filing:'FY2025 (Jan 2025)', px:175.80,            rev:3634,   fcf:338,    sh:340,   nc:3800,    cagr:25, cur:'USD', sec:'tech'},
+  {t:'PLTR', n:'Palantir', filing:'FY2024 (Dec 2024)', px:95.35,             rev:2865,   fcf:1142,   sh:2130,  nc:4600,    cagr:25, cur:'USD', sec:'tech'},
+  {t:'ORCL', n:'Oracle', filing:'FY2024 (May 2024)', px:174.20,               rev:57400,  fcf:11800,  sh:2740,  nc:-88000,  cagr:8,  cur:'USD', sec:'tech'},
+  {t:'INTU', n:'Intuit', filing:'FY2024 (Jul 2024)', px:609.50,               rev:17352,  fcf:4200,   sh:280,   nc:1200,    cagr:12, cur:'USD', sec:'tech'},
+  {t:'SHOP', n:'Shopify', filing:'FY2024 (Dec 2024)', px:116.50,              rev:8877,   fcf:1551,   sh:1260,  nc:5100,    cagr:25, cur:'USD', sec:'tech'},
   // ── Semiconductors ─────────────────────────────────────────────────
-  {t:'AMD',  n:'Advanced Micro Devices', filing:'FY2024 (Dec 2024)',rev:25785, fcf:1611,   sh:1618,  nc:4000,    cagr:20, cur:'USD', sec:'semi'},
-  {t:'INTC', n:'Intel', filing:'FY2024 (Dec 2024)',                rev:53101,  fcf:-15200, sh:4330,  nc:-11000,  cagr:5,  cur:'USD', sec:'semi'},
-  {t:'QCOM', n:'Qualcomm', filing:'FY2024 (Sep 2024)',             rev:39116,  fcf:11200,  sh:1090,  nc:-4500,   cagr:8,  cur:'USD', sec:'semi'},
-  {t:'AVGO', n:'Broadcom', filing:'FY2024 (Oct 2024)',             rev:51574,  fcf:21528,  sh:4690,  nc:-65000,  cagr:12, cur:'USD', sec:'semi'},
-  {t:'TSM',  n:'TSMC (ADR)', filing:'FY2024 (Dec 2024)',           rev:88900,  fcf:16200,  sh:5180,  nc:25000,   cagr:15, cur:'USD', sec:'semi'},
-  {t:'ASML', n:'ASML', filing:'FY2024 (Dec 2024)',                 rev:28262,  fcf:2600,   sh:394,   nc:2300,    cagr:15, cur:'USD', sec:'semi'},
+  {t:'AMD',  n:'Advanced Micro Devices', filing:'FY2024 (Dec 2024)', px:104.20,rev:25785, fcf:1611,   sh:1618,  nc:4000,    cagr:20, cur:'USD', sec:'semi'},
+  {t:'INTC', n:'Intel', filing:'FY2024 (Dec 2024)', px:21.80,                rev:53101,  fcf:-15200, sh:4330,  nc:-11000,  cagr:5,  cur:'USD', sec:'semi'},
+  {t:'QCOM', n:'Qualcomm', filing:'FY2024 (Sep 2024)', px:156.90,             rev:39116,  fcf:11200,  sh:1090,  nc:-4500,   cagr:8,  cur:'USD', sec:'semi'},
+  {t:'AVGO', n:'Broadcom', filing:'FY2024 (Oct 2024)', px:237.50,             rev:51574,  fcf:21528,  sh:4690,  nc:-65000,  cagr:12, cur:'USD', sec:'semi'},
+  {t:'TSM',  n:'TSMC (ADR)', filing:'FY2024 (Dec 2024)', px:194.20,           rev:88900,  fcf:16200,  sh:5180,  nc:25000,   cagr:15, cur:'USD', sec:'semi'},
+  {t:'ASML', n:'ASML', filing:'FY2024 (Dec 2024)', px:677.30,                 rev:28262,  fcf:2600,   sh:394,   nc:2300,    cagr:15, cur:'USD', sec:'semi'},
   // ── Finance ────────────────────────────────────────────────────────
-  {t:'JPM',  n:'JPMorgan Chase', filing:'FY2024 (Dec 2024)',       rev:177622, fcf:52000,  sh:2860,  nc:0,       cagr:5,  cur:'USD', sec:'fin'},
-  {t:'V',    n:'Visa', filing:'FY2024 (Sep 2024)',                 rev:35926,  fcf:20400,  sh:2050,  nc:-7500,   cagr:10, cur:'USD', sec:'fin'},
-  {t:'MA',   n:'Mastercard', filing:'FY2024 (Dec 2024)',           rev:28172,  fcf:12800,  sh:916,   nc:-5000,   cagr:12, cur:'USD', sec:'fin'},
-  {t:'BRK-B',n:'Berkshire Hathaway', filing:'FY2024 (Dec 2024)',   rev:364482, fcf:42000,  sh:2170,  nc:141000,  cagr:8,  cur:'USD', sec:'fin'},
-  {t:'GS',   n:'Goldman Sachs', filing:'FY2024 (Dec 2024)',        rev:53509,  fcf:12000,  sh:320,   nc:0,       cagr:5,  cur:'USD', sec:'fin'},
-  {t:'PYPL', n:'PayPal', filing:'FY2024 (Dec 2024)',               rev:31797,  fcf:6400,   sh:1040,  nc:-3200,   cagr:6,  cur:'USD', sec:'fin'},
-  {t:'COIN', n:'Coinbase', filing:'FY2024 (Dec 2024)',             rev:6641,   fcf:2118,   sh:253,   nc:7800,    cagr:20, cur:'USD', sec:'fin'},
-  {t:'SQ',   n:'Block (Square)', filing:'FY2024 (Dec 2024)',       rev:23456,  fcf:866,    sh:1005,  nc:7800,    cagr:12, cur:'USD', sec:'fin'},
+  {t:'JPM',  n:'JPMorgan Chase', filing:'FY2024 (Dec 2024)', px:275.30,       rev:177622, fcf:52000,  sh:2860,  nc:0,       cagr:5,  cur:'USD', sec:'fin'},
+  {t:'V',    n:'Visa', filing:'FY2024 (Sep 2024)', px:358.10,                 rev:35926,  fcf:20400,  sh:2050,  nc:-7500,   cagr:10, cur:'USD', sec:'fin'},
+  {t:'MA',   n:'Mastercard', filing:'FY2024 (Dec 2024)', px:554.70,           rev:28172,  fcf:12800,  sh:916,   nc:-5000,   cagr:12, cur:'USD', sec:'fin'},
+  {t:'BRK-B',n:'Berkshire Hathaway', filing:'FY2024 (Dec 2024)', px:484.70,   rev:364482, fcf:42000,  sh:2170,  nc:141000,  cagr:8,  cur:'USD', sec:'fin'},
+  {t:'GS',   n:'Goldman Sachs', filing:'FY2024 (Dec 2024)', px:613.20,        rev:53509,  fcf:12000,  sh:320,   nc:0,       cagr:5,  cur:'USD', sec:'fin'},
+  {t:'PYPL', n:'PayPal', filing:'FY2024 (Dec 2024)', px:79.45,               rev:31797,  fcf:6400,   sh:1040,  nc:-3200,   cagr:6,  cur:'USD', sec:'fin'},
+  {t:'COIN', n:'Coinbase', filing:'FY2024 (Dec 2024)', px:265.80,             rev:6641,   fcf:2118,   sh:253,   nc:7800,    cagr:20, cur:'USD', sec:'fin'},
+  {t:'SQ',   n:'Block (Square)', filing:'FY2024 (Dec 2024)', px:72.10,       rev:23456,  fcf:866,    sh:1005,  nc:7800,    cagr:12, cur:'USD', sec:'fin'},
   // ── Consumer ───────────────────────────────────────────────────────
-  {t:'WMT',  n:'Walmart', filing:'FY2025 (Jan 2025)',              rev:680984, fcf:17200,  sh:8020,  nc:-40000,  cagr:5,  cur:'USD', sec:'con'},
-  {t:'COST', n:'Costco', filing:'FY2024 (Aug 2024)',               rev:254352, fcf:7490,   sh:443,   nc:2400,    cagr:8,  cur:'USD', sec:'con'},
-  {t:'NKE',  n:'Nike', filing:'FY2024 (May 2024)',                 rev:51362,  fcf:4200,   sh:1498,  nc:-9800,   cagr:6,  cur:'USD', sec:'con'},
-  {t:'MCD',  n:"McDonald's",           filing:'FY2024 (Dec 2024)', rev:25920,  fcf:7300,   sh:714,   nc:-47000,  cagr:5,  cur:'USD', sec:'con'},
-  {t:'SBUX', n:'Starbucks', filing:'FY2024 (Sep 2024)',            rev:36176,  fcf:3100,   sh:1140,  nc:-13200,  cagr:6,  cur:'USD', sec:'con'},
-  {t:'LULU', n:'Lululemon', filing:'FY2024 (Jan 2025)',            rev:10574,  fcf:1600,   sh:128,   nc:1800,    cagr:10, cur:'USD', sec:'con'},
-  {t:'UBER', n:'Uber', filing:'FY2024 (Dec 2024)',                 rev:43975,  fcf:6940,   sh:2120,  nc:5900,    cagr:18, cur:'USD', sec:'con'},
-  {t:'ABNB', n:'Airbnb', filing:'FY2024 (Dec 2024)',               rev:11000,  fcf:4070,   sh:634,   nc:9400,    cagr:12, cur:'USD', sec:'con'},
-  {t:'SPOT', n:'Spotify', filing:'FY2024 (Dec 2024)',              rev:15673,  fcf:1816,   sh:196,   nc:5400,    cagr:15, cur:'USD', sec:'con'},
-  {t:'DIS',  n:'Walt Disney', filing:'FY2024 (Sep 2024)',          rev:91361,  fcf:8600,   sh:1800,  nc:-40000,  cagr:6,  cur:'USD', sec:'con'},
+  {t:'WMT',  n:'Walmart', filing:'FY2025 (Jan 2025)', px:100.80,              rev:680984, fcf:17200,  sh:8020,  nc:-40000,  cagr:5,  cur:'USD', sec:'con'},
+  {t:'COST', n:'Costco', filing:'FY2024 (Aug 2024)', px:1054.40,               rev:254352, fcf:7490,   sh:443,   nc:2400,    cagr:8,  cur:'USD', sec:'con'},
+  {t:'NKE',  n:'Nike', filing:'FY2024 (May 2024)', px:73.30,                 rev:51362,  fcf:4200,   sh:1498,  nc:-9800,   cagr:6,  cur:'USD', sec:'con'},
+  {t:'MCD',  n:"McDonald's",           filing:'FY2024 (Dec 2024)', px:298.70, rev:25920,  fcf:7300,   sh:714,   nc:-47000,  cagr:5,  cur:'USD', sec:'con'},
+  {t:'SBUX', n:'Starbucks', filing:'FY2024 (Sep 2024)', px:110.90,            rev:36176,  fcf:3100,   sh:1140,  nc:-13200,  cagr:6,  cur:'USD', sec:'con'},
+  {t:'LULU', n:'Lululemon', filing:'FY2024 (Jan 2025)', px:307.20,            rev:10574,  fcf:1600,   sh:128,   nc:1800,    cagr:10, cur:'USD', sec:'con'},
+  {t:'UBER', n:'Uber', filing:'FY2024 (Dec 2024)', px:74.50,                 rev:43975,  fcf:6940,   sh:2120,  nc:5900,    cagr:18, cur:'USD', sec:'con'},
+  {t:'ABNB', n:'Airbnb', filing:'FY2024 (Dec 2024)', px:141.20,               rev:11000,  fcf:4070,   sh:634,   nc:9400,    cagr:12, cur:'USD', sec:'con'},
+  {t:'SPOT', n:'Spotify', filing:'FY2024 (Dec 2024)', px:659.80,              rev:15673,  fcf:1816,   sh:196,   nc:5400,    cagr:15, cur:'USD', sec:'con'},
+  {t:'DIS',  n:'Walt Disney', filing:'FY2024 (Sep 2024)', px:100.20,          rev:91361,  fcf:8600,   sh:1800,  nc:-40000,  cagr:6,  cur:'USD', sec:'con'},
   // ── Healthcare ─────────────────────────────────────────────────────
-  {t:'LLY',  n:'Eli Lilly', filing:'FY2024 (Dec 2024)',            rev:45042,  fcf:8400,   sh:950,   nc:-19000,  cagr:20, cur:'USD', sec:'hc'},
-  {t:'JNJ',  n:'Johnson & Johnson', filing:'FY2024 (Dec 2024)',    rev:89096,  fcf:18200,  sh:2400,  nc:-14000,  cagr:5,  cur:'USD', sec:'hc'},
-  {t:'UNH',  n:'UnitedHealth', filing:'FY2024 (Dec 2024)',         rev:400278, fcf:22800,  sh:930,   nc:-8000,   cagr:10, cur:'USD', sec:'hc'},
-  {t:'ABBV', n:'AbbVie', filing:'FY2024 (Dec 2024)',               rev:56334,  fcf:16600,  sh:1770,  nc:-62000,  cagr:6,  cur:'USD', sec:'hc'},
-  {t:'PFE',  n:'Pfizer', filing:'FY2024 (Dec 2024)',               rev:63625,  fcf:12100,  sh:5680,  nc:-48000,  cagr:4,  cur:'USD', sec:'hc'},
+  {t:'LLY',  n:'Eli Lilly', filing:'FY2024 (Dec 2024)', px:848.40,            rev:45042,  fcf:8400,   sh:950,   nc:-19000,  cagr:20, cur:'USD', sec:'hc'},
+  {t:'JNJ',  n:'Johnson & Johnson', filing:'FY2024 (Dec 2024)', px:157.30,    rev:89096,  fcf:18200,  sh:2400,  nc:-14000,  cagr:5,  cur:'USD', sec:'hc'},
+  {t:'UNH',  n:'UnitedHealth', filing:'FY2024 (Dec 2024)', px:478.20,         rev:400278, fcf:22800,  sh:930,   nc:-8000,   cagr:10, cur:'USD', sec:'hc'},
+  {t:'ABBV', n:'AbbVie', filing:'FY2024 (Dec 2024)', px:189.40,               rev:56334,  fcf:16600,  sh:1770,  nc:-62000,  cagr:6,  cur:'USD', sec:'hc'},
+  {t:'PFE',  n:'Pfizer', filing:'FY2024 (Dec 2024)', px:27.20,               rev:63625,  fcf:12100,  sh:5680,  nc:-48000,  cagr:4,  cur:'USD', sec:'hc'},
   // ── Energy ─────────────────────────────────────────────────────────
-  {t:'XOM',  n:'ExxonMobil', filing:'FY2024 (Dec 2024)',           rev:398491, fcf:33000,  sh:4450,  nc:-43000,  cagr:3,  cur:'USD', sec:'energy'},
-  {t:'CVX',  n:'Chevron', filing:'FY2024 (Dec 2024)',              rev:200949, fcf:15300,  sh:1830,  nc:-18000,  cagr:3,  cur:'USD', sec:'energy'},
+  {t:'XOM',  n:'ExxonMobil', filing:'FY2024 (Dec 2024)', px:108.50,           rev:398491, fcf:33000,  sh:4450,  nc:-43000,  cagr:3,  cur:'USD', sec:'energy'},
+  {t:'CVX',  n:'Chevron', filing:'FY2024 (Dec 2024)', px:151.80,              rev:200949, fcf:15300,  sh:1830,  nc:-18000,  cagr:3,  cur:'USD', sec:'energy'},
   // ── International ──────────────────────────────────────────────────
-  {t:'SAP',  n:'SAP', filing:'FY2024 (Dec 2024)',                  rev:35380,  fcf:7600,   sh:1190,  nc:1800,    cagr:10, cur:'EUR', sec:'tech'},
-  {t:'BABA', n:'Alibaba', filing:'FY2024 (Mar 2024)',              rev:130350, fcf:27900,  sh:2160,  nc:61000,   cagr:8,  cur:'USD', sec:'tech'},
-  {t:'NOVO-B',n:'Novo Nordisk', filing:'FY2024 (Dec 2024)',        rev:232260, fcf:62100,  sh:4460,  nc:-19000,  cagr:15, cur:'USD', sec:'hc'},
+  {t:'SAP',  n:'SAP', filing:'FY2024 (Dec 2024)', px:258.40,                  rev:35380,  fcf:7600,   sh:1190,  nc:1800,    cagr:10, cur:'EUR', sec:'tech'},
+  {t:'BABA', n:'Alibaba', filing:'FY2024 (Mar 2024)', px:144.20,              rev:130350, fcf:27900,  sh:2160,  nc:61000,   cagr:8,  cur:'USD', sec:'tech'},
+  {t:'NOVO-B',n:'Novo Nordisk', filing:'FY2024 (Dec 2024)', px:85.10,        rev:232260, fcf:62100,  sh:4460,  nc:-19000,  cagr:15, cur:'USD', sec:'hc'},
 ];
 
 // Deduplicate and build lookup
@@ -3781,40 +3775,43 @@ async function loadCompany(ticker) {
   var hint = document.getElementById('onboard-hint');
   if (hint) { hint.style.animation = 'none'; hint.style.opacity = '0'; }
 
-  // Clear price, show fetching state, run partial update
-  document.getElementById('inp-price').value = '';
-  setDataDates(filingDate, 'Fetching live price…');
-  setPriceStatus('Fetching end-of-day price…', true);
+  // ── Set stored price immediately so the model runs right away ──
+  var storedPrice = co.px ? String(co.px) : '';
+  document.getElementById('inp-price').value = storedPrice;
+  var priceNote = storedPrice ? 'Stored price (21 Feb 2025)' : 'Enter current price';
+  setDataDates(filingDate, priceNote);
+  var prov0 = document.getElementById('provenance-text');
+  if (prov0) prov0.innerHTML = '<strong>' + co.n + '</strong> &middot; ' + filingDate +
+    (storedPrice ? ' &middot; Price stored 21 Feb 2025 — updating…' : '');
   update();
   showToast(co.n + ' loaded ✓');
 
-  // ── Fetch live EOD price ──
+  // ── Try to upgrade to live EOD price silently in background ──
   if (POLYGON_KEY && POLYGON_KEY !== 'REPLACE_WITH_YOUR_POLYGON_KEY') {
-    try {
-      const result = await fetchPolygonPrice(ticker);
-      document.getElementById('inp-price').value = fmt(result.price, 2);
-      setPriceStatus('Price: ' + result.dateStr, false);
-      setDataDates(filingDate, result.dateStr + ' close');
-      var prov = document.getElementById('provenance-text');
-      if (prov) prov.innerHTML = '<strong>' + co.n + '</strong> &middot; ' + filingDate +
-        ' &middot; Price: ' + result.dateStr +
-        ' <span class="live-badge"><span class="live-dot"></span>EOD</span>';
-      update();
-    } catch(err) {
-      console.warn('Polygon price fetch failed:', err);
-      var errMsg = (err && err.message === 'no_data')
-        ? 'Market closed — enter current price'
-        : 'Live price unavailable — enter manually';
-      setPriceStatus(errMsg, false);
-      setDataDates(filingDate, 'Enter current price manually');
-      var prov2 = document.getElementById('provenance-text');
-      if (prov2) prov2.innerHTML = '<strong>' + co.n + '</strong> &middot; ' + filingDate + ' &middot; Enter current price above';
-    }
+    setPriceStatus('Fetching live price…', true);
+    fetchPolygonPrice(ticker)
+      .then(function(result) {
+        document.getElementById('inp-price').value = fmt(result.price, 2);
+        setPriceStatus('', false);
+        setDataDates(filingDate, result.dateStr + ' close');
+        var prov = document.getElementById('provenance-text');
+        if (prov) prov.innerHTML = '<strong>' + co.n + '</strong> &middot; ' + filingDate +
+          ' &middot; Price: ' + result.dateStr +
+          ' <span class="live-badge"><span class="live-dot"></span>EOD</span>';
+        update();
+      })
+      .catch(function(err) {
+        // Silently fall back — stored price is already showing
+        setPriceStatus('', false);
+        var isWeekend = err && err.message === 'no_data';
+        var dateNote = isWeekend ? 'Stored price (market closed)' : 'Stored price (21 Feb 2025)';
+        setDataDates(filingDate, dateNote);
+        var prov2 = document.getElementById('provenance-text');
+        if (prov2) prov2.innerHTML = '<strong>' + co.n + '</strong> &middot; ' + filingDate +
+          ' &middot; ' + (isWeekend ? 'Market closed — stored price shown' : 'Stored price — verify before use');
+      });
   } else {
-    setPriceStatus('', false);
-    setDataDates(filingDate, 'Enter current price manually');
-    var prov3 = document.getElementById('provenance-text');
-    if (prov3) prov3.innerHTML = '<strong>' + co.n + '</strong> &middot; ' + filingDate + ' &middot; Add a Polygon key or enter price above';
+    setDataDates(filingDate, 'Stored price (21 Feb 2025)');
   }
 }
 
