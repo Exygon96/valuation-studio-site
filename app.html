@@ -3451,10 +3451,13 @@ function toPolygonTicker(t) { return POLYGON_TICKER[t] || t; }
 async function fetchPolygonPrice(ticker) {
   const pt = toPolygonTicker(ticker);
   const url = 'https://api.polygon.io/v2/aggs/ticker/' + pt + '/prev?adjusted=true&apiKey=' + POLYGON_KEY;
+  console.log('[Polygon] Fetching:', url);
 
-  // Manual timeout using AbortController (works in all modern browsers, unlike AbortSignal.timeout)
   const controller = new AbortController();
-  const timer = setTimeout(function() { controller.abort(); }, 9000);
+  const timer = setTimeout(function() {
+    console.log('[Polygon] Timeout — aborting');
+    controller.abort();
+  }, 9000);
 
   var res;
   try {
@@ -3463,17 +3466,16 @@ async function fetchPolygonPrice(ticker) {
     clearTimeout(timer);
   }
 
+  console.log('[Polygon] Response status:', res.status, res.ok);
   if (!res.ok) throw new Error('HTTP ' + res.status);
   const data = await res.json();
+  console.log('[Polygon] Data:', JSON.stringify(data).slice(0, 200));
   const result = data && data.results && data.results[0];
-  if (!result || !result.c) {
-    // Polygon returns {status:'OK', resultsCount:0} on weekends/holidays — not an error
-    throw new Error('no_data');
-  }
-  // Polygon returns t as Unix ms (midnight of trading day UTC)
+  if (!result || !result.c) throw new Error('no_data');
   const dateStr = result.t
     ? new Date(result.t).toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' })
     : 'prev close';
+  console.log('[Polygon] Success — price:', result.c, 'date:', dateStr);
   return { price: result.c, dateStr };
 }
 
