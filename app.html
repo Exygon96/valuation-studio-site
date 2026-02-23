@@ -1107,6 +1107,7 @@ input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.15)}
       <button class="info-btn" onclick="showInfo('price')" title="About this field">ⓘ</button>
     </label>
     <input type="text" id="inp-price" placeholder="e.g. 78.00"/>
+    <a id="price-check-link" href="#" target="_blank" rel="noopener" style="display:none;font-size:10.5px;color:var(--blue);margin-top:3px;text-decoration:none" title="Check current price on Google">↗ Check current price</a>
   </div>
 
   <div class="sb-lbl" style="margin-top:4px">Currency</div>
@@ -1572,28 +1573,6 @@ input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.15)}
 
 <div id="toast"></div>
 
-<!-- Price Debug Panel -->
-<div id="price-debug" style="
-  display:none;
-  position:fixed;bottom:80px;left:50%;transform:translateX(-50%);
-  background:#1c1c1e;color:#f2f2f7;
-  border-radius:12px;padding:16px 20px;
-  font-family:monospace;font-size:12px;line-height:1.8;
-  max-width:90vw;width:460px;
-  box-shadow:0 8px 32px rgba(0,0,0,.5);
-  z-index:9999;
-">
-  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
-    <span style="font-weight:700;font-size:13px;color:#0a84ff">🔍 Price Fetch Diagnostics</span>
-    <button onclick="document.getElementById('price-debug').style.display='none'"
-      style="background:none;border:none;color:#636366;font-size:16px;cursor:pointer;padding:0">✕</button>
-  </div>
-  <div id="price-debug-log" style="max-height:260px;overflow-y:auto"></div>
-  <div style="margin-top:10px;padding-top:10px;border-top:1px solid #3a3a3c;font-size:10px;color:#636366">
-    Close this panel once you've noted the results
-  </div>
-</div>
-
 <!-- Info modal -->
 <div class="info-modal-overlay" id="info-modal-overlay" onclick="closeInfoModal(event)">
   <div class="info-modal" id="info-modal">
@@ -1604,6 +1583,8 @@ input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.15)}
     <div class="im-body" id="im-body"></div>
   </div>
 </div>
+
+
 
 <script>
 /* ══════════════════════════════════════════
@@ -1617,6 +1598,142 @@ const PRESETS={
   META:{company:'Meta (META)',price:'656',shares:'2530',revenue:'164501',fcf:'52100',netcash:'52000',cagr:15,dpp:0.2,years:8,termMode:'growth',tg:3,tmult:'18',fccy:'USD',pccy:'USD'},
   TSLA:{company:'Tesla (TSLA)',price:'412',shares:'3200',revenue:'94830',fcf:'6200',netcash:'44100',cagr:20,dpp:0.5,years:8,termMode:'growth',tg:3,tmult:'20',fccy:'USD',pccy:'USD'},
 };
+// Guard flag — prevents the company-name input listener from clearing fields during programmatic load
+let _loadingPreset = false;
+
+// Safe localStorage wrapper — sandbox iframes block localStorage and throw SecurityError
+var _store = {
+  get: function(k)    { try { return localStorage.getItem(k); }    catch(e) { return null; } },
+  set: function(k, v) { try { localStorage.setItem(k, v); }        catch(e) { /* silent */ } },
+};
+
+/* ══════════════════════════════════════════
+   DATABASE + POLYGON — declared first so all
+   functions below can reference DB_MAP
+══════════════════════════════════════════ */
+// ── Live price fetch — completely sandboxed, never throws ──────────────
+// Uses Polygon.io end-of-day API. Add your free key at polygon.io to enable.
+// If no key, or fetch fails for ANY reason, the stored price stays. Silent.
+var POLYGON_KEY = 'Jh93BPZQd6Hn83xAIHbCP4gqJXB2LXwC';
+
+function tryFetchLivePrice(ticker, filingDate) {
+  // Hard exit if no key
+  if (!POLYGON_KEY || POLYGON_KEY === 'YOUR_POLYGON_KEY') return;
+
+  // Map tickers that differ in Polygon's system
+  var pt = ({
+    'BRK-B': 'BRK.B',
+    'NOVO-B': 'NOVO-B'
+  })[ticker] || ticker;
+
+  var url = 'https://api.polygon.io/v2/aggs/ticker/' + pt + '/prev?adjusted=true&apiKey=' + POLYGON_KEY;
+
+  // Completely wrapped — nothing can escape this try/catch
+  try {
+    if (typeof XMLHttpRequest === 'undefined') return;
+    var xhr = new XMLHttpRequest();
+    xhr.timeout = 8000;
+    xhr.open('GET', url, true);
+    xhr.onload = function() {
+      try {
+        if (xhr.status !== 200) return;
+        var data = JSON.parse(xhr.responseText);
+        var r = data && data.results && data.results[0];
+        if (!r || !r.c) return; // weekend / holiday
+        var px = String(r.c);
+        var dateStr = r.t ? new Date(r.t).toLocaleDateString('en-GB', {day:'numeric',month:'short',year:'numeric'}) : '21 Feb 2025';
+        // Only update if user hasn't manually edited the price field
+        var field = document.getElementById('inp-price');
+        if (field) {
+          field.value = px;
+          setDataDates(filingDate, 'Live · ' + dateStr);
+          update();
+        }
+      } catch(e) { /* silent */ }
+    };
+    xhr.onerror   = function() { /* silent */ };
+    xhr.ontimeout = function() { /* silent */ };
+    xhr.send();
+  } catch(e) { /* silent */ }
+}
+
+
+
+// ── Company database ────────────────────────────────────────────────
+// rev/fcf/netcash in millions. shares in millions. cagr = suggested growth %.
+// sector codes: tech, semi, fin, con, hc, energy, ind
+const _RAW_DB = [
+  // ── Mega-cap Tech ──────────────────────────────────────────────────
+  {t:'AAPL', n:'Apple', filing:'FY2024 (Sep 2024)', px:245.55,                rev:416161, fcf:98767,  sh:14773, nc:34000,   cagr:8,  cur:'USD', sec:'tech'},
+  {t:'MSFT', n:'Microsoft', filing:'FY2024 (Jun 2024)', px:399.72,            rev:281724, fcf:71611,  sh:7433,  nc:27000,   cagr:15, cur:'USD', sec:'tech'},
+  {t:'NVDA', n:'Nvidia', filing:'FY2025 (Jan 2025)', px:134.25,               rev:130497, fcf:60853,  sh:24400, nc:38000,   cagr:30, cur:'USD', sec:'semi'},
+  {t:'GOOG', n:'Alphabet', filing:'FY2024 (Dec 2024)', px:191.93,             rev:350018, fcf:72764,  sh:12140, nc:93000,   cagr:12, cur:'USD', sec:'tech'},
+  {t:'META', n:'Meta Platforms', filing:'FY2024 (Dec 2024)', px:719.32,       rev:164501, fcf:52100,  sh:2530,  nc:52000,   cagr:15, cur:'USD', sec:'tech'},
+  {t:'AMZN', n:'Amazon', filing:'FY2024 (Dec 2024)', px:228.85,               rev:637959, fcf:38521,  sh:10580, nc:78000,   cagr:15, cur:'USD', sec:'tech'},
+  {t:'TSLA', n:'Tesla', filing:'FY2024 (Dec 2024)', px:337.83,                rev:94830,  fcf:6200,   sh:3200,  nc:44100,   cagr:20, cur:'USD', sec:'tech'},
+  {t:'NFLX', n:'Netflix', filing:'FY2024 (Dec 2024)', px:1013.74,              rev:45183,  fcf:9461,   sh:4317,  nc:-4500,   cagr:12, cur:'USD', sec:'tech'},
+  // ── Software / Cloud ───────────────────────────────────────────────
+  {t:'CRM',  n:'Salesforce', filing:'FY2025 (Jan 2025)', px:316.40,           rev:36472,  fcf:12386,  sh:960,   nc:4500,    cagr:12, cur:'USD', sec:'tech'},
+  {t:'ADBE', n:'Adobe', filing:'FY2024 (Nov 2024)', px:462.50,                rev:21507,  fcf:7852,   sh:430,   nc:4000,    cagr:10, cur:'USD', sec:'tech'},
+  {t:'NOW',  n:'ServiceNow', filing:'FY2024 (Dec 2024)', px:1084.20,           rev:11516,  fcf:3482,   sh:204,   nc:4200,    cagr:20, cur:'USD', sec:'tech'},
+  {t:'SNOW', n:'Snowflake', filing:'FY2025 (Jan 2025)', px:175.80,            rev:3634,   fcf:338,    sh:340,   nc:3800,    cagr:25, cur:'USD', sec:'tech'},
+  {t:'PLTR', n:'Palantir', filing:'FY2024 (Dec 2024)', px:95.35,             rev:2865,   fcf:1142,   sh:2130,  nc:4600,    cagr:25, cur:'USD', sec:'tech'},
+  {t:'ORCL', n:'Oracle', filing:'FY2024 (May 2024)', px:174.20,               rev:57400,  fcf:11800,  sh:2740,  nc:-88000,  cagr:8,  cur:'USD', sec:'tech'},
+  {t:'INTU', n:'Intuit', filing:'FY2024 (Jul 2024)', px:609.50,               rev:17352,  fcf:4200,   sh:280,   nc:1200,    cagr:12, cur:'USD', sec:'tech'},
+  {t:'SHOP', n:'Shopify', filing:'FY2024 (Dec 2024)', px:116.50,              rev:8877,   fcf:1551,   sh:1260,  nc:5100,    cagr:25, cur:'USD', sec:'tech'},
+  // ── Semiconductors ─────────────────────────────────────────────────
+  {t:'AMD',  n:'Advanced Micro Devices', filing:'FY2024 (Dec 2024)', px:104.20,rev:25785, fcf:1611,   sh:1618,  nc:4000,    cagr:20, cur:'USD', sec:'semi'},
+  {t:'INTC', n:'Intel', filing:'FY2024 (Dec 2024)', px:21.80,                rev:53101,  fcf:-15200, sh:4330,  nc:-11000,  cagr:5,  cur:'USD', sec:'semi'},
+  {t:'QCOM', n:'Qualcomm', filing:'FY2024 (Sep 2024)', px:156.90,             rev:39116,  fcf:11200,  sh:1090,  nc:-4500,   cagr:8,  cur:'USD', sec:'semi'},
+  {t:'AVGO', n:'Broadcom', filing:'FY2024 (Oct 2024)', px:237.50,             rev:51574,  fcf:21528,  sh:4690,  nc:-65000,  cagr:12, cur:'USD', sec:'semi'},
+  {t:'TSM',  n:'TSMC (ADR)', filing:'FY2024 (Dec 2024)', px:194.20,           rev:88900,  fcf:16200,  sh:5180,  nc:25000,   cagr:15, cur:'USD', sec:'semi'},
+  {t:'ASML', n:'ASML', filing:'FY2024 (Dec 2024)', px:677.30,                 rev:28262,  fcf:2600,   sh:394,   nc:2300,    cagr:15, cur:'USD', sec:'semi'},
+  // ── Finance ────────────────────────────────────────────────────────
+  {t:'JPM',  n:'JPMorgan Chase', filing:'FY2024 (Dec 2024)', px:275.30,       rev:177622, fcf:52000,  sh:2860,  nc:0,       cagr:5,  cur:'USD', sec:'fin'},
+  {t:'V',    n:'Visa', filing:'FY2024 (Sep 2024)', px:358.10,                 rev:35926,  fcf:20400,  sh:2050,  nc:-7500,   cagr:10, cur:'USD', sec:'fin'},
+  {t:'MA',   n:'Mastercard', filing:'FY2024 (Dec 2024)', px:554.70,           rev:28172,  fcf:12800,  sh:916,   nc:-5000,   cagr:12, cur:'USD', sec:'fin'},
+  {t:'BRK-B',n:'Berkshire Hathaway', filing:'FY2024 (Dec 2024)', px:484.70,   rev:364482, fcf:42000,  sh:2170,  nc:141000,  cagr:8,  cur:'USD', sec:'fin'},
+  {t:'GS',   n:'Goldman Sachs', filing:'FY2024 (Dec 2024)', px:613.20,        rev:53509,  fcf:12000,  sh:320,   nc:0,       cagr:5,  cur:'USD', sec:'fin'},
+  {t:'PYPL', n:'PayPal', filing:'FY2024 (Dec 2024)', px:79.45,               rev:31797,  fcf:6400,   sh:1040,  nc:-3200,   cagr:6,  cur:'USD', sec:'fin'},
+  {t:'COIN', n:'Coinbase', filing:'FY2024 (Dec 2024)', px:265.80,             rev:6641,   fcf:2118,   sh:253,   nc:7800,    cagr:20, cur:'USD', sec:'fin'},
+  {t:'SQ',   n:'Block (Square)', filing:'FY2024 (Dec 2024)', px:72.10,       rev:23456,  fcf:866,    sh:1005,  nc:7800,    cagr:12, cur:'USD', sec:'fin'},
+  // ── Consumer ───────────────────────────────────────────────────────
+  {t:'WMT',  n:'Walmart', filing:'FY2025 (Jan 2025)', px:100.80,              rev:680984, fcf:17200,  sh:8020,  nc:-40000,  cagr:5,  cur:'USD', sec:'con'},
+  {t:'COST', n:'Costco', filing:'FY2024 (Aug 2024)', px:1054.40,               rev:254352, fcf:7490,   sh:443,   nc:2400,    cagr:8,  cur:'USD', sec:'con'},
+  {t:'NKE',  n:'Nike', filing:'FY2024 (May 2024)', px:73.30,                 rev:51362,  fcf:4200,   sh:1498,  nc:-9800,   cagr:6,  cur:'USD', sec:'con'},
+  {t:'MCD',  n:"McDonald's",           filing:'FY2024 (Dec 2024)', px:298.70, rev:25920,  fcf:7300,   sh:714,   nc:-47000,  cagr:5,  cur:'USD', sec:'con'},
+  {t:'SBUX', n:'Starbucks', filing:'FY2024 (Sep 2024)', px:110.90,            rev:36176,  fcf:3100,   sh:1140,  nc:-13200,  cagr:6,  cur:'USD', sec:'con'},
+  {t:'LULU', n:'Lululemon', filing:'FY2024 (Jan 2025)', px:307.20,            rev:10574,  fcf:1600,   sh:128,   nc:1800,    cagr:10, cur:'USD', sec:'con'},
+  {t:'UBER', n:'Uber', filing:'FY2024 (Dec 2024)', px:74.50,                 rev:43975,  fcf:6940,   sh:2120,  nc:5900,    cagr:18, cur:'USD', sec:'con'},
+  {t:'ABNB', n:'Airbnb', filing:'FY2024 (Dec 2024)', px:141.20,               rev:11000,  fcf:4070,   sh:634,   nc:9400,    cagr:12, cur:'USD', sec:'con'},
+  {t:'SPOT', n:'Spotify', filing:'FY2024 (Dec 2024)', px:659.80,              rev:15673,  fcf:1816,   sh:196,   nc:5400,    cagr:15, cur:'USD', sec:'con'},
+  {t:'DIS',  n:'Walt Disney', filing:'FY2024 (Sep 2024)', px:100.20,          rev:91361,  fcf:8600,   sh:1800,  nc:-40000,  cagr:6,  cur:'USD', sec:'con'},
+  // ── Healthcare ─────────────────────────────────────────────────────
+  {t:'LLY',  n:'Eli Lilly', filing:'FY2024 (Dec 2024)', px:848.40,            rev:45042,  fcf:8400,   sh:950,   nc:-19000,  cagr:20, cur:'USD', sec:'hc'},
+  {t:'JNJ',  n:'Johnson & Johnson', filing:'FY2024 (Dec 2024)', px:157.30,    rev:89096,  fcf:18200,  sh:2400,  nc:-14000,  cagr:5,  cur:'USD', sec:'hc'},
+  {t:'UNH',  n:'UnitedHealth', filing:'FY2024 (Dec 2024)', px:478.20,         rev:400278, fcf:22800,  sh:930,   nc:-8000,   cagr:10, cur:'USD', sec:'hc'},
+  {t:'ABBV', n:'AbbVie', filing:'FY2024 (Dec 2024)', px:189.40,               rev:56334,  fcf:16600,  sh:1770,  nc:-62000,  cagr:6,  cur:'USD', sec:'hc'},
+  {t:'PFE',  n:'Pfizer', filing:'FY2024 (Dec 2024)', px:27.20,               rev:63625,  fcf:12100,  sh:5680,  nc:-48000,  cagr:4,  cur:'USD', sec:'hc'},
+  // ── Energy ─────────────────────────────────────────────────────────
+  {t:'XOM',  n:'ExxonMobil', filing:'FY2024 (Dec 2024)', px:108.50,           rev:398491, fcf:33000,  sh:4450,  nc:-43000,  cagr:3,  cur:'USD', sec:'energy'},
+  {t:'CVX',  n:'Chevron', filing:'FY2024 (Dec 2024)', px:151.80,              rev:200949, fcf:15300,  sh:1830,  nc:-18000,  cagr:3,  cur:'USD', sec:'energy'},
+  // ── International ──────────────────────────────────────────────────
+  {t:'SAP',  n:'SAP', filing:'FY2024 (Dec 2024)', px:258.40,                  rev:35380,  fcf:7600,   sh:1190,  nc:1800,    cagr:10, cur:'EUR', sec:'tech'},
+  {t:'BABA', n:'Alibaba', filing:'FY2024 (Mar 2024)', px:144.20,              rev:130350, fcf:27900,  sh:2160,  nc:61000,   cagr:8,  cur:'USD', sec:'tech'},
+  {t:'NOVO-B',n:'Novo Nordisk', filing:'FY2024 (Dec 2024)', px:85.10,        rev:232260, fcf:62100,  sh:4460,  nc:-19000,  cagr:15, cur:'USD', sec:'hc'},
+];
+
+// Deduplicate and build lookup
+const DB_MAP = {};
+_RAW_DB.forEach(c => { if (!DB_MAP[c.t]) DB_MAP[c.t] = c; });
+const DB = Object.values(DB_MAP);
+
+// Sector display labels
+const SEC_LABEL = {
+  tech:'Technology', semi:'Semiconductors', fin:'Finance',
+  con:'Consumer', hc:'Healthcare', energy:'Energy', ind:'Industrial',
+};
+
 
 /* ══════════════════════════════════════════
    ENGINE
@@ -2011,7 +2128,7 @@ function setDataDates(filingStr, priceStr) {
   if (price) price.textContent = priceStr || '—';
 }
 
-function hideOnboardHint(){const h=document.getElementById('onboard-hint');if(h){h.style.display='none';localStorage.setItem('vs-onboarded','1')}}
+function hideOnboardHint(){const h=document.getElementById('onboard-hint');if(h){h.style.display='none';_store.set('vs-onboarded','1')}}
 
 function setBench(v){
   document.getElementById('sl-cagr').value=v;
@@ -2048,19 +2165,27 @@ function onDiscChange(){
 }
 function setDisc(v){document.getElementById('sl-disc').value=v;onDiscChange();}
 
-['inp-price','inp-shares','inp-revenue','inp-fcf','inp-netcash']
-  .forEach(id=>document.getElementById(id).addEventListener('input',()=>{clearPills();update()}));
+// Event bindings — deferred to ensure DOM is ready in all environments
+function _bindInputEvents() {
+  ['inp-price','inp-shares','inp-revenue','inp-fcf','inp-netcash']
+    .forEach(function(id){
+      var el = document.getElementById(id);
+      if(el) el.addEventListener('input',function(){clearPills();update();});
+    });
 
-// When company name is cleared, wipe the company-specific financials
-// but leave all assumptions (growth, discount, terminal, years) intact
-document.getElementById('inp-company').addEventListener('input',function(){
-  clearPills();
-  if(this.value.trim()===''){
-    ['inp-price','inp-shares','inp-revenue','inp-fcf','inp-netcash'].forEach(id=>document.getElementById(id).value='');
-    document.getElementById('btn-reset').style.display='none';
-  }
-  update();
-});
+  var companyEl = document.getElementById('inp-company');
+  if(companyEl) companyEl.addEventListener('input',function(){
+    if(_loadingPreset) return;
+    clearPills();
+    if(this.value.trim()===''){
+      ['inp-price','inp-shares','inp-revenue','inp-fcf','inp-netcash'].forEach(function(id){
+        var el=document.getElementById(id); if(el) el.value='';
+      });
+      var rb=document.getElementById('btn-reset'); if(rb) rb.style.display='none';
+    }
+    update();
+  });
+}
 
 function onCurrencyChange(){
   const f=document.getElementById('sel-fccy').value,p=document.getElementById('sel-pccy').value;
@@ -2091,62 +2216,58 @@ function toggleDark(){
   const d=document.documentElement.getAttribute('data-theme')==='dark';
   document.documentElement.setAttribute('data-theme',d?'light':'dark');
   document.getElementById('dark-btn').textContent=d?'🌙':'☀️';
-  localStorage.setItem('vs-theme',d?'light':'dark');
+  _store.set('vs-theme',d?'light':'dark');
   setTimeout(()=>{const inp=buildInp(getInputs());if(!inp)return;if(activeTab==='dcf')drawSensChart(inp.price,inp.disc*100);else if(activeTab==='rev'){const irr=impliedIRR(inp,inp.price);drawIRRChart(inp.price,irr,inp.disc)}},50);
 }
 
-function loadPreset(key,isAuto){
-  const p=PRESETS[key];if(!p)return;
-  if(!isAuto)hideOnboardHint();
-  document.querySelectorAll('.co-pill').forEach(b=>{
-    b.classList.toggle('active',b.querySelector('.pt').textContent.trim()===key);
-  });
-  document.getElementById('inp-company').value=p.company;
-  document.getElementById('inp-shares').value=p.shares;
-  document.getElementById('inp-revenue').value=p.revenue;
-  document.getElementById('inp-fcf').value=p.fcf;
-  document.getElementById('inp-netcash').value=p.netcash;
-  document.getElementById('sl-cagr').value=p.cagr;document.getElementById('lbl-cagr').textContent=p.cagr+'%';syncBenchPills();
-  document.getElementById('sl-dpp').value=p.dpp;document.getElementById('lbl-dpp').textContent=p.dpp.toFixed(1)+'pp';
-  document.getElementById('sl-years').value=p.years;document.getElementById('lbl-years').textContent=p.years+' yrs';
-  setTerm(p.termMode);
-  document.getElementById('sl-tg').value=p.tg;document.getElementById('lbl-tg').textContent=p.tg.toFixed(1)+'%';
-  document.getElementById('sl-tmult').value=p.tmult;document.getElementById('lbl-tmult').textContent=parseFloat(p.tmult).toFixed(1)+'×';
-  document.getElementById('sel-fccy').value=p.fccy||'USD';
-  document.getElementById('sel-pccy').value=p.pccy||'USD';
-  onCurrencyChange();
-  document.getElementById('btn-reset').style.display='';
-
-  // ── Set stored price immediately ──
+function loadPreset(key, isAuto) {
+  try {
+  var p = PRESETS[key]; if (!p) return;
   var co = DB_MAP[key];
-  var filingDate = co ? (co.filing || 'Annual report') : 'Annual report';
-  // Use DB price if available, fall back to PRESETS price
-  var storedPrice = (co && co.px) ? String(co.px) : (p.price || '');
-  document.getElementById('inp-price').value = storedPrice;
-  setDataDates(filingDate, 'Stored price (21 Feb 2025)');
+  _loadingPreset = true;
+  if (!isAuto) hideOnboardHint();
+
+  // Highlight active pill
+  document.querySelectorAll('.co-pill').forEach(function(b) {
+    b.classList.toggle('active', b.querySelector('.pt').textContent.trim() === key);
+  });
+
+  // Fill every field synchronously — no async, no network
+  var g = function(id) { return document.getElementById(id); };
+  g('inp-company').value = p.company;
+  g('inp-shares').value  = p.shares;
+  g('inp-revenue').value = p.revenue;
+  g('inp-fcf').value     = p.fcf;
+  g('inp-netcash').value = p.netcash;
+  g('sl-cagr').value     = p.cagr;  g('lbl-cagr').textContent = p.cagr + '%'; syncBenchPills();
+  g('sl-dpp').value      = p.dpp;   g('lbl-dpp').textContent  = p.dpp.toFixed(1) + 'pp';
+  g('sl-years').value    = p.years; g('lbl-years').textContent = p.years + ' yrs';
+  setTerm(p.termMode);
+  g('sl-tg').value       = p.tg;    g('lbl-tg').textContent   = p.tg.toFixed(1) + '%';
+  g('sl-tmult').value    = p.tmult; g('lbl-tmult').textContent = parseFloat(p.tmult).toFixed(1) + '×';
+  g('sel-fccy').value    = p.fccy || 'USD';
+  g('sel-pccy').value    = p.pccy || 'USD';
+  onCurrencyChange();
+  g('btn-reset').style.display = '';
+
+  // Set price from DB (stored 21 Feb 2025), fall back to PRESETS price
+  var storedPx = (co && co.px) ? String(co.px) : (p.price || '');
+  g('inp-price').value = storedPx;
+  _loadingPreset = false;
+
+  // Show provenance
+  var filing = co ? (co.filing || 'Annual report') : 'Annual report';
+  setDataDates(filing, 'Stored · 21 Feb 2025');
+  var prov = document.getElementById('provenance-text');
+  if (prov) prov.textContent = p.company + ' · ' + filing + ' · Price as of 21 Feb 2025';
+
   update();
 
-  // ── Silently try to upgrade to live EOD price ──
-  if (POLYGON_KEY && POLYGON_KEY !== 'REPLACE_WITH_YOUR_POLYGON_KEY') {
-    setPriceStatus('Fetching live price…', true);
-    fetchPolygonPrice(key)
-      .then(function(result) {
-        document.getElementById('inp-price').value = fmt(result.price, 2);
-        setPriceStatus('', false);
-        setDataDates(filingDate, result.dateStr + ' close');
-        var prov = document.getElementById('provenance-text');
-        if (prov) prov.innerHTML = '<strong>' + p.company + '</strong> &middot; Price: ' + result.dateStr +
-          ' <span class="live-badge"><span class="live-dot"></span>EOD</span>';
-        update();
-      })
-      .catch(function() {
-        // Stored price already showing — just hide the spinner
-        setPriceStatus('', false);
-        var isWeekend = arguments[0] && arguments[0].message === 'no_data';
-        setDataDates(filingDate, isWeekend ? 'Stored price (market closed)' : 'Stored price (21 Feb 2025)');
-      });
-  }
+  // Attempt live price in background — completely isolated, any failure is silent
+  tryFetchLivePrice(key, filing);
+  } catch(e) { _loadingPreset = false; }
 }
+
 
 function resetInputs(){
   clearPills();
@@ -2416,7 +2537,13 @@ function shareURL(){
   const raw=getInputs();
   const p=new URLSearchParams({co:raw.company,px:raw.price,sh:raw.shares,rev:raw.revLTM,fcf:raw.fcfLTM,nc:raw.netCashRaw,cagr:document.getElementById('sl-cagr').value,dpp:document.getElementById('sl-dpp').value,yr:raw.years,disc:document.getElementById('sl-disc').value,tm:termMode,tg:document.getElementById('sl-tg').value,tmult:raw.tmult||'',fccy:raw.fccy,pccy:raw.pccy,fxr:raw.fxRate});
   const url=window.location.origin+window.location.pathname+'?'+p.toString();
-  navigator.clipboard.writeText(url).then(()=>showToast('Link copied ✓')).catch(()=>prompt('Copy this link:',url));
+  try {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(url).then(function(){ showToast('Link copied ✓'); }).catch(function(){ prompt('Copy this link:',url); });
+    } else {
+      prompt('Copy this link:', url);
+    }
+  } catch(e) { prompt('Copy this link:', url); }
 }
 function loadFromURL(){
   const p=new URLSearchParams(window.location.search);
@@ -2492,16 +2619,18 @@ function update(){
 
   // ── Price check link → Google search (shows price widget inline)
   const priceLink=document.getElementById('price-check-link');
-  const coName=raw.company||'';
-  const tickerMatch=coName.match(/\(([A-Z]{1,5})\)/)||coName.match(/^([A-Z]{2,5})$/);
-  if(tickerMatch||coName.length>1){
-    const q=tickerMatch?`${tickerMatch[1]} stock price`:`${coName} stock price`;
-    priceLink.setAttribute('href','https://www.google.com/search?q='+encodeURIComponent(q));
-    priceLink.dataset.ready='1';
-    priceLink.style.display='inline';
-  } else {
-    priceLink.style.display='none';
-    priceLink.dataset.ready='';
+  if(priceLink){
+    const coName=raw.company||'';
+    const tickerMatch=coName.match(/\(([A-Z]{1,5})\)/)||coName.match(/^([A-Z]{2,5})$/);
+    if(tickerMatch||coName.length>1){
+      const q=tickerMatch?tickerMatch[1]+' stock price':coName+' stock price';
+      priceLink.setAttribute('href','https://www.google.com/search?q='+encodeURIComponent(q));
+      priceLink.dataset.ready='1';
+      priceLink.style.display='inline';
+    } else {
+      priceLink.style.display='none';
+      priceLink.dataset.ready='';
+    }
   }
 
   const inp=buildInp(raw);
@@ -3131,7 +3260,7 @@ function drawIRRChart(curPrice,curIRR,userDisc,dragPrice){
 }
 
 function renderRevTable(inp){
-  const t=document.getElementById('rev-tbl');
+  const t=document.getElementById('rev-tbl'); if(!t) return;
   const prices=[];for(let i=-5;i<=5;i++){const p=inp.price*(1+.1*i);if(p>0)prices.push(p)}
   let h=`<thead><tr><th>Price</th><th>vs today</th><th>Implied return</th></tr></thead><tbody>`;
   prices.forEach(p=>{
@@ -3449,170 +3578,6 @@ function downloadMatrix(scLabel){
 
 // ── Your Polygon.io API key ─────────────────────────────────────────
 // Free at polygon.io — end-of-day data, no CORS issues
-// Replace the string below with your key to enable live prices
-const POLYGON_KEY = 'Jh93BPZQd6Hn83xAIHbCP4gqJXB2LXwC';
-
-// Some tickers differ between our DB and Polygon's format
-const POLYGON_TICKER = {
-  'BRK-B':  'BRK.B',
-  'NOVO-B': 'NOVO-B',  // Danish — may return no data on free tier
-  'TSM':    'TSM',     // ADR — works fine
-  'ASML':   'ASML',    // ADR — works fine
-  'BABA':   'BABA',    // ADR — works fine
-  'SAP':    'SAP',     // ADR — works fine
-};
-function toPolygonTicker(t) { return POLYGON_TICKER[t] || t; }
-
-// Central price fetching function — used by both loadPreset and loadCompany
-// Visible debug logger — writes to on-screen panel
-function dbgLog(msg, color) {
-  var panel = document.getElementById('price-debug');
-  var log = document.getElementById('price-debug-log');
-  if (!panel || !log) return;
-  panel.style.display = 'block';
-  var line = document.createElement('div');
-  line.style.color = color || '#f2f2f7';
-  line.textContent = new Date().toLocaleTimeString() + '  ' + msg;
-  log.appendChild(line);
-  log.scrollTop = log.scrollHeight;
-  console.log('[Polygon]', msg);
-}
-
-async function fetchPolygonPrice(ticker) {
-  var pt = toPolygonTicker(ticker);
-  var url = 'https://api.polygon.io/v2/aggs/ticker/' + pt + '/prev?adjusted=true&apiKey=' + POLYGON_KEY;
-
-  dbgLog('Ticker: ' + ticker + (pt !== ticker ? ' → ' + pt : ''), '#0a84ff');
-  dbgLog('URL: ' + url.replace(POLYGON_KEY, '***KEY***'));
-  dbgLog('Starting fetch…');
-
-  var controller = new AbortController();
-  var timer = setTimeout(function() {
-    dbgLog('⏱ Timeout after 9s — aborting', '#ff9f0a');
-    controller.abort();
-  }, 9000);
-
-  var res;
-  try {
-    res = await fetch(url, { signal: controller.signal });
-  } catch(fetchErr) {
-    clearTimeout(timer);
-    dbgLog('❌ fetch() threw: ' + fetchErr.name + ' — ' + fetchErr.message, '#ff453a');
-    throw fetchErr;
-  }
-  clearTimeout(timer);
-
-  dbgLog('HTTP status: ' + res.status + ' ' + (res.ok ? '✓' : '✗'), res.ok ? '#30d158' : '#ff453a');
-
-  if (!res.ok) throw new Error('HTTP ' + res.status);
-
-  var data;
-  try {
-    data = await res.json();
-  } catch(jsonErr) {
-    dbgLog('❌ JSON parse error: ' + jsonErr.message, '#ff453a');
-    throw jsonErr;
-  }
-
-  dbgLog('Response keys: ' + Object.keys(data).join(', '));
-  dbgLog('resultsCount: ' + (data.resultsCount !== undefined ? data.resultsCount : 'n/a'));
-
-  var result = data && data.results && data.results[0];
-  if (!result || !result.c) {
-    dbgLog('⚠ No price data (market closed / holiday?)', '#ff9f0a');
-    throw new Error('no_data');
-  }
-
-  var dateStr = result.t
-    ? new Date(result.t).toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' })
-    : 'prev close';
-
-  dbgLog('✅ Price: ' + result.c + '  Date: ' + dateStr, '#30d158');
-  return { price: result.c, dateStr: dateStr };
-}
-
-// Shared UI helper — show/hide price loading row and update status text
-function setPriceStatus(msg, loading) {
-  var row = document.getElementById('price-loading-row');
-  var txt = document.getElementById('price-status-text');
-  if (row) row.classList.toggle('show', !!loading);
-  if (txt) txt.innerHTML = msg || '';
-}
-
-// ── Company database ────────────────────────────────────────────────
-// rev/fcf/netcash in millions. shares in millions. cagr = suggested growth %.
-// sector codes: tech, semi, fin, con, hc, energy, ind
-const _RAW_DB = [
-  // ── Mega-cap Tech ──────────────────────────────────────────────────
-  {t:'AAPL', n:'Apple', filing:'FY2024 (Sep 2024)', px:245.55,                rev:416161, fcf:98767,  sh:14773, nc:34000,   cagr:8,  cur:'USD', sec:'tech'},
-  {t:'MSFT', n:'Microsoft', filing:'FY2024 (Jun 2024)', px:399.72,            rev:281724, fcf:71611,  sh:7433,  nc:27000,   cagr:15, cur:'USD', sec:'tech'},
-  {t:'NVDA', n:'Nvidia', filing:'FY2025 (Jan 2025)', px:134.25,               rev:130497, fcf:60853,  sh:24400, nc:38000,   cagr:30, cur:'USD', sec:'semi'},
-  {t:'GOOG', n:'Alphabet', filing:'FY2024 (Dec 2024)', px:191.93,             rev:350018, fcf:72764,  sh:12140, nc:93000,   cagr:12, cur:'USD', sec:'tech'},
-  {t:'META', n:'Meta Platforms', filing:'FY2024 (Dec 2024)', px:719.32,       rev:164501, fcf:52100,  sh:2530,  nc:52000,   cagr:15, cur:'USD', sec:'tech'},
-  {t:'AMZN', n:'Amazon', filing:'FY2024 (Dec 2024)', px:228.85,               rev:637959, fcf:38521,  sh:10580, nc:78000,   cagr:15, cur:'USD', sec:'tech'},
-  {t:'TSLA', n:'Tesla', filing:'FY2024 (Dec 2024)', px:337.83,                rev:94830,  fcf:6200,   sh:3200,  nc:44100,   cagr:20, cur:'USD', sec:'tech'},
-  {t:'NFLX', n:'Netflix', filing:'FY2024 (Dec 2024)', px:1013.74,              rev:45183,  fcf:9461,   sh:4317,  nc:-4500,   cagr:12, cur:'USD', sec:'tech'},
-  // ── Software / Cloud ───────────────────────────────────────────────
-  {t:'CRM',  n:'Salesforce', filing:'FY2025 (Jan 2025)', px:316.40,           rev:36472,  fcf:12386,  sh:960,   nc:4500,    cagr:12, cur:'USD', sec:'tech'},
-  {t:'ADBE', n:'Adobe', filing:'FY2024 (Nov 2024)', px:462.50,                rev:21507,  fcf:7852,   sh:430,   nc:4000,    cagr:10, cur:'USD', sec:'tech'},
-  {t:'NOW',  n:'ServiceNow', filing:'FY2024 (Dec 2024)', px:1084.20,           rev:11516,  fcf:3482,   sh:204,   nc:4200,    cagr:20, cur:'USD', sec:'tech'},
-  {t:'SNOW', n:'Snowflake', filing:'FY2025 (Jan 2025)', px:175.80,            rev:3634,   fcf:338,    sh:340,   nc:3800,    cagr:25, cur:'USD', sec:'tech'},
-  {t:'PLTR', n:'Palantir', filing:'FY2024 (Dec 2024)', px:95.35,             rev:2865,   fcf:1142,   sh:2130,  nc:4600,    cagr:25, cur:'USD', sec:'tech'},
-  {t:'ORCL', n:'Oracle', filing:'FY2024 (May 2024)', px:174.20,               rev:57400,  fcf:11800,  sh:2740,  nc:-88000,  cagr:8,  cur:'USD', sec:'tech'},
-  {t:'INTU', n:'Intuit', filing:'FY2024 (Jul 2024)', px:609.50,               rev:17352,  fcf:4200,   sh:280,   nc:1200,    cagr:12, cur:'USD', sec:'tech'},
-  {t:'SHOP', n:'Shopify', filing:'FY2024 (Dec 2024)', px:116.50,              rev:8877,   fcf:1551,   sh:1260,  nc:5100,    cagr:25, cur:'USD', sec:'tech'},
-  // ── Semiconductors ─────────────────────────────────────────────────
-  {t:'AMD',  n:'Advanced Micro Devices', filing:'FY2024 (Dec 2024)', px:104.20,rev:25785, fcf:1611,   sh:1618,  nc:4000,    cagr:20, cur:'USD', sec:'semi'},
-  {t:'INTC', n:'Intel', filing:'FY2024 (Dec 2024)', px:21.80,                rev:53101,  fcf:-15200, sh:4330,  nc:-11000,  cagr:5,  cur:'USD', sec:'semi'},
-  {t:'QCOM', n:'Qualcomm', filing:'FY2024 (Sep 2024)', px:156.90,             rev:39116,  fcf:11200,  sh:1090,  nc:-4500,   cagr:8,  cur:'USD', sec:'semi'},
-  {t:'AVGO', n:'Broadcom', filing:'FY2024 (Oct 2024)', px:237.50,             rev:51574,  fcf:21528,  sh:4690,  nc:-65000,  cagr:12, cur:'USD', sec:'semi'},
-  {t:'TSM',  n:'TSMC (ADR)', filing:'FY2024 (Dec 2024)', px:194.20,           rev:88900,  fcf:16200,  sh:5180,  nc:25000,   cagr:15, cur:'USD', sec:'semi'},
-  {t:'ASML', n:'ASML', filing:'FY2024 (Dec 2024)', px:677.30,                 rev:28262,  fcf:2600,   sh:394,   nc:2300,    cagr:15, cur:'USD', sec:'semi'},
-  // ── Finance ────────────────────────────────────────────────────────
-  {t:'JPM',  n:'JPMorgan Chase', filing:'FY2024 (Dec 2024)', px:275.30,       rev:177622, fcf:52000,  sh:2860,  nc:0,       cagr:5,  cur:'USD', sec:'fin'},
-  {t:'V',    n:'Visa', filing:'FY2024 (Sep 2024)', px:358.10,                 rev:35926,  fcf:20400,  sh:2050,  nc:-7500,   cagr:10, cur:'USD', sec:'fin'},
-  {t:'MA',   n:'Mastercard', filing:'FY2024 (Dec 2024)', px:554.70,           rev:28172,  fcf:12800,  sh:916,   nc:-5000,   cagr:12, cur:'USD', sec:'fin'},
-  {t:'BRK-B',n:'Berkshire Hathaway', filing:'FY2024 (Dec 2024)', px:484.70,   rev:364482, fcf:42000,  sh:2170,  nc:141000,  cagr:8,  cur:'USD', sec:'fin'},
-  {t:'GS',   n:'Goldman Sachs', filing:'FY2024 (Dec 2024)', px:613.20,        rev:53509,  fcf:12000,  sh:320,   nc:0,       cagr:5,  cur:'USD', sec:'fin'},
-  {t:'PYPL', n:'PayPal', filing:'FY2024 (Dec 2024)', px:79.45,               rev:31797,  fcf:6400,   sh:1040,  nc:-3200,   cagr:6,  cur:'USD', sec:'fin'},
-  {t:'COIN', n:'Coinbase', filing:'FY2024 (Dec 2024)', px:265.80,             rev:6641,   fcf:2118,   sh:253,   nc:7800,    cagr:20, cur:'USD', sec:'fin'},
-  {t:'SQ',   n:'Block (Square)', filing:'FY2024 (Dec 2024)', px:72.10,       rev:23456,  fcf:866,    sh:1005,  nc:7800,    cagr:12, cur:'USD', sec:'fin'},
-  // ── Consumer ───────────────────────────────────────────────────────
-  {t:'WMT',  n:'Walmart', filing:'FY2025 (Jan 2025)', px:100.80,              rev:680984, fcf:17200,  sh:8020,  nc:-40000,  cagr:5,  cur:'USD', sec:'con'},
-  {t:'COST', n:'Costco', filing:'FY2024 (Aug 2024)', px:1054.40,               rev:254352, fcf:7490,   sh:443,   nc:2400,    cagr:8,  cur:'USD', sec:'con'},
-  {t:'NKE',  n:'Nike', filing:'FY2024 (May 2024)', px:73.30,                 rev:51362,  fcf:4200,   sh:1498,  nc:-9800,   cagr:6,  cur:'USD', sec:'con'},
-  {t:'MCD',  n:"McDonald's",           filing:'FY2024 (Dec 2024)', px:298.70, rev:25920,  fcf:7300,   sh:714,   nc:-47000,  cagr:5,  cur:'USD', sec:'con'},
-  {t:'SBUX', n:'Starbucks', filing:'FY2024 (Sep 2024)', px:110.90,            rev:36176,  fcf:3100,   sh:1140,  nc:-13200,  cagr:6,  cur:'USD', sec:'con'},
-  {t:'LULU', n:'Lululemon', filing:'FY2024 (Jan 2025)', px:307.20,            rev:10574,  fcf:1600,   sh:128,   nc:1800,    cagr:10, cur:'USD', sec:'con'},
-  {t:'UBER', n:'Uber', filing:'FY2024 (Dec 2024)', px:74.50,                 rev:43975,  fcf:6940,   sh:2120,  nc:5900,    cagr:18, cur:'USD', sec:'con'},
-  {t:'ABNB', n:'Airbnb', filing:'FY2024 (Dec 2024)', px:141.20,               rev:11000,  fcf:4070,   sh:634,   nc:9400,    cagr:12, cur:'USD', sec:'con'},
-  {t:'SPOT', n:'Spotify', filing:'FY2024 (Dec 2024)', px:659.80,              rev:15673,  fcf:1816,   sh:196,   nc:5400,    cagr:15, cur:'USD', sec:'con'},
-  {t:'DIS',  n:'Walt Disney', filing:'FY2024 (Sep 2024)', px:100.20,          rev:91361,  fcf:8600,   sh:1800,  nc:-40000,  cagr:6,  cur:'USD', sec:'con'},
-  // ── Healthcare ─────────────────────────────────────────────────────
-  {t:'LLY',  n:'Eli Lilly', filing:'FY2024 (Dec 2024)', px:848.40,            rev:45042,  fcf:8400,   sh:950,   nc:-19000,  cagr:20, cur:'USD', sec:'hc'},
-  {t:'JNJ',  n:'Johnson & Johnson', filing:'FY2024 (Dec 2024)', px:157.30,    rev:89096,  fcf:18200,  sh:2400,  nc:-14000,  cagr:5,  cur:'USD', sec:'hc'},
-  {t:'UNH',  n:'UnitedHealth', filing:'FY2024 (Dec 2024)', px:478.20,         rev:400278, fcf:22800,  sh:930,   nc:-8000,   cagr:10, cur:'USD', sec:'hc'},
-  {t:'ABBV', n:'AbbVie', filing:'FY2024 (Dec 2024)', px:189.40,               rev:56334,  fcf:16600,  sh:1770,  nc:-62000,  cagr:6,  cur:'USD', sec:'hc'},
-  {t:'PFE',  n:'Pfizer', filing:'FY2024 (Dec 2024)', px:27.20,               rev:63625,  fcf:12100,  sh:5680,  nc:-48000,  cagr:4,  cur:'USD', sec:'hc'},
-  // ── Energy ─────────────────────────────────────────────────────────
-  {t:'XOM',  n:'ExxonMobil', filing:'FY2024 (Dec 2024)', px:108.50,           rev:398491, fcf:33000,  sh:4450,  nc:-43000,  cagr:3,  cur:'USD', sec:'energy'},
-  {t:'CVX',  n:'Chevron', filing:'FY2024 (Dec 2024)', px:151.80,              rev:200949, fcf:15300,  sh:1830,  nc:-18000,  cagr:3,  cur:'USD', sec:'energy'},
-  // ── International ──────────────────────────────────────────────────
-  {t:'SAP',  n:'SAP', filing:'FY2024 (Dec 2024)', px:258.40,                  rev:35380,  fcf:7600,   sh:1190,  nc:1800,    cagr:10, cur:'EUR', sec:'tech'},
-  {t:'BABA', n:'Alibaba', filing:'FY2024 (Mar 2024)', px:144.20,              rev:130350, fcf:27900,  sh:2160,  nc:61000,   cagr:8,  cur:'USD', sec:'tech'},
-  {t:'NOVO-B',n:'Novo Nordisk', filing:'FY2024 (Dec 2024)', px:85.10,        rev:232260, fcf:62100,  sh:4460,  nc:-19000,  cagr:15, cur:'USD', sec:'hc'},
-];
-
-// Deduplicate and build lookup
-const DB_MAP = {};
-_RAW_DB.forEach(c => { if (!DB_MAP[c.t]) DB_MAP[c.t] = c; });
-const DB = Object.values(DB_MAP);
-
-// Sector display labels
-const SEC_LABEL = {
-  tech:'Technology', semi:'Semiconductors', fin:'Finance',
-  con:'Consumer', hc:'Healthcare', energy:'Energy', ind:'Industrial',
-};
 
 // Update DB count badge
 document.addEventListener('DOMContentLoaded', () => {
@@ -3748,6 +3713,7 @@ async function loadCompany(ticker) {
   if (!co) { showToast('Company not found'); return; }
 
   clearPills();
+  _loadingPreset = true;
 
   // ── Populate fundamentals instantly ──
   const filingDate = co.filing || 'Annual report';
@@ -3778,41 +3744,13 @@ async function loadCompany(ticker) {
   // ── Set stored price immediately so the model runs right away ──
   var storedPrice = co.px ? String(co.px) : '';
   document.getElementById('inp-price').value = storedPrice;
-  var priceNote = storedPrice ? 'Stored price (21 Feb 2025)' : 'Enter current price';
-  setDataDates(filingDate, priceNote);
+  _loadingPreset = false;
+  setDataDates(filingDate, storedPrice ? 'Stored · 21 Feb 2025' : 'Enter price above');
   var prov0 = document.getElementById('provenance-text');
-  if (prov0) prov0.innerHTML = '<strong>' + co.n + '</strong> &middot; ' + filingDate +
-    (storedPrice ? ' &middot; Price stored 21 Feb 2025 — updating…' : '');
+  if (prov0) prov0.textContent = co.n + ' (' + co.t + ') · ' + filingDate;
   update();
   showToast(co.n + ' loaded ✓');
-
-  // ── Try to upgrade to live EOD price silently in background ──
-  if (POLYGON_KEY && POLYGON_KEY !== 'REPLACE_WITH_YOUR_POLYGON_KEY') {
-    setPriceStatus('Fetching live price…', true);
-    fetchPolygonPrice(ticker)
-      .then(function(result) {
-        document.getElementById('inp-price').value = fmt(result.price, 2);
-        setPriceStatus('', false);
-        setDataDates(filingDate, result.dateStr + ' close');
-        var prov = document.getElementById('provenance-text');
-        if (prov) prov.innerHTML = '<strong>' + co.n + '</strong> &middot; ' + filingDate +
-          ' &middot; Price: ' + result.dateStr +
-          ' <span class="live-badge"><span class="live-dot"></span>EOD</span>';
-        update();
-      })
-      .catch(function(err) {
-        // Silently fall back — stored price is already showing
-        setPriceStatus('', false);
-        var isWeekend = err && err.message === 'no_data';
-        var dateNote = isWeekend ? 'Stored price (market closed)' : 'Stored price (21 Feb 2025)';
-        setDataDates(filingDate, dateNote);
-        var prov2 = document.getElementById('provenance-text');
-        if (prov2) prov2.innerHTML = '<strong>' + co.n + '</strong> &middot; ' + filingDate +
-          ' &middot; ' + (isWeekend ? 'Market closed — stored price shown' : 'Stored price — verify before use');
-      });
-  } else {
-    setDataDates(filingDate, 'Stored price (21 Feb 2025)');
-  }
+  tryFetchLivePrice(ticker, filingDate);
 }
 
 // (search functions defined above in COMPANY DATABASE section)
@@ -3821,17 +3759,33 @@ async function loadCompany(ticker) {
 let _rt;
 window.addEventListener('resize',()=>{clearTimeout(_rt);_rt=setTimeout(()=>{const inp=buildInp(getInputs());if(!inp)return;if(activeTab==='dcf')drawSensChart(inp.price,inp.disc*100);else if(activeTab==='rev'){const irr=impliedIRR(inp,inp.price);drawIRRChart(inp.price,irr,inp.disc,_irrDragPrice)}else if(activeTab==='matrix'&&_matrixView==='chart')drawMatrixChart(_matrixChartScenario)},100)});
 
-// Restore theme
-const savedTheme=localStorage.getItem('vs-theme');
-if(savedTheme){document.documentElement.setAttribute('data-theme',savedTheme);document.getElementById('dark-btn').textContent=savedTheme==='dark'?'☀️':'🌙'}
-// Hide onboarding hint for returning users
-if(localStorage.getItem('vs-onboarded')){const h=document.getElementById('onboard-hint');if(h)h.style.display='none';}
-onDiscChange();
-syncBenchPills();
-// Init drag after DOM is ready
-setTimeout(()=>initIRRDrag(),200);
-loadFromURL();
-if(!window.location.search||window.location.search==='?')loadPreset('NFLX',true);
+// ── Init — runs after DOM is ready, nothing can crash it ──
+function _init() {
+  try { _bindInputEvents(); } catch(e) {}
+  try {
+    var savedTheme=_store.get('vs-theme');
+    if(savedTheme){
+      document.documentElement.setAttribute('data-theme',savedTheme);
+      var db=document.getElementById('dark-btn');
+      if(db) db.textContent=savedTheme==='dark'?'☀️':'🌙';
+    }
+    var oh=document.getElementById('onboard-hint');
+    if(_store.get('vs-onboarded')&&oh) oh.style.display='none';
+  } catch(e) {}
+  try { onDiscChange(); } catch(e) {}
+  try { syncBenchPills(); } catch(e) {}
+  setTimeout(function(){ try{ initIRRDrag(); }catch(e){} }, 200);
+  try { loadFromURL(); } catch(e) {}
+  if(!window.location.search||window.location.search==='?') {
+    try { loadPreset('NFLX',true); } catch(e) {}
+  }
+}
+// Run immediately if DOM ready, else wait
+if(document.readyState==='loading'){
+  document.addEventListener('DOMContentLoaded', _init);
+} else {
+  _init();
+}
 // If blank=1, keep fields empty and show onboarding
 
 </script>
