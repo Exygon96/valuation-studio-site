@@ -164,49 +164,80 @@ a{color:inherit;text-decoration:none}
 .sb-lbl:first-child{padding-top:2px}
 
 /* ── Ticker search ── */
-.ticker-search-wrap{position:relative;margin-bottom:10px}
+/* ── Ticker search ── */
+.ticker-search-wrap{position:relative;margin-bottom:12px}
 .ticker-search-input{
-  width:100%;padding:9px 36px 9px 32px;border-radius:var(--r-sm);
-  border:1px solid var(--border);background:var(--surface-2);
-  color:var(--ink);font-size:13px;font-family:var(--ff);
-  outline:none;transition:border-color .1s,box-shadow .1s;
-  -webkit-appearance:none;
+  width:100%;padding:10px 34px 10px 34px;border-radius:var(--r);
+  border:1.5px solid var(--border);background:var(--surface);
+  color:var(--ink);font-size:13.5px;font-family:var(--ff);
+  outline:none;transition:border-color .15s,box-shadow .15s,background .15s;
+  -webkit-appearance:none;box-shadow:0 1px 3px rgba(0,0,0,.05);
 }
 .ticker-search-input:focus{
-  border-color:var(--blue);box-shadow:0 0 0 3px rgba(26,92,152,.12);
+  border-color:var(--blue);box-shadow:0 0 0 3px rgba(26,92,152,.1);
   background:var(--surface);
 }
 .ticker-search-input::placeholder{color:var(--ink-5)}
 .ticker-search-icon{
-  position:absolute;left:10px;top:50%;transform:translateY(-50%);
-  color:var(--ink-5);pointer-events:none;font-size:12px;
+  position:absolute;left:11px;top:50%;transform:translateY(-50%);
+  color:var(--ink-4);pointer-events:none;font-size:13px;line-height:1;
 }
 .ticker-search-clear{
-  position:absolute;right:8px;top:50%;transform:translateY(-50%);
+  position:absolute;right:9px;top:50%;transform:translateY(-50%);
   color:var(--ink-5);cursor:pointer;font-size:14px;line-height:1;
-  display:none;background:none;border:none;padding:2px;
-  transition:color .1s;
+  display:none;background:none;border:none;padding:3px;
+  transition:color .1s;border-radius:3px;
 }
-.ticker-search-clear:hover{color:var(--ink)}
+.ticker-search-clear:hover{color:var(--ink);background:var(--surface-2)}
+/* Dropdown */
 .ticker-dropdown{
-  position:absolute;top:calc(100% + 4px);left:0;right:0;z-index:200;
+  position:absolute;top:calc(100% + 5px);left:0;right:0;z-index:200;
   background:var(--surface);border:1px solid var(--border);
-  border-radius:var(--r-sm);box-shadow:var(--shadow-md);
+  border-radius:var(--r);box-shadow:0 8px 24px rgba(0,0,0,.12),0 2px 6px rgba(0,0,0,.06);
   overflow:hidden;display:none;
 }
 .ticker-dropdown.open{display:block}
+.td-header{
+  padding:7px 12px 5px;font-size:9.5px;font-weight:600;letter-spacing:.6px;
+  text-transform:uppercase;color:var(--ink-4);background:var(--surface-2);
+  border-bottom:1px solid var(--border-2);font-family:var(--ff-mono);
+}
 .td-item{
-  display:flex;align-items:center;gap:10px;padding:9px 12px;
-  cursor:pointer;transition:background .1s;border-bottom:1px solid var(--border-2);
+  display:grid;grid-template-columns:50px 1fr auto;align-items:center;
+  gap:6px;padding:9px 12px;cursor:pointer;
+  transition:background .08s;border-bottom:1px solid var(--border-2);
 }
 .td-item:last-child{border-bottom:none}
 .td-item:hover,.td-item.focused{background:var(--blue-bg)}
-.td-ticker{font-family:var(--ff-mono);font-size:12px;font-weight:700;color:var(--blue);min-width:44px}
-.td-name{font-size:11.5px;color:var(--ink-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.td-exchange{font-size:10px;color:var(--ink-5);margin-left:auto;flex-shrink:0;font-family:var(--ff-mono)}
-.td-loading{padding:12px;text-align:center;font-size:12px;color:var(--ink-4)}
-.td-err{padding:10px 12px;font-size:12px;color:var(--red-dk);background:var(--red-bg)}
-/* Live data badge on provenance note */
+.td-item:hover .td-ticker,.td-item.focused .td-ticker{color:var(--blue)}
+.td-ticker{
+  font-family:var(--ff-mono);font-size:12.5px;font-weight:700;
+  color:var(--ink);letter-spacing:.2px;
+}
+.td-info{display:flex;flex-direction:column;min-width:0}
+.td-name{font-size:12px;color:var(--ink-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:500}
+.td-sub{font-size:10px;color:var(--ink-5);margin-top:1px;font-family:var(--ff-mono)}
+.td-badge{
+  font-size:9px;font-weight:600;font-family:var(--ff-mono);
+  background:var(--surface-2);color:var(--ink-4);
+  padding:2px 6px;border-radius:4px;white-space:nowrap;flex-shrink:0;
+  border:1px solid var(--border-2);
+}
+.td-loading{padding:14px 12px;text-align:center;font-size:12px;color:var(--ink-4)}
+.td-empty{
+  padding:14px 12px;text-align:center;font-size:12px;color:var(--ink-4);
+  font-style:italic;
+}
+/* DB count badge next to search */
+.search-db-note{
+  display:flex;justify-content:flex-end;margin-top:-8px;margin-bottom:6px;
+}
+.sdb-badge{
+  font-size:10px;color:var(--ink-5);font-family:var(--ff-mono);
+  background:var(--surface-2);border:1px solid var(--border-2);
+  border-radius:4px;padding:2px 7px;
+}
+/* Live data badges */
 .live-badge{
   display:inline-flex;align-items:center;gap:4px;
   font-family:var(--ff-mono);font-size:9.5px;font-weight:600;
@@ -214,14 +245,27 @@ a{color:inherit;text-decoration:none}
   border-radius:10px;padding:1px 7px;margin-left:4px;vertical-align:middle;
 }
 [data-theme="dark"] .live-badge{color:var(--green)}
-.live-dot{width:5px;height:5px;border-radius:50%;background:var(--green-dk);animation:pulse-hint 2s ease-in-out infinite}
+.live-dot{width:5px;height:5px;border-radius:50%;background:var(--green-dk);animation:pulse-hint 2s ease-in-out infinite;flex-shrink:0}
 [data-theme="dark"] .live-dot{background:var(--green)}
-/* Loading spinner overlay on sidebar */
+/* Price fetch states */
+.price-loading-row{
+  display:none;align-items:center;gap:7px;
+  font-size:11px;color:var(--ink-4);margin-top:4px;
+}
+.price-loading-row.show{display:flex}
+.price-spinner{
+  width:12px;height:12px;border-radius:50%;flex-shrink:0;
+  border:1.5px solid var(--border);border-top-color:var(--blue);
+  animation:spin .7s linear infinite;
+}
+.price-status{font-size:10.5px;color:var(--ink-4);font-family:var(--ff-mono)}
+/* Sidebar loading spinner overlay */
 .sb-loading{
   display:none;position:absolute;inset:0;z-index:100;
-  background:rgba(var(--surface-rgb),.75);backdrop-filter:blur(2px);
+  background:rgba(255,255,255,.6);backdrop-filter:blur(3px);
   align-items:center;justify-content:center;border-radius:var(--r);
 }
+[data-theme="dark"] .sb-loading{background:rgba(28,28,30,.6)}
 .sb-loading.show{display:flex}
 .sb-spinner{
   width:22px;height:22px;border-radius:50%;
@@ -894,15 +938,17 @@ input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.15)}
 <aside id="sidebar">
 
   <!-- Ticker search -->
-  <div style="position:relative">
+  <div style="position:relative;margin-bottom:2px">
     <div class="sb-loading" id="sb-loading"><div class="sb-spinner"></div></div>
     <div class="ticker-search-wrap">
-      <span class="ticker-search-icon">⌕</span>
+      <span class="ticker-search-icon">
+        <svg viewBox="0 0 14 14" fill="none" width="13" height="13"><circle cx="6" cy="6" r="4.5" stroke="currentColor" stroke-width="1.4"/><path d="M9.5 9.5L12 12" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+      </span>
       <input
         class="ticker-search-input"
         id="ticker-search"
         type="text"
-        placeholder="Search ticker or company…"
+        placeholder="Search 50+ companies — AAPL, Netflix…"
         autocomplete="off"
         spellcheck="false"
         oninput="onTickerInput(this.value)"
@@ -912,6 +958,13 @@ input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.15)}
       />
       <button class="ticker-search-clear" id="ticker-clear" onclick="clearTickerSearch()" tabindex="-1">✕</button>
       <div class="ticker-dropdown" id="ticker-dropdown"></div>
+    </div>
+    <div class="search-db-note">
+      <span class="sdb-badge" id="db-count-badge">Loading…</span>
+    </div>
+    <div class="price-loading-row" id="price-loading-row">
+      <div class="price-spinner"></div>
+      <span class="price-status" id="price-status-text">Fetching end-of-day price…</span>
     </div>
   </div>
 
@@ -1603,7 +1656,6 @@ function loadPreset(key,isAuto){
     b.classList.toggle('active',b.querySelector('.pt').textContent.trim()===key);
   });
   document.getElementById('inp-company').value=p.company;
-  document.getElementById('inp-price').value=p.price;
   document.getElementById('inp-shares').value=p.shares;
   document.getElementById('inp-revenue').value=p.revenue;
   document.getElementById('inp-fcf').value=p.fcf;
@@ -1618,7 +1670,47 @@ function loadPreset(key,isAuto){
   document.getElementById('sel-pccy').value=p.pccy||'USD';
   onCurrencyChange();
   document.getElementById('btn-reset').style.display='';
-  update();
+
+  // Attempt live EOD price; fall back to preset hardcoded price
+  const hasKey = POLYGON_KEY && POLYGON_KEY !== 'REPLACE_WITH_YOUR_POLYGON_KEY';
+  if (hasKey) {
+    document.getElementById('inp-price').value = '';
+    const priceRow = document.getElementById('price-loading-row');
+    const priceStatus = document.getElementById('price-status-text');
+    if (priceRow) priceRow.classList.add('show');
+    if (priceStatus) priceStatus.textContent = 'Fetching end-of-day price…';
+    update();
+    // Async price fetch
+    fetch(`https://api.polygon.io/v2/aggs/ticker/${key}/prev?adjusted=true&apiKey=${POLYGON_KEY}`,
+      {signal: AbortSignal.timeout(8000)})
+      .then(r => r.json())
+      .then(data => {
+        const c = data?.results?.[0]?.c;
+        if (c) {
+          document.getElementById('inp-price').value = fmt(c, 2);
+          const t = data.results[0].t;
+          const ds = t ? new Date(t).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}) : 'prev close';
+          const prov = document.getElementById('provenance-text');
+          if (prov) prov.innerHTML = `<strong>${p.company}</strong> · Price: ${ds} <span class="live-badge"><span class="live-dot"></span>EOD</span>`;
+          if (priceStatus) priceStatus.textContent = `Price: ${ds}`;
+        } else {
+          document.getElementById('inp-price').value = p.price;
+          if (priceStatus) priceStatus.textContent = 'Using preset price (fetch failed)';
+        }
+      })
+      .catch(() => {
+        document.getElementById('inp-price').value = p.price;
+        if (priceStatus && priceStatus.textContent.includes('Fetching'))
+          priceStatus.textContent = 'Using preset price';
+      })
+      .finally(() => {
+        update();
+        if (priceRow) setTimeout(() => priceRow.classList.remove('show'), 3000);
+      });
+  } else {
+    document.getElementById('inp-price').value=p.price;
+    update();
+  }
 }
 
 function resetInputs(){
@@ -2915,35 +3007,125 @@ function downloadMatrix(scLabel){
 }
 
 /* ══════════════════════════════════════════
-   LIVE DATA — Financial Modeling Prep
+   COMPANY DATABASE + LIVE END-OF-DAY PRICE
+   Fundamentals: manually curated, updated Feb 2026
+   Price: Polygon.io free tier (prev close, CORS-safe)
 ══════════════════════════════════════════ */
-const FMP = '/.netlify/functions/fmp'; // proxy — key lives server-side
 
+// ── Your Polygon.io API key ─────────────────────────────────────────
+// Free at polygon.io — end-of-day data, no CORS issues
+// Replace the string below with your key to enable live prices
+const POLYGON_KEY = 'REPLACE_WITH_YOUR_POLYGON_KEY';
+
+// ── Company database ────────────────────────────────────────────────
+// rev/fcf/netcash in millions. shares in millions. cagr = suggested growth %.
+// sector codes: tech, semi, fin, con, hc, energy, ind
+const _RAW_DB = [
+  // ── Mega-cap Tech ──────────────────────────────────────────────────
+  {t:'AAPL', n:'Apple',                rev:416161, fcf:98767,  sh:14773, nc:34000,   cagr:8,  cur:'USD', sec:'tech'},
+  {t:'MSFT', n:'Microsoft',            rev:281724, fcf:71611,  sh:7433,  nc:27000,   cagr:15, cur:'USD', sec:'tech'},
+  {t:'NVDA', n:'Nvidia',               rev:130497, fcf:60853,  sh:24400, nc:38000,   cagr:30, cur:'USD', sec:'semi'},
+  {t:'GOOG', n:'Alphabet',             rev:350018, fcf:72764,  sh:12140, nc:93000,   cagr:12, cur:'USD', sec:'tech'},
+  {t:'META', n:'Meta Platforms',       rev:164501, fcf:52100,  sh:2530,  nc:52000,   cagr:15, cur:'USD', sec:'tech'},
+  {t:'AMZN', n:'Amazon',               rev:637959, fcf:38521,  sh:10580, nc:78000,   cagr:15, cur:'USD', sec:'tech'},
+  {t:'TSLA', n:'Tesla',                rev:94830,  fcf:6200,   sh:3200,  nc:44100,   cagr:20, cur:'USD', sec:'tech'},
+  {t:'NFLX', n:'Netflix',              rev:45183,  fcf:9461,   sh:4317,  nc:-4500,   cagr:12, cur:'USD', sec:'tech'},
+  // ── Software / Cloud ───────────────────────────────────────────────
+  {t:'CRM',  n:'Salesforce',           rev:36472,  fcf:12386,  sh:960,   nc:4500,    cagr:12, cur:'USD', sec:'tech'},
+  {t:'ADBE', n:'Adobe',                rev:21507,  fcf:7852,   sh:430,   nc:4000,    cagr:10, cur:'USD', sec:'tech'},
+  {t:'NOW',  n:'ServiceNow',           rev:11516,  fcf:3482,   sh:204,   nc:4200,    cagr:20, cur:'USD', sec:'tech'},
+  {t:'SNOW', n:'Snowflake',            rev:3634,   fcf:338,    sh:340,   nc:3800,    cagr:25, cur:'USD', sec:'tech'},
+  {t:'PLTR', n:'Palantir',             rev:2865,   fcf:1142,   sh:2130,  nc:4600,    cagr:25, cur:'USD', sec:'tech'},
+  {t:'ORCL', n:'Oracle',               rev:57400,  fcf:11800,  sh:2740,  nc:-88000,  cagr:8,  cur:'USD', sec:'tech'},
+  {t:'INTU', n:'Intuit',               rev:17352,  fcf:4200,   sh:280,   nc:1200,    cagr:12, cur:'USD', sec:'tech'},
+  {t:'SHOP', n:'Shopify',              rev:8877,   fcf:1551,   sh:1260,  nc:5100,    cagr:25, cur:'USD', sec:'tech'},
+  // ── Semiconductors ─────────────────────────────────────────────────
+  {t:'AMD',  n:'Advanced Micro Devices',rev:25785, fcf:1611,   sh:1618,  nc:4000,    cagr:20, cur:'USD', sec:'semi'},
+  {t:'INTC', n:'Intel',                rev:53101,  fcf:-15200, sh:4330,  nc:-11000,  cagr:5,  cur:'USD', sec:'semi'},
+  {t:'QCOM', n:'Qualcomm',             rev:39116,  fcf:11200,  sh:1090,  nc:-4500,   cagr:8,  cur:'USD', sec:'semi'},
+  {t:'AVGO', n:'Broadcom',             rev:51574,  fcf:21528,  sh:4690,  nc:-65000,  cagr:12, cur:'USD', sec:'semi'},
+  {t:'TSM',  n:'TSMC (ADR)',           rev:88900,  fcf:16200,  sh:5180,  nc:25000,   cagr:15, cur:'USD', sec:'semi'},
+  {t:'ASML', n:'ASML',                 rev:28262,  fcf:2600,   sh:394,   nc:2300,    cagr:15, cur:'USD', sec:'semi'},
+  // ── Finance ────────────────────────────────────────────────────────
+  {t:'JPM',  n:'JPMorgan Chase',       rev:177622, fcf:52000,  sh:2860,  nc:0,       cagr:5,  cur:'USD', sec:'fin'},
+  {t:'V',    n:'Visa',                 rev:35926,  fcf:20400,  sh:2050,  nc:-7500,   cagr:10, cur:'USD', sec:'fin'},
+  {t:'MA',   n:'Mastercard',           rev:28172,  fcf:12800,  sh:916,   nc:-5000,   cagr:12, cur:'USD', sec:'fin'},
+  {t:'BRK-B',n:'Berkshire Hathaway',   rev:364482, fcf:42000,  sh:2170,  nc:141000,  cagr:8,  cur:'USD', sec:'fin'},
+  {t:'GS',   n:'Goldman Sachs',        rev:53509,  fcf:12000,  sh:320,   nc:0,       cagr:5,  cur:'USD', sec:'fin'},
+  {t:'PYPL', n:'PayPal',               rev:31797,  fcf:6400,   sh:1040,  nc:-3200,   cagr:6,  cur:'USD', sec:'fin'},
+  {t:'COIN', n:'Coinbase',             rev:6641,   fcf:2118,   sh:253,   nc:7800,    cagr:20, cur:'USD', sec:'fin'},
+  {t:'SQ',   n:'Block (Square)',       rev:23456,  fcf:866,    sh:1005,  nc:7800,    cagr:12, cur:'USD', sec:'fin'},
+  // ── Consumer ───────────────────────────────────────────────────────
+  {t:'WMT',  n:'Walmart',              rev:680984, fcf:17200,  sh:8020,  nc:-40000,  cagr:5,  cur:'USD', sec:'con'},
+  {t:'COST', n:'Costco',               rev:254352, fcf:7490,   sh:443,   nc:2400,    cagr:8,  cur:'USD', sec:'con'},
+  {t:'NKE',  n:'Nike',                 rev:51362,  fcf:4200,   sh:1498,  nc:-9800,   cagr:6,  cur:'USD', sec:'con'},
+  {t:'MCD',  n:"McDonald's",           rev:25920,  fcf:7300,   sh:714,   nc:-47000,  cagr:5,  cur:'USD', sec:'con'},
+  {t:'SBUX', n:'Starbucks',            rev:36176,  fcf:3100,   sh:1140,  nc:-13200,  cagr:6,  cur:'USD', sec:'con'},
+  {t:'LULU', n:'Lululemon',            rev:10574,  fcf:1600,   sh:128,   nc:1800,    cagr:10, cur:'USD', sec:'con'},
+  {t:'UBER', n:'Uber',                 rev:43975,  fcf:6940,   sh:2120,  nc:5900,    cagr:18, cur:'USD', sec:'con'},
+  {t:'ABNB', n:'Airbnb',               rev:11000,  fcf:4070,   sh:634,   nc:9400,    cagr:12, cur:'USD', sec:'con'},
+  {t:'SPOT', n:'Spotify',              rev:15673,  fcf:1816,   sh:196,   nc:5400,    cagr:15, cur:'USD', sec:'con'},
+  {t:'DIS',  n:'Walt Disney',          rev:91361,  fcf:8600,   sh:1800,  nc:-40000,  cagr:6,  cur:'USD', sec:'con'},
+  // ── Healthcare ─────────────────────────────────────────────────────
+  {t:'LLY',  n:'Eli Lilly',            rev:45042,  fcf:8400,   sh:950,   nc:-19000,  cagr:20, cur:'USD', sec:'hc'},
+  {t:'JNJ',  n:'Johnson & Johnson',    rev:89096,  fcf:18200,  sh:2400,  nc:-14000,  cagr:5,  cur:'USD', sec:'hc'},
+  {t:'UNH',  n:'UnitedHealth',         rev:400278, fcf:22800,  sh:930,   nc:-8000,   cagr:10, cur:'USD', sec:'hc'},
+  {t:'ABBV', n:'AbbVie',               rev:56334,  fcf:16600,  sh:1770,  nc:-62000,  cagr:6,  cur:'USD', sec:'hc'},
+  {t:'PFE',  n:'Pfizer',               rev:63625,  fcf:12100,  sh:5680,  nc:-48000,  cagr:4,  cur:'USD', sec:'hc'},
+  // ── Energy ─────────────────────────────────────────────────────────
+  {t:'XOM',  n:'ExxonMobil',           rev:398491, fcf:33000,  sh:4450,  nc:-43000,  cagr:3,  cur:'USD', sec:'energy'},
+  {t:'CVX',  n:'Chevron',              rev:200949, fcf:15300,  sh:1830,  nc:-18000,  cagr:3,  cur:'USD', sec:'energy'},
+  // ── International ──────────────────────────────────────────────────
+  {t:'SAP',  n:'SAP',                  rev:35380,  fcf:7600,   sh:1190,  nc:1800,    cagr:10, cur:'EUR', sec:'tech'},
+  {t:'BABA', n:'Alibaba',              rev:130350, fcf:27900,  sh:2160,  nc:61000,   cagr:8,  cur:'USD', sec:'tech'},
+  {t:'NOVO-B',n:'Novo Nordisk',        rev:232260, fcf:62100,  sh:4460,  nc:-19000,  cagr:15, cur:'USD', sec:'hc'},
+];
+
+// Deduplicate and build lookup
+const DB_MAP = {};
+_RAW_DB.forEach(c => { if (!DB_MAP[c.t]) DB_MAP[c.t] = c; });
+const DB = Object.values(DB_MAP);
+
+// Sector display labels
+const SEC_LABEL = {
+  tech:'Technology', semi:'Semiconductors', fin:'Finance',
+  con:'Consumer', hc:'Healthcare', energy:'Energy', ind:'Industrial',
+};
+
+// Update DB count badge
+document.addEventListener('DOMContentLoaded', () => {
+  const el = document.getElementById('db-count-badge');
+  if (el) el.textContent = `${DB.length} companies`;
+});
+// Also set it immediately in case DOM is already ready
+setTimeout(() => {
+  const el = document.getElementById('db-count-badge');
+  if (el) el.textContent = `${DB.length} companies`;
+}, 0);
+
+// ── Search input handlers ─────────────────────────────────────────
 let _searchTimer = null;
 let _dropFocusIdx = -1;
 let _lastResults = [];
 let _blurTimer = null;
 
-// ── Search input handlers ──────────────────
 function onTickerInput(val) {
   const clear = document.getElementById('ticker-clear');
-  clear.style.display = val ? 'block' : 'none';
+  if (clear) clear.style.display = val ? 'block' : 'none';
   clearTimeout(_searchTimer);
-  const dd = document.getElementById('ticker-dropdown');
   if (!val.trim()) { closeDropdown(); return; }
-  dd.innerHTML = '<div class="td-loading">Searching…</div>';
-  dd.classList.add('open');
-  _searchTimer = setTimeout(() => searchTicker(val.trim()), 320);
+  const results = searchDB(val.trim());
+  _lastResults = results;
+  renderDropdown(results, val.trim());
 }
 
 function onTickerFocus() {
   const val = document.getElementById('ticker-search').value.trim();
-  if (val && _lastResults.length) renderDropdown(_lastResults);
+  if (val && _lastResults.length) renderDropdown(_lastResults, val);
 }
 
 function onTickerBlur() {
-  // Delay close so clicks on dropdown items register first
-  _blurTimer = setTimeout(closeDropdown, 180);
+  _blurTimer = setTimeout(closeDropdown, 200);
 }
 
 function onTickerKey(e) {
@@ -2953,162 +3135,187 @@ function onTickerKey(e) {
   else if (e.key === 'ArrowUp') { e.preventDefault(); moveFocus(-1); }
   else if (e.key === 'Enter') {
     e.preventDefault();
-    if (_dropFocusIdx >= 0 && _lastResults[_dropFocusIdx]) {
-      loadLiveData(_lastResults[_dropFocusIdx].symbol);
-    }
+    const pick = _lastResults[_dropFocusIdx] || (_lastResults.length === 1 ? _lastResults[0] : null);
+    if (pick) pickTicker(pick.t);
   }
   else if (e.key === 'Escape') { closeDropdown(); document.getElementById('ticker-search').blur(); }
 }
 
 function moveFocus(dir) {
   const items = document.querySelectorAll('.td-item');
+  if (!items.length) return;
   _dropFocusIdx = Math.max(0, Math.min(_lastResults.length - 1, _dropFocusIdx + dir));
   items.forEach((el, i) => el.classList.toggle('focused', i === _dropFocusIdx));
+  items[_dropFocusIdx]?.scrollIntoView({ block:'nearest' });
 }
 
 function clearTickerSearch() {
-  document.getElementById('ticker-search').value = '';
-  document.getElementById('ticker-clear').style.display = 'none';
+  const inp = document.getElementById('ticker-search');
+  inp.value = '';
+  const clear = document.getElementById('ticker-clear');
+  if (clear) clear.style.display = 'none';
   closeDropdown();
-  document.getElementById('ticker-search').focus();
+  inp.focus();
 }
 
 function closeDropdown() {
-  document.getElementById('ticker-dropdown').classList.remove('open');
+  const dd = document.getElementById('ticker-dropdown');
+  if (dd) dd.classList.remove('open');
   _dropFocusIdx = -1;
 }
 
-// ── Autocomplete search ────────────────────
-async function searchTicker(q) {
-  try {
-    const r = await fetch(`${FMP}?path=/v3/search&query=${encodeURIComponent(q)}&limit=7`);
-    const data = await r.json();
-    // Filter to equities only
-    const results = (Array.isArray(data) ? data : [])
-      .filter(d => d.exchangeShortName && ['NYSE','NASDAQ','AMEX','TSX','LSE'].includes(d.exchangeShortName))
-      .slice(0, 6);
-    _lastResults = results;
-    renderDropdown(results);
-  } catch(e) {
-    document.getElementById('ticker-dropdown').innerHTML = '<div class="td-err">Search failed — check connection</div>';
-  }
+// ── Local DB search ─────────────────────────────────────────────────
+function searchDB(q) {
+  const s = q.toLowerCase();
+  const exact    = DB.filter(c => c.t.toLowerCase() === s);
+  const startT   = DB.filter(c => c.t.toLowerCase().startsWith(s) && c.t.toLowerCase() !== s);
+  const startN   = DB.filter(c => c.n.toLowerCase().startsWith(s));
+  const containN = DB.filter(c => c.n.toLowerCase().includes(s) && !c.n.toLowerCase().startsWith(s));
+  const seen = new Set();
+  return [...exact, ...startT, ...startN, ...containN]
+    .filter(c => { if (seen.has(c.t)) return false; seen.add(c.t); return true; })
+    .slice(0, 7);
 }
 
-function renderDropdown(results) {
+// Highlight matching text
+function highlight(text, q) {
+  if (!q) return text;
+  const idx = text.toLowerCase().indexOf(q.toLowerCase());
+  if (idx < 0) return text;
+  return text.slice(0, idx) +
+    `<strong style="color:var(--blue)">${text.slice(idx, idx + q.length)}</strong>` +
+    text.slice(idx + q.length);
+}
+
+function renderDropdown(results, q = '') {
   const dd = document.getElementById('ticker-dropdown');
   if (!results.length) {
-    dd.innerHTML = '<div class="td-loading">No results found</div>';
+    dd.innerHTML = `<div class="td-empty">No companies found for "<strong>${q}</strong>"<br><span style="font-size:10.5px;color:var(--ink-5)">Try a ticker like AAPL or company name</span></div>`;
     dd.classList.add('open');
     return;
   }
-  dd.innerHTML = results.map((r, i) => `
-    <div class="td-item" data-i="${i}" onmousedown="pickTicker('${r.symbol}')">
-      <span class="td-ticker">${r.symbol}</span>
-      <span class="td-name">${r.name||''}</span>
-      <span class="td-exchange">${r.exchangeShortName||''}</span>
-    </div>`).join('');
+  const rows = results.map((r, i) => {
+    const secLabel = SEC_LABEL[r.sec] || r.sec || '';
+    const cagr = r.cagr ? `+${r.cagr}%/yr` : '';
+    return `<div class="td-item" data-i="${i}" onmousedown="pickTicker('${r.t}')">
+      <span class="td-ticker">${highlight(r.t, q.toUpperCase())}</span>
+      <span class="td-info">
+        <span class="td-name">${highlight(r.n, q)}</span>
+        <span class="td-sub">${secLabel}${cagr ? ' · Est. ' + cagr : ''}</span>
+      </span>
+      <span class="td-badge">${r.cur}</span>
+    </div>`;
+  }).join('');
+  dd.innerHTML = `<div class="td-header">${results.length} match${results.length > 1 ? 'es' : ''} in database</div>` + rows;
   dd.classList.add('open');
   _dropFocusIdx = -1;
 }
 
-function pickTicker(symbol) {
+function pickTicker(ticker) {
   clearTimeout(_blurTimer);
   closeDropdown();
   document.getElementById('ticker-search').value = '';
-  document.getElementById('ticker-clear').style.display = 'none';
-  loadLiveData(symbol);
+  const clear = document.getElementById('ticker-clear');
+  if (clear) clear.style.display = 'none';
+  loadCompany(ticker);
 }
 
-// ── Live data fetch & populate ─────────────
-async function loadLiveData(symbol) {
+// ── Load company from DB + fetch live EOD price ───────────────────
+async function loadCompany(ticker) {
+  const co = DB_MAP[ticker];
+  if (!co) { showToast('Company not found'); return; }
+
+  // Show loading state
   const loading = document.getElementById('sb-loading');
-  loading.classList.add('show');
+  const priceRow = document.getElementById('price-loading-row');
+  const priceStatus = document.getElementById('price-status-text');
+  if (loading) loading.classList.add('show');
   clearPills();
 
-  try {
-    // Parallel: fundamentals + quote
-    const [profileRes, incomeRes, cashRes, balanceRes, quoteRes] = await Promise.all([
-      fetch(`${FMP}?path=/v3/profile/${symbol}`),
-      fetch(`${FMP}?path=/v3/income-statement/${symbol}&limit=1`),
-      fetch(`${FMP}?path=/v3/cash-flow-statement/${symbol}&limit=1`),
-      fetch(`${FMP}?path=/v3/balance-sheet-statement/${symbol}&limit=1`),
-      fetch(`${FMP}?path=/v3/quote-short/${symbol}`),
-    ]);
+  // ── Populate fundamentals instantly from database ──
+  document.getElementById('inp-company').value = `${co.n} (${co.t})`;
+  document.getElementById('inp-shares').value  = fmt(co.sh, 0);
+  document.getElementById('inp-revenue').value = fmt(co.rev, 0);
+  document.getElementById('inp-fcf').value     = fmt(co.fcf, 0);
+  document.getElementById('inp-netcash').value = fmt(co.nc, 0);
 
-    const [profile, income, cash, balance, quote] = await Promise.all([
-      profileRes.json(), incomeRes.json(), cashRes.json(),
-      balanceRes.json(), quoteRes.json(),
-    ]);
+  // Suggested growth
+  document.getElementById('sl-cagr').value = co.cagr;
+  document.getElementById('lbl-cagr').textContent = co.cagr + '%';
 
-    const p = Array.isArray(profile) ? profile[0] : null;
-    const inc = Array.isArray(income) && income[0] ? income[0] : null;
-    const cf = Array.isArray(cash) && cash[0] ? cash[0] : null;
-    const bs = Array.isArray(balance) && balance[0] ? balance[0] : null;
-    const q = Array.isArray(quote) && quote[0] ? quote[0] : null;
-
-    if (!p || !inc || !cf) throw new Error('Incomplete data');
-
-    // ── Map to inputs ──
-    // Revenue (in millions)
-    const revenue = inc.revenue ? inc.revenue / 1e6 : null;
-    // Free cash flow = operating CF - capex (in millions)
-    const fcf = cf.freeCashFlow ? cf.freeCashFlow / 1e6 :
-                (cf.operatingCashFlow && cf.capitalExpenditure)
-                  ? (cf.operatingCashFlow + cf.capitalExpenditure) / 1e6 : null;
-    // Net cash = cash & equivalents - total debt (in millions)
-    const cashAmt = bs ? (bs.cashAndCashEquivalents || bs.cashAndShortTermInvestments || 0) : 0;
-    const totalDebt = bs ? (bs.totalDebt || bs.longTermDebt || 0) : 0;
-    const netCash = (cashAmt - totalDebt) / 1e6;
-    // Shares outstanding (in millions)
-    const shares = p.sharesOutstanding ? p.sharesOutstanding / 1e6 : null;
-    // Price — live 15-min delayed
-    const price = q ? q.price : (p.price || null);
-    // Currency
-    const currency = p.currency || 'USD';
-    // Company name
-    const name = `${p.companyName} (${symbol})`;
-    // Report date
-    const reportDate = inc.date ? inc.date.substring(0,7) : '';
-
-    if (!revenue || !shares || !price) throw new Error('Key data missing');
-
-    // ── Populate fields ──
-    document.getElementById('inp-company').value = name;
-    document.getElementById('inp-price').value = fmt(price, 2);
-    document.getElementById('inp-shares').value = shares ? fmt(shares, 1) : '';
-    document.getElementById('inp-revenue').value = revenue ? fmt(revenue, 0) : '';
-    document.getElementById('inp-fcf').value = fcf !== null ? fmt(fcf, 0) : '';
-    document.getElementById('inp-netcash').value = fmt(netCash, 0);
-
-    // Currency
-    const ccySelect = document.getElementById('sel-fccy');
-    const pccySelect = document.getElementById('sel-pccy');
-    for (let opt of ccySelect.options) if (opt.value === currency) { ccySelect.value = currency; break; }
-    for (let opt of pccySelect.options) if (opt.value === currency) { pccySelect.value = currency; break; }
-    onCurrencyChange();
-
-    // ── Update provenance note ──
-    const prov = document.getElementById('provenance-text');
-    const dateStr = reportDate || 'latest filing';
-    prov.innerHTML = `Live data for <strong>${symbol}</strong> · Filing: ${dateStr} · Price: 15-min delayed <span class="live-badge"><span class="live-dot"></span>Live</span>`;
-
-    // Show reset
-    document.getElementById('btn-reset').style.display = '';
-
-    // Hide onboarding hint
-    const hint = document.getElementById('onboard-hint');
-    if (hint) hint.style.animation = 'none', hint.style.opacity = '0';
-
-    update();
-    showToast(`${symbol} loaded ✓`);
-
-  } catch(err) {
-    showToast('Could not load data — try another ticker');
-    console.warn('FMP error:', err);
-  } finally {
-    loading.classList.remove('show');
+  // Currency
+  for (const sel of ['sel-fccy','sel-pccy']) {
+    const el = document.getElementById(sel);
+    if (el) for (const opt of el.options) if (opt.value === co.cur) { el.value = co.cur; break; }
   }
+  onCurrencyChange();
+
+  // Show reset, hide onboarding
+  document.getElementById('btn-reset').style.display = '';
+  const hint = document.getElementById('onboard-hint');
+  if (hint) { hint.style.animation = 'none'; hint.style.opacity = '0'; }
+
+  // ── Clear price and show loading state ──
+  document.getElementById('inp-price').value = '';
+  if (loading) loading.classList.remove('show');
+  if (priceRow) priceRow.classList.add('show');
+  if (priceStatus) priceStatus.textContent = 'Fetching end-of-day price…';
+
+  // Run update immediately with blank price (shows partial state)
+  update();
+  showToast(`${co.n} loaded ✓`);
+
+  // ── Fetch end-of-day price from Polygon ──
+  const hasKey = POLYGON_KEY && POLYGON_KEY !== 'REPLACE_WITH_YOUR_POLYGON_KEY';
+
+  if (hasKey) {
+    try {
+      // Use previous close endpoint — free tier, CORS-safe
+      const res = await fetch(
+        `https://api.polygon.io/v2/aggs/ticker/${ticker}/prev?adjusted=true&apiKey=${POLYGON_KEY}`,
+        { signal: AbortSignal.timeout(8000) }
+      );
+      const data = await res.json();
+      const result = data?.results?.[0];
+
+      if (result?.c) {
+        const price = result.c;
+        const dateMs = result.t;
+        const dateStr = dateMs
+          ? new Date(dateMs).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})
+          : 'prev close';
+
+        document.getElementById('inp-price').value = fmt(price, 2);
+        if (priceStatus) priceStatus.textContent = `Price: ${dateStr}`;
+
+        // Update provenance
+        const prov = document.getElementById('provenance-text');
+        if (prov) prov.innerHTML =
+          `<strong>${co.n}</strong> · Financials Feb 2026 · Price: ${dateStr}
+           <span class="live-badge"><span class="live-dot"></span>EOD</span>`;
+
+        update();
+      } else {
+        throw new Error('No price in response');
+      }
+    } catch(err) {
+      console.warn('Polygon fetch failed:', err);
+      if (priceStatus) priceStatus.textContent = 'Price unavailable — enter manually';
+      const prov = document.getElementById('provenance-text');
+      if (prov) prov.innerHTML = `<strong>${co.n}</strong> · Financials Feb 2026 · Price: enter manually`;
+    }
+  } else {
+    // No API key — show helpful message with setup link
+    if (priceStatus) priceStatus.innerHTML =
+      `No price API key · <a href="https://polygon.io" target="_blank" rel="noopener" style="color:var(--blue)">Get free key</a> or enter price manually`;
+    const prov = document.getElementById('provenance-text');
+    if (prov) prov.innerHTML = `<strong>${co.n}</strong> · Financials from Feb 2026 filing · Enter current stock price above`;
+  }
+
+  if (priceRow) setTimeout(() => priceRow.classList.remove('show'), 3000);
 }
+
+// (search functions defined above in COMPANY DATABASE section)
 
 
 let _rt;
