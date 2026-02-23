@@ -2095,44 +2095,36 @@ function loadPreset(key,isAuto){
   onCurrencyChange();
   document.getElementById('btn-reset').style.display='';
 
-  // Attempt live EOD price; fall back to preset hardcoded price
-  const hasKey = POLYGON_KEY && POLYGON_KEY !== 'REPLACE_WITH_YOUR_POLYGON_KEY';
-  if (hasKey) {
-    document.getElementById('inp-price').value = '';
-    const priceRow = document.getElementById('price-loading-row');
-    const priceStatus = document.getElementById('price-status-text');
-    if (priceRow) priceRow.classList.add('show');
-    if (priceStatus) priceStatus.textContent = 'Fetching end-of-day price…';
-    update();
-    // Async price fetch
-    fetch(`https://api.polygon.io/v2/aggs/ticker/${key}/prev?adjusted=true&apiKey=${POLYGON_KEY}`,
-      {signal: AbortSignal.timeout(8000)})
-      .then(r => r.json())
-      .then(data => {
-        const c = data?.results?.[0]?.c;
-        if (c) {
-          document.getElementById('inp-price').value = fmt(c, 2);
-          const t = data.results[0].t;
-          const ds = t ? new Date(t).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}) : 'prev close';
-          const prov = document.getElementById('provenance-text');
-          if (prov) prov.innerHTML = `<strong>${p.company}</strong> · Price: ${ds} <span class="live-badge"><span class="live-dot"></span>EOD</span>`;
-          if (priceStatus) priceStatus.textContent = `Price: ${ds}`;
-        } else {
-          document.getElementById('inp-price').value = p.price;
-          if (priceStatus) priceStatus.textContent = 'Using preset price (fetch failed)';
-        }
-      })
-      .catch(() => {
-        document.getElementById('inp-price').value = p.price;
-        if (priceStatus && priceStatus.textContent.includes('Fetching'))
-          priceStatus.textContent = 'Using preset price';
-      })
-      .finally(() => {
+  // Fetch live EOD price; fall back to preset price on any failure
+  document.getElementById('inp-price').value = '';
+  const co = DB_MAP[key];
+  const filingDate = co ? (co.filing || 'Annual report') : 'Annual report';
+  setDataDates(filingDate, 'Fetching…');
+  setPriceStatus('Fetching end-of-day price…', true);
+  update();
+
+  if (POLYGON_KEY && POLYGON_KEY !== 'REPLACE_WITH_YOUR_POLYGON_KEY') {
+    fetchPolygonPrice(key)
+      .then(function(result) {
+        document.getElementById('inp-price').value = fmt(result.price, 2);
+        setPriceStatus('Price: ' + result.dateStr, false);
+        setDataDates(filingDate, result.dateStr + ' close');
+        var prov = document.getElementById('provenance-text');
+        if (prov) prov.innerHTML = '<strong>' + p.company + '</strong> · Price: ' + result.dateStr +
+          ' <span class="live-badge"><span class="live-dot"></span>EOD</span>';
         update();
-        if (priceRow) setTimeout(() => priceRow.classList.remove('show'), 3000);
+      })
+      .catch(function(err) {
+        console.warn('Polygon price fetch failed:', err);
+        document.getElementById('inp-price').value = p.price;
+        setPriceStatus('Using stored price (live fetch failed)', false);
+        setDataDates(filingDate, 'Stored price — verify before use');
+        update();
       });
   } else {
-    document.getElementById('inp-price').value=p.price;
+    document.getElementById('inp-price').value = p.price;
+    setPriceStatus('', false);
+    setDataDates(filingDate, 'Stored price — verify before use');
     update();
   }
 }
@@ -3441,6 +3433,41 @@ function downloadMatrix(scLabel){
 // Replace the string below with your key to enable live prices
 const POLYGON_KEY = 'Jh93BPZQd6Hn83xAIHbCP4gqJXB2LXwC';
 
+// Some tickers differ between our DB and Polygon's format
+const POLYGON_TICKER = {
+  'BRK-B':  'BRK.B',
+  'NOVO-B': 'NOVO-B',  // Danish — may return no data on free tier
+  'TSM':    'TSM',     // ADR — works fine
+  'ASML':   'ASML',    // ADR — works fine
+  'BABA':   'BABA',    // ADR — works fine
+  'SAP':    'SAP',     // ADR — works fine
+};
+function toPolygonTicker(t) { return POLYGON_TICKER[t] || t; }
+
+// Central price fetching function — used by both loadPreset and loadCompany
+async function fetchPolygonPrice(ticker) {
+  const pt = toPolygonTicker(ticker);
+  const url = 'https://api.polygon.io/v2/aggs/ticker/' + pt + '/prev?adjusted=true&apiKey=' + POLYGON_KEY;
+  const res = await fetch(url, { signal: AbortSignal.timeout(9000) });
+  if (!res.ok) throw new Error('HTTP ' + res.status);
+  const data = await res.json();
+  const result = data && data.results && data.results[0];
+  if (!result || !result.c) throw new Error('No price in response');
+  // Polygon returns t as Unix ms (midnight of trading day)
+  const dateStr = result.t
+    ? new Date(result.t).toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' })
+    : 'prev close';
+  return { price: result.c, dateStr };
+}
+
+// Shared UI helper — show/hide price loading row and update status text
+function setPriceStatus(msg, loading) {
+  const row = document.getElementById('price-loading-row');
+  const txt = document.getElementById('price-status-text');
+  if (row) row.classList.toggle('show', !!loading);
+  if (txt) txt.textContent = msg || '';
+}
+
 // ── Company database ────────────────────────────────────────────────
 // rev/fcf/netcash in millions. shares in millions. cagr = suggested growth %.
 // sector codes: tech, semi, fin, con, hc, energy, ind
@@ -3649,100 +3676,66 @@ async function loadCompany(ticker) {
   const co = DB_MAP[ticker];
   if (!co) { showToast('Company not found'); return; }
 
-  // Show loading state
-  const loading = document.getElementById('sb-loading');
-  const priceRow = document.getElementById('price-loading-row');
-  const priceStatus = document.getElementById('price-status-text');
-  if (loading) loading.classList.add('show');
   clearPills();
 
-  // ── Populate fundamentals instantly from database ──
-  // Set filing date from database
-  const filingDate = co.filing || 'Feb 2026 (annual report)';
-  setDataDates(filingDate, 'Fetching…');
-  document.getElementById('inp-company').value = `${co.n} (${co.t})`;
+  // ── Populate fundamentals instantly ──
+  const filingDate = co.filing || 'Annual report';
+  document.getElementById('inp-company').value = co.n + ' (' + co.t + ')';
   document.getElementById('inp-shares').value  = fmt(co.sh, 0);
   document.getElementById('inp-revenue').value = fmt(co.rev, 0);
   document.getElementById('inp-fcf').value     = fmt(co.fcf, 0);
   document.getElementById('inp-netcash').value = fmt(co.nc, 0);
 
-  // Suggested growth
+  // Growth
   document.getElementById('sl-cagr').value = co.cagr;
   document.getElementById('lbl-cagr').textContent = co.cagr + '%';
+  syncBenchPills();
 
   // Currency
-  for (const sel of ['sel-fccy','sel-pccy']) {
-    const el = document.getElementById(sel);
-    if (el) for (const opt of el.options) if (opt.value === co.cur) { el.value = co.cur; break; }
+  var ccyEls = ['sel-fccy','sel-pccy'];
+  for (var ci = 0; ci < ccyEls.length; ci++) {
+    var el = document.getElementById(ccyEls[ci]);
+    if (el) el.value = co.cur;
   }
   onCurrencyChange();
 
-  // Show reset, hide onboarding
+  // UI chrome
   document.getElementById('btn-reset').style.display = '';
-  const hint = document.getElementById('onboard-hint');
+  var hint = document.getElementById('onboard-hint');
   if (hint) { hint.style.animation = 'none'; hint.style.opacity = '0'; }
 
-  // ── Clear price and show loading state ──
+  // Clear price, show fetching state, run partial update
   document.getElementById('inp-price').value = '';
-  if (loading) loading.classList.remove('show');
-  if (priceRow) priceRow.classList.add('show');
-  if (priceStatus) priceStatus.textContent = 'Fetching end-of-day price…';
-
-  // Run update immediately with blank price (shows partial state)
+  setDataDates(filingDate, 'Fetching live price…');
+  setPriceStatus('Fetching end-of-day price…', true);
   update();
-  showToast(`${co.n} loaded ✓`);
+  showToast(co.n + ' loaded ✓');
 
-  // ── Fetch end-of-day price from Polygon ──
-  const hasKey = POLYGON_KEY && POLYGON_KEY !== 'REPLACE_WITH_YOUR_POLYGON_KEY';
-
-  if (hasKey) {
+  // ── Fetch live EOD price ──
+  if (POLYGON_KEY && POLYGON_KEY !== 'REPLACE_WITH_YOUR_POLYGON_KEY') {
     try {
-      // Use previous close endpoint — free tier, CORS-safe
-      const res = await fetch(
-        `https://api.polygon.io/v2/aggs/ticker/${ticker}/prev?adjusted=true&apiKey=${POLYGON_KEY}`,
-        { signal: AbortSignal.timeout(8000) }
-      );
-      const data = await res.json();
-      const result = data?.results?.[0];
-
-      if (result?.c) {
-        const price = result.c;
-        const dateMs = result.t;
-        const dateStr = dateMs
-          ? new Date(dateMs).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})
-          : 'prev close';
-
-        document.getElementById('inp-price').value = fmt(price, 2);
-        if (priceStatus) priceStatus.textContent = `Price: ${dateStr}`;
-        setDataDates(filingDate, dateStr + ' close');
-
-        // Update provenance
-        const prov = document.getElementById('provenance-text');
-        if (prov) prov.innerHTML =
-          `<strong>${co.n}</strong> · Financials Feb 2026 · Price: ${dateStr}
-           <span class="live-badge"><span class="live-dot"></span>EOD</span>`;
-
-        update();
-      } else {
-        throw new Error('No price in response');
-      }
+      const result = await fetchPolygonPrice(ticker);
+      document.getElementById('inp-price').value = fmt(result.price, 2);
+      setPriceStatus('Price: ' + result.dateStr, false);
+      setDataDates(filingDate, result.dateStr + ' close');
+      var prov = document.getElementById('provenance-text');
+      if (prov) prov.innerHTML = '<strong>' + co.n + '</strong> &middot; ' + filingDate +
+        ' &middot; Price: ' + result.dateStr +
+        ' <span class="live-badge"><span class="live-dot"></span>EOD</span>';
+      update();
     } catch(err) {
-      console.warn('Polygon fetch failed:', err);
-      if (priceStatus) priceStatus.textContent = 'Price unavailable — enter manually';
-      setDataDates(filingDate, 'Enter manually');
-      const prov = document.getElementById('provenance-text');
-      if (prov) prov.innerHTML = `<strong>${co.n}</strong> · Financials Feb 2026 · Price: enter manually`;
+      console.warn('Polygon price fetch failed:', err);
+      setPriceStatus('Live price unavailable — enter manually', false);
+      setDataDates(filingDate, 'Enter current price manually');
+      var prov2 = document.getElementById('provenance-text');
+      if (prov2) prov2.innerHTML = '<strong>' + co.n + '</strong> &middot; ' + filingDate + ' &middot; Enter current price above';
     }
   } else {
-    // No API key — show helpful message with setup link
-    if (priceStatus) priceStatus.innerHTML =
-      `No price API key · <a href="https://polygon.io" target="_blank" rel="noopener" style="color:var(--blue)">Get free key</a> or enter price manually`;
-    setDataDates(filingDate, 'No price API key — enter manually');
-    const prov = document.getElementById('provenance-text');
-    if (prov) prov.innerHTML = `<strong>${co.n}</strong> · Financials from Feb 2026 filing · Enter current stock price above`;
+    setPriceStatus('', false);
+    setDataDates(filingDate, 'Enter current price manually');
+    var prov3 = document.getElementById('provenance-text');
+    if (prov3) prov3.innerHTML = '<strong>' + co.n + '</strong> &middot; ' + filingDate + ' &middot; Add a Polygon key or enter price above';
   }
-
-  if (priceRow) setTimeout(() => priceRow.classList.remove('show'), 3000);
 }
 
 // (search functions defined above in COMPANY DATABASE section)
