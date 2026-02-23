@@ -7,7 +7,7 @@
   <meta name="description" content="Professional DCF valuation tools. Fair value, implied return, and scenario analysis for serious investors."/>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet"/>
   <!-- Prevent flash of wrong theme -->
   <script>if(localStorage.getItem('vs-theme')==='dark')document.documentElement.setAttribute('data-theme','dark')</script>
   <style>
@@ -41,7 +41,7 @@
 
       --ff-head:    'DM Sans', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
       --ff-body:    'DM Sans', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
-      --ff-mono:    'DM Mono', 'SF Mono', ui-monospace, monospace;
+      --ff-mono:    'JetBrains Mono', 'SF Mono', ui-monospace, monospace;
 
       --r:          10px;
       --shadow:     0 1px 3px rgba(28,26,22,.06), 0 1px 2px rgba(28,26,22,.04);
@@ -179,9 +179,10 @@
 
     /* Hero right — floating card */
     .hero-card {
-      background: var(--paper-2); border: 1px solid var(--paper-4);
+      background: linear-gradient(135deg, #F9F7F2 0%, #F0EDE5 100%);
+      border: 1px solid rgba(28,26,22,.09);
       border-radius: 14px; overflow: hidden;
-      box-shadow: var(--shadow-lg);
+      box-shadow: 0 4px 20px rgba(28,26,22,.08), inset 0 1px 0 rgba(255,255,255,.7);
       position: relative; top: 0;
     }
     .hc-header {
@@ -288,8 +289,10 @@
     .ticker-right { flex-shrink: 0; }
     .provenance-card {
       display: flex; align-items: stretch; gap: 0;
-      background: var(--paper-2); border: 1px solid var(--paper-4);
+      background: linear-gradient(135deg, #F9F7F2 0%, #F0EDE5 100%);
+      border: 1px solid rgba(28,26,22,.09);
       border-radius: 10px; overflow: hidden;
+      box-shadow: 0 2px 8px rgba(28,26,22,.05), inset 0 1px 0 rgba(255,255,255,.7);
     }
     .prov-item {
       display: flex; align-items: center; gap: 9px;
@@ -340,11 +343,13 @@
 
     .tools-grid {
       display: grid; grid-template-columns: repeat(3,1fr);
-      border: 1px solid var(--paper-4); border-radius: 14px; overflow: hidden;
+      border: 1px solid rgba(28,26,22,.09); border-radius: 14px; overflow: hidden;
+      box-shadow: 0 2px 12px rgba(28,26,22,.06), inset 0 1px 0 rgba(255,255,255,.5);
     }
     .tool-card {
       padding: 32px 28px; border-right: 1px solid var(--paper-4);
-      background: var(--paper); transition: background .15s;
+      background: linear-gradient(135deg, #F9F7F2 0%, #F0EDE5 100%);
+      transition: background .15s;
       position: relative;
     }
     .tool-card:last-child { border-right: none; }
@@ -369,12 +374,14 @@
     /* ── FEATURES ── */
     .features-strip {
       display: grid; grid-template-columns: repeat(4,1fr);
-      border: 1px solid var(--paper-4); border-radius: 12px; overflow: hidden;
+      border: 1px solid rgba(28,26,22,.09); border-radius: 12px; overflow: hidden;
       margin-top: 16px;
+      box-shadow: 0 2px 12px rgba(28,26,22,.06), inset 0 1px 0 rgba(255,255,255,.5);
     }
     .feat-cell {
       padding: 22px 22px; border-right: 1px solid var(--paper-4);
-      background: var(--paper-2); transition: background .15s;
+      background: linear-gradient(135deg, #F9F7F2 0%, #F0EDE5 100%);
+      transition: background .15s;
     }
     .feat-cell:last-child { border-right: none; }
     .feat-cell:hover { background: var(--paper-3); }
@@ -499,14 +506,14 @@
     [data-theme="dark"] .stats-section { border-color: var(--paper-4); }
     [data-theme="dark"] .stat-item { border-color: var(--paper-4); }
     [data-theme="dark"] .ticker-strip, [data-theme="dark"] .ticker-pill,
-    [data-theme="dark"] .provenance-card { background: var(--paper-2); border-color: var(--paper-4); }
+    [data-theme="dark"] .provenance-card { background: linear-gradient(135deg,#1E1C19 0%,#242220 100%); border-color: var(--paper-4); }
     [data-theme="dark"] .prov-divider { background: var(--paper-4); }
     [data-theme="dark"] .tools-section { background: var(--paper); }
-    [data-theme="dark"] .tool-card { background: var(--paper-2); border-color: var(--paper-4); }
+    [data-theme="dark"] .tool-card { background: linear-gradient(135deg,#1E1C19 0%,#242220 100%); border-color: var(--paper-4); }
     [data-theme="dark"] .tool-card:hover { background: var(--paper-3); }
-    [data-theme="dark"] .feat-cell { background: var(--paper-2); border-color: var(--paper-4); }
-    [data-theme="dark"] .hero-card, [data-theme="dark"] .hc-row { background: var(--paper-2); border-color: var(--paper-4); }
-    [data-theme="dark"] .step-card { background: var(--paper-2); border-color: var(--paper-4); }
+    [data-theme="dark"] .feat-cell { background: linear-gradient(135deg,#1E1C19 0%,#242220 100%); border-color: var(--paper-4); }
+    [data-theme="dark"] .hero-card, [data-theme="dark"] .hc-row { background: linear-gradient(135deg,#1E1C19 0%,#242220 100%); border-color: rgba(240,236,228,.10); box-shadow: 0 4px 20px rgba(0,0,0,.25), inset 0 1px 0 rgba(255,255,255,.04); }
+    [data-theme="dark"] .step-card { background: linear-gradient(135deg,#1E1C19 0%,#242220 100%); border-color: rgba(240,236,228,.10); box-shadow: 0 2px 8px rgba(0,0,0,.2), inset 0 1px 0 rgba(255,255,255,.04); }
     [data-theme="dark"] .cta-section { border-color: var(--paper-4); }
 
     /* Dark toggle button in nav */
@@ -662,8 +669,8 @@
         <div class="stat-lbl">Valuation tools</div>
       </div>
       <div class="stat-item">
-        <div class="stat-num">6</div>
-        <div class="stat-lbl">Pre-loaded companies</div>
+        <div class="stat-num">100+</div>
+        <div class="stat-lbl">Companies in database</div>
       </div>
       <div class="stat-item">
         <div class="stat-num">100%</div>
@@ -682,7 +689,7 @@
   <div class="container">
     <div class="section-eyebrow">The Three Tools</div>
     <h2 class="section-title">Everything you need to value a stock properly.</h2>
-    <p class="section-body">No black boxes. No simplified formulas. All three tools share the same discounted cash flow engine — with full transparency into every calculation.</p>
+    <p class="section-body">No black boxes. All three tools share the same engine — estimate future cash, bring it back to today's value, and show you every step.</p>
 
     <div class="tools-grid">
       <div class="tool-card">
@@ -690,11 +697,10 @@
         <div class="tool-title">Fair Value per Share</div>
         <div class="tool-desc">Project free cash flow at your assumed growth rate, discount it back at your required return, add the terminal value. Outputs a fair value per share — colour-coded against the market price.</div>
         <div class="tool-detail">
-          <span>→</span> Gordon Growth or Exit Multiple terminal value<br>
+          <span>→</span> Step-by-step calculation breakdown<br>
           <span>→</span> Sensitivity chart across every discount rate<br>
-          <span>→</span> Full year-by-year forecast table<br>
-          <span>→</span> Valuation bridge breakdown<br>
-          <span>→</span> CSV export
+          <span>→</span> Gordon Growth or Exit Multiple terminal value<br>
+          <span>→</span> Full year-by-year forecast table &amp; CSV export
         </div>
       </div>
       <div class="tool-card">
@@ -702,11 +708,10 @@
         <div class="tool-title">Implied Return</div>
         <div class="tool-desc">Flip the model. Instead of asking what the company is worth, ask what return the current stock price implies. Compare to your own required return — you decide what's attractive.</div>
         <div class="tool-detail">
-          <span>→</span> Implied IRR across −90% to +200% price range<br>
+          <span>→</span> Step-by-step calculation breakdown<br>
           <span>→</span> Interactive price slider with live readout<br>
-          <span>→</span> Your required return as the reference line<br>
-          <span>→</span> Sensitivity table at different prices<br>
-          <span>→</span> CSV export
+          <span>→</span> Implied IRR chart across price range<br>
+          <span>→</span> Sensitivity table &amp; CSV export
         </div>
       </div>
       <div class="tool-card">
@@ -716,7 +721,6 @@
         <div class="tool-detail">
           <span>→</span> Bear / Base / Bull side-by-side<br>
           <span>→</span> Median return summary strip<br>
-          <span>→</span> Customisable grid dimensions<br>
           <span>→</span> Heatmap or chart view<br>
           <span>→</span> CSV export per scenario
         </div>
@@ -725,29 +729,24 @@
 
     <div class="features-strip">
       <div class="feat-cell">
-        <div class="feat-icon">⬆</div>
-        <div class="feat-title">Share any valuation</div>
-        <div class="feat-body">All inputs encoded in a URL. Copy, share — anyone lands on your exact analysis.</div>
+        <div class="feat-icon">🔍</div>
+        <div class="feat-title">Full transparency</div>
+        <div class="feat-body">Every result shows a step-by-step calculation. Every ⓘ button explains the input, formula, and company-specific data.</div>
       </div>
       <div class="feat-cell">
-        <div class="feat-icon">⬇</div>
-        <div class="feat-title">Save as report</div>
-        <div class="feat-body">Download a self-contained HTML report with visual cards, scenario grid, and all assumptions. Open in any browser and print to PDF.</div>
+        <div class="feat-icon">⬆</div>
+        <div class="feat-title">Share &amp; export</div>
+        <div class="feat-body">Share via URL, download PDF reports, or export CSV. All inputs encoded so anyone sees your exact analysis.</div>
       </div>
       <div class="feat-cell">
         <div class="feat-icon">💱</div>
         <div class="feat-title">Multi-currency</div>
-        <div class="feat-body">Financials in JPY, price in USD? Set an FX rate and fair value converts automatically.</div>
-      </div>
-      <div class="feat-cell">
-        <div class="feat-icon">🌙</div>
-        <div class="feat-title">Dark mode</div>
-        <div class="feat-body">Toggle between light and dark. Preference saved across sessions.</div>
+        <div class="feat-body">Financials in EUR, price in USD? Set an FX rate and fair value converts automatically.</div>
       </div>
       <div class="feat-cell">
         <div class="feat-icon">📱</div>
-        <div class="feat-title">Mobile ready</div>
-        <div class="feat-body">Full access on any device. Sticky bar keeps results visible while scrolling. Share and save buttons always within reach.</div>
+        <div class="feat-title">Any device, dark mode</div>
+        <div class="feat-body">Full access on phone, tablet, or desktop. Light and dark mode with sticky result bar on mobile.</div>
       </div>
     </div>
   </div>
@@ -762,22 +761,22 @@
       <div class="step">
         <div class="step-num">01</div>
         <div class="step-rule"></div>
-        <div class="step-title">Enter the numbers</div>
-        <div class="step-body">Pick from six pre-loaded companies or enter any stock's financials manually — revenue, free cash flow, net cash, shares. All values in millions.</div>
-        <div class="step-note">Revenue · FCF · net cash · shares outstanding</div>
+        <div class="step-title">Search or enter a company</div>
+        <div class="step-body">Search for a company by name or ticker — all numbers load automatically from annual reports. Or type any company's numbers by hand. Always check pre-loaded data against the latest filings.</div>
+        <div class="step-note">Revenue · FCF · capex · net cash · shares · beta</div>
       </div>
       <div class="step">
         <div class="step-num">02</div>
         <div class="step-rule"></div>
         <div class="step-title">Set your assumptions</div>
-        <div class="step-body">Growth rate, margin change, years to forecast, terminal value method. Benchmark anchors help you calibrate — S&amp;P 500 companies have averaged ~8% revenue growth historically.</div>
+        <div class="step-body">Growth rate, margin change, years to forecast, terminal value method, and your required return (defaults to 12% for all stocks). Every ⓘ button explains what the input means and why that default was chosen.</div>
         <div class="step-note">All sliders · results update live</div>
       </div>
       <div class="step">
         <div class="step-num">03</div>
         <div class="step-rule"></div>
-        <div class="step-title">Read the output</div>
-        <div class="step-body">Fair value tells you what the stock is worth at your return target. Implied return tells you what the current price is pricing in. The scenario grid maps every combination at once.</div>
+        <div class="step-title">See the full calculation</div>
+        <div class="step-body">Fair value and implied return both show a step-by-step breakdown — every number explained in plain English. No black boxes. Click ⓘ next to any result to understand exactly how it was calculated.</div>
         <div class="step-note">Share via URL · Save PDF report · Export CSV · Dark mode</div>
       </div>
     </div>
