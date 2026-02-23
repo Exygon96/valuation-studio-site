@@ -384,62 +384,77 @@ input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.15)}
 .cw-item{display:flex;align-items:flex-start;gap:8px;font-size:12px;color:var(--ink-3);background:var(--surface-2);border-radius:6px;padding:7px 10px}
 .cw-item-icon{font-size:11px;margin-top:1px;flex-shrink:0}
 
-/* ── Valuation gauge (replaces bar chart) ── */
-.val-gauge{
+/* ══════════════════════════════════════════
+   UNIFIED VALUATION CARD
+   One card: FV vs Market · Required return slider
+══════════════════════════════════════════ */
+.val-card{
   background:var(--surface);border:1px solid var(--border);
-  border-radius:var(--r);padding:20px 22px;margin-bottom:12px;
-  box-shadow:var(--shadow);
+  border-radius:var(--r);margin-bottom:12px;
+  box-shadow:var(--shadow);overflow:hidden;
 }
-.vg-title{font-size:11px;font-weight:500;color:var(--ink-4);text-transform:uppercase;letter-spacing:.5px;font-family:var(--ff-mono);margin-bottom:14px}
-.vg-numbers{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:10px}
-.vg-num{text-align:center}
-.vg-num-label{font-size:10px;color:var(--ink-5);font-family:var(--ff-mono);text-transform:uppercase;letter-spacing:.4px;margin-bottom:3px}
-.vg-num-val{font-family:var(--ff-head);font-size:28px;font-weight:700;letter-spacing:-1px;line-height:1}
-.vg-num-val.fv-good{color:var(--green-dk)}
-.vg-num-val.fv-bad{color:var(--red-dk)}
-.vg-num-val.mkt{color:var(--ink-3)}
-[data-theme="dark"] .vg-num-val.fv-good{color:var(--green)}
-[data-theme="dark"] .vg-num-val.fv-bad{color:var(--red)}
-.vg-num-ccy{font-size:11px;color:var(--ink-5);font-family:var(--ff-mono);margin-top:2px}
-.vg-track-wrap{position:relative;margin:6px 0 4px}
-.vg-track{height:6px;border-radius:3px;background:var(--bg);border:1px solid var(--border-2);position:relative;overflow:visible}
-.vg-fill-good{position:absolute;top:0;height:100%;border-radius:3px;background:linear-gradient(90deg,var(--green-bg),var(--green));transition:all .6s cubic-bezier(.4,0,.2,1)}
-.vg-fill-bad{position:absolute;top:0;height:100%;border-radius:3px;background:linear-gradient(90deg,var(--red),var(--red-bg));transition:all .6s cubic-bezier(.4,0,.2,1)}
-/* market price pin */
-.vg-pin{position:absolute;top:-5px;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;pointer-events:none;transition:left .6s cubic-bezier(.4,0,.2,1)}
-.vg-pin-line{width:2px;height:16px;background:var(--ink-3);border-radius:1px}
-.vg-pin-dot{width:8px;height:8px;border-radius:50%;background:var(--ink);border:2px solid var(--surface);box-shadow:0 1px 4px rgba(26,24,20,.2);margin-top:-1px}
-.vg-pin-label{font-size:9px;font-family:var(--ff-mono);color:var(--ink-4);white-space:nowrap;margin-top:4px}
-.vg-axis{display:flex;justify-content:space-between;font-size:9.5px;color:var(--ink-5);font-family:var(--ff-mono);margin-top:18px}
-.vg-upside{display:flex;align-items:center;gap:8px;margin-top:14px;padding-top:14px;border-top:1px solid var(--border-2)}
-.vg-upside-pill{
-  display:inline-flex;align-items:center;gap:5px;
-  padding:5px 12px;border-radius:20px;
-  font-size:12.5px;font-weight:600;font-family:var(--ff-mono);
+/* — top numbers section — */
+.val-card-top{padding:20px 22px 18px;display:grid;grid-template-columns:1fr auto 1fr;align-items:center}
+.vc-side{display:flex;flex-direction:column}
+.vc-side.right{align-items:flex-end;text-align:right}
+.vc-lbl{font-size:10px;font-weight:500;color:var(--ink-5);text-transform:uppercase;
+  letter-spacing:.6px;font-family:var(--ff-mono);margin-bottom:6px}
+.vc-num{font-family:var(--ff-head);font-size:40px;font-weight:700;letter-spacing:-1.5px;line-height:1}
+.vc-num.fv-good{color:var(--green-dk)}
+.vc-num.fv-bad{color:var(--red-dk)}
+.vc-num.mkt{color:var(--ink-2)}
+[data-theme="dark"] .vc-num.fv-good{color:var(--green)}
+[data-theme="dark"] .vc-num.fv-bad{color:var(--red)}
+.vc-ccy{font-size:11px;color:var(--ink-5);font-family:var(--ff-mono);margin-top:4px}
+.vc-mid{display:flex;flex-direction:column;align-items:center;padding:0 18px;gap:3px}
+.vc-divider-v{width:1px;height:44px;background:var(--border)}
+.vc-arrow{font-size:18px;line-height:1;color:var(--ink-4)}
+.vc-delta{font-family:var(--ff-mono);font-size:13px;font-weight:700;letter-spacing:-.3px;white-space:nowrap}
+.vc-delta.good{color:var(--green-dk)}
+.vc-delta.bad{color:var(--red-dk)}
+[data-theme="dark"] .vc-delta.good{color:var(--green)}
+[data-theme="dark"] .vc-delta.bad{color:var(--red)}
+/* — verdict strip — */
+.val-card-verdict{
+  display:flex;align-items:center;gap:8px;
+  padding:10px 22px;border-top:1px solid var(--border-2);
+  background:var(--surface-2);
 }
-.vg-upside-pill.good{background:var(--green-bg);color:var(--green-dk)}
-.vg-upside-pill.bad{background:var(--red-bg);color:var(--red-dk)}
-[data-theme="dark"] .vg-upside-pill.good{color:var(--green)}
-[data-theme="dark"] .vg-upside-pill.bad{color:var(--red)}
-.vg-upside-note{font-size:11.5px;color:var(--ink-4)}
+.vc-pill{display:inline-flex;align-items:center;gap:5px;padding:4px 11px;
+  border-radius:20px;font-size:11.5px;font-weight:600;font-family:var(--ff-mono)}
+.vc-pill.good{background:var(--green-bg);color:var(--green-dk)}
+.vc-pill.bad{background:var(--red-bg);color:var(--red-dk)}
+[data-theme="dark"] .vc-pill.good{color:var(--green)}
+[data-theme="dark"] .vc-pill.bad{color:var(--red)}
+.vc-verdict-note{font-size:11.5px;color:var(--ink-4);font-weight:400}
+.vc-verdict-note.good{color:var(--green-dk);font-weight:500}
+.vc-verdict-note.bad{color:var(--red-dk);font-weight:500}
+[data-theme="dark"] .vc-verdict-note.good{color:var(--green)}
+[data-theme="dark"] .vc-verdict-note.bad{color:var(--red)}
+/* — slider section — */
+.val-card-slider{padding:14px 22px 16px;border-bottom:1px solid var(--border-2)}
+.vcs-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.vcs-label{display:flex;align-items:center;gap:7px}
+.vcs-title{font-size:12px;font-weight:600;color:var(--ink)}
+.vcs-tag{font-size:10px;font-weight:500;color:var(--gold);background:var(--gold-bg);
+  border:1px solid rgba(176,125,46,.2);border-radius:10px;
+  padding:1px 7px;font-family:var(--ff-mono);letter-spacing:.3px}
+.vcs-val{font-family:var(--ff-mono);font-size:18px;font-weight:700;color:var(--ink);letter-spacing:-.5px}
+.vcs-track{position:relative;height:4px;border-radius:2px;margin-bottom:10px;
+  background:linear-gradient(90deg,var(--green) 0%,#d4a332 40%,var(--red) 75%,#7a1a1a 100%)}
+.vcs-track input[type=range]{position:absolute;inset:0;width:100%;opacity:0;cursor:pointer;height:20px;top:-8px;margin:0}
+.vcs-thumb{position:absolute;top:50%;transform:translate(-50%,-50%);width:15px;height:15px;
+  border-radius:50%;background:var(--surface);border:2px solid var(--ink-3);
+  box-shadow:0 1px 4px rgba(26,24,20,.2);pointer-events:none;transition:left .05s}
+.vcs-hints{display:grid;grid-template-columns:repeat(4,1fr);gap:5px}
+.vcs-hint{text-align:center;padding:5px 4px;background:var(--bg);border-radius:6px;
+  cursor:pointer;transition:all .1s;border:1px solid transparent}
+.vcs-hint:hover{border-color:var(--blue);background:var(--blue-bg)}
+.vcs-hint-rate{font-size:11px;font-weight:600;font-family:var(--ff-mono);color:var(--ink-3)}
+.vcs-hint-lbl{font-size:10px;color:var(--ink-5);margin-top:1px}
 
-/* Discount slider area */
-.disc-area{
-  background:var(--surface);border:1px solid var(--border);
-  border-radius:var(--r);padding:16px 18px;margin-bottom:12px;
-  box-shadow:var(--shadow);
-}
-.disc-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
-.disc-title{font-size:13px;font-weight:600;color:var(--ink)}
-.disc-val{font-family:var(--ff-head);font-size:28px;font-weight:700;color:var(--ink);letter-spacing:-1px}
-.disc-track{position:relative;height:4px;border-radius:2px;margin-bottom:14px;background:linear-gradient(90deg,var(--green) 0%,#d4a332 40%,var(--red) 75%,#7a1a1a 100%)}
-.disc-track input[type=range]{position:absolute;inset:0;width:100%;opacity:0;cursor:pointer;height:20px;top:-8px;margin:0}
-.disc-thumb{position:absolute;top:50%;transform:translate(-50%,-50%);width:15px;height:15px;border-radius:50%;background:var(--surface);border:2px solid var(--ink-3);box-shadow:0 1px 4px rgba(26,24,20,.2);pointer-events:none;transition:left .05s}
-.disc-hint{display:grid;grid-template-columns:repeat(4,1fr);gap:5px}
-.dh-item{text-align:center;padding:6px 4px;background:var(--surface-2);border-radius:6px;cursor:pointer;transition:all .1s;border:1px solid transparent}
-.dh-item:hover{border-color:var(--blue);background:var(--blue-bg)}
-.dh-rate{font-size:11px;font-weight:600;font-family:var(--ff-mono);color:var(--ink-3)}
-.dh-lbl{font-size:10px;color:var(--ink-5);margin-top:1px}
+/* Discount slider area — keep for compat but hide */
+.disc-area{display:none}
 
 /* Chart card */
 .chart-card{
@@ -1009,38 +1024,38 @@ input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.15)}
       </div>
       <div id="dcf-content" style="display:none">
 
-        <!-- Big result card -->
-        <div class="result-hero" id="dcf-hero"></div>
+        <!-- ONE unified card: required return (input) + FV vs Market (output) -->
+        <div class="val-card" id="val-card">
 
-        <!-- Stats row -->
-        <div class="stat-row" id="dcf-stat-row"></div>
-
-        <!-- Valuation gauge -->
-        <div class="val-gauge" id="dcf-cmp"></div>
-
-        <!-- Discount rate control -->
-        <div class="disc-area">
-          <div class="disc-top">
-            <div>
-              <div style="display:flex;align-items:center;gap:8px;margin-bottom:3px">
-                <div style="font-size:12px;font-weight:600;color:var(--ink)">Required return</div>
-                <div style="font-size:10px;font-weight:500;color:var(--gold);background:var(--gold-bg);border:1px solid rgba(176,125,46,.2);border-radius:10px;padding:1px 8px;font-family:var(--ff-mono);letter-spacing:.3px">or WACC</div>
+          <!-- Required return slider — top, as it's the key input -->
+          <div class="val-card-slider">
+            <div class="vcs-top">
+              <div class="vcs-label">
+                <span class="vcs-title">Required return</span>
+                <span class="vcs-tag">or WACC</span>
               </div>
-              <div style="font-size:12px;color:var(--ink-4);line-height:1.4">The annual return you require — or your company's cost of capital. Higher = stricter = lower fair value.</div>
+              <span class="vcs-val" id="lbl-disc">12%</span>
             </div>
-            <div class="disc-val" id="lbl-disc">12%</div>
+            <div class="vcs-track">
+              <input type="range" id="sl-disc" min="1" max="50" step="1" value="12" oninput="onDiscChange()"/>
+              <div class="vcs-thumb" id="disc-thumb"></div>
+            </div>
+            <div class="vcs-hints">
+              <div class="vcs-hint" onclick="setDisc(8)"><div class="vcs-hint-rate">8%</div><div class="vcs-hint-lbl">Aggressive</div></div>
+              <div class="vcs-hint" onclick="setDisc(12)"><div class="vcs-hint-rate">12%</div><div class="vcs-hint-lbl">Moderate</div></div>
+              <div class="vcs-hint" onclick="setDisc(15)"><div class="vcs-hint-rate">15%</div><div class="vcs-hint-lbl">Careful</div></div>
+              <div class="vcs-hint" onclick="setDisc(20)"><div class="vcs-hint-rate">20%</div><div class="vcs-hint-lbl">Very strict</div></div>
+            </div>
           </div>
-          <div class="disc-track">
-            <input type="range" id="sl-disc" min="1" max="50" step="1" value="12" oninput="onDiscChange()"/>
-            <div class="disc-thumb" id="disc-thumb"></div>
-          </div>
-          <div class="disc-hint">
-            <div class="dh-item" onclick="setDisc(8)"><div class="dh-rate">8%</div><div class="dh-lbl">Aggressive</div></div>
-            <div class="dh-item" onclick="setDisc(12)"><div class="dh-rate">12%</div><div class="dh-lbl">Moderate</div></div>
-            <div class="dh-item" onclick="setDisc(15)"><div class="dh-rate">15%</div><div class="dh-lbl">Careful</div></div>
-            <div class="dh-item" onclick="setDisc(20)"><div class="dh-rate">20%</div><div class="dh-lbl">Very strict</div></div>
-          </div>
+
+          <!-- Numbers + verdict — result of the input above -->
+          <div class="val-card-top" id="dcf-hero"></div>
+          <div id="dcf-verdict"></div>
+
         </div>
+
+        <!-- hidden compat divs (JS still writes to dcf-cmp) -->
+        <div id="dcf-cmp" style="display:none"></div>
 
         <!-- Chart -->
         <div class="chart-card">
@@ -1588,13 +1603,9 @@ function saveReport(){
     return h;
   }
 
-  // SVG number line — wider viewBox for bigger, more legible visual
-  const lineMin=res.ok?Math.min(res.fvps,inp.price)*0.88:inp.price*0.88;
-  const lineMax=res.ok?Math.max(res.fvps,inp.price)*1.12:inp.price*1.12;
-  // 0–480 horizontal range with 24px margins each side → 432px usable
-  const toX=(v)=>Math.round(24+(v-lineMin)/(lineMax-lineMin)*432);
-  const fvX=res.ok?toX(res.fvps):0;
-  const pxX=toX(inp.price);
+  // SVG number line — anchored: fair value always at 28% from left,
+  // market price proportional so visual gap reflects real ratio
+  // (no SVG coordinate variables needed — using CSS layout now)
 
   const goodColor=up!==null&&up>=0?'#1a5c32':'#7a1a1a';
   const goodBg=up!==null&&up>=0?'#edf7f0':'#fdf0f0';
@@ -1618,9 +1629,9 @@ function saveReport(){
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <title>${inp.company||'Valuation'} — Report</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,600&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,600&family=Inter:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap');
   *{box-sizing:border-box;margin:0;padding:0}
-  body{font-family:'Inter',sans-serif;background:#f4f0e8;color:#1a1814;font-size:13px;line-height:1.5;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  body{font-family:'Inter',sans-serif;background:#f4f0e8;color:#1a1814;font-size:13px;line-height:1.5;letter-spacing:-.01em;-webkit-font-smoothing:antialiased;-webkit-print-color-adjust:exact;print-color-adjust:exact}
   .page{max-width:800px;margin:0 auto;padding:48px 48px 64px;background:#f4f0e8}
   .report-header{display:flex;justify-content:space-between;align-items:flex-start;padding-bottom:18px;border-bottom:2px solid #1a1814;margin-bottom:28px}
   .rh-brand{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:#8a857c}
@@ -1639,12 +1650,20 @@ function saveReport(){
   .visual-row{display:flex;flex-direction:column;gap:16px;margin-bottom:28px}
   .vis-card{border-radius:14px;padding:28px 32px;border:1px solid #d8d3ca}
   .vis-label{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1.4px;text-transform:uppercase;color:#8a857c;margin-bottom:16px}
-  /* Fair value card */
-  .fv-top{display:flex;align-items:baseline;gap:10px;margin-bottom:6px}
-  .fv-number{font-family:'Cormorant Garamond',serif;font-size:64px;font-weight:700;letter-spacing:-2.5px;line-height:1}
-  .fv-currency{font-family:'DM Mono',monospace;font-size:13px;color:#8a857c;margin-bottom:28px}
-  .fv-line-svg{width:100%;overflow:visible;display:block;margin-bottom:20px}
-  .fv-badge{display:inline-flex;align-items:center;gap:5px;padding:6px 14px;border-radius:20px;font-family:'DM Mono',monospace;font-size:12px;font-weight:500}
+  /* Fair value card — two-number comparison layout */
+  .fv-vc-row{display:grid;grid-template-columns:1fr auto 1fr;align-items:center}
+  .fv-vc-side{display:flex;flex-direction:column}
+  .fv-vc-side.right{align-items:flex-end;text-align:right}
+  .fv-vc-lbl{font-family:'DM Mono',monospace;font-size:9.5px;font-weight:500;text-transform:uppercase;letter-spacing:.6px;color:#8a857c;margin-bottom:6px}
+  .fv-vc-num{font-family:'Inter','Cormorant Garamond',serif;font-size:52px;font-weight:700;letter-spacing:-2px;line-height:1}
+  .fv-vc-ccy{font-family:'DM Mono',monospace;font-size:11px;color:#8a857c;margin-top:5px}
+  .fv-vc-mid{display:flex;flex-direction:column;align-items:center;padding:0 24px;gap:3px}
+  .fv-vc-divider{width:1px;height:44px;background:#d8d3ca}
+  .fv-vc-arrow{font-size:20px;line-height:1;color:#4a4640}
+  .fv-vc-delta{font-family:'DM Mono',monospace;font-size:13px;font-weight:700;letter-spacing:-.3px;white-space:nowrap}
+  .fv-vc-foot{display:flex;align-items:center;gap:8px;margin-top:18px;padding-top:14px;border-top:1px solid #d8d3ca}
+  .fv-vc-badge{display:inline-flex;align-items:center;gap:5px;padding:5px 12px;border-radius:20px;font-family:'DM Mono',monospace;font-size:12px;font-weight:600}
+  .fv-vc-note{font-size:12px;color:#6a6560}
   /* IRR card — horizontal layout: big number left, description right */
   .irr-row{display:flex;align-items:center;gap:0}
   .irr-left{flex-shrink:0;padding-right:28px;border-right:1px solid #d8d3ca;min-width:130px}
@@ -1690,35 +1709,31 @@ function saveReport(){
 
     <!-- Fair Value Card -->
     <div class="vis-card" style="background:${goodBg}">
-      <div class="vis-label">Fair Value per Share</div>
+      <div class="vis-label">Fair Value per Share · at ${fmt(inp.disc*100,0)}% required return</div>
       ${res.ok?`
-      <div class="fv-number" style="color:${goodColor}">${fvDisplay}</div>
-      <div class="fv-currency">${inp.pccy} · at ${fmt(inp.disc*100,0)}% required return</div>
-      <svg class="fv-line-svg" viewBox="0 0 480 100" height="100">
-        <!-- baseline rule -->
-        <line x1="24" y1="50" x2="456" y2="50" stroke="#d8d3ca" stroke-width="2"/>
-        <!-- coloured gap between the two dots -->
-        <line x1="${Math.min(fvX,pxX)}" y1="50" x2="${Math.max(fvX,pxX)}" y2="50"
-              stroke="${goodColor}" stroke-width="3" opacity="0.3"/>
-        <!-- Fair value dot -->
-        <circle cx="${fvX}" cy="50" r="7" fill="${goodColor}"/>
-        <text x="${fvX}" y="30" font-size="11" font-family="monospace" fill="${goodColor}"
-              text-anchor="middle" font-weight="700">${fvDisplay}</text>
-        <text x="${fvX}" y="18" font-size="9" font-family="monospace" fill="${goodColor}"
-              text-anchor="middle" opacity="0.75">Fair value</text>
-        <!-- Market price dot -->
-        <circle cx="${pxX}" cy="50" r="7" fill="#4a4640"/>
-        <text x="${pxX}" y="73" font-size="11" font-family="monospace" fill="#4a4640"
-              text-anchor="middle" font-weight="700">${fmt(inp.price)}</text>
-        <text x="${pxX}" y="85" font-size="9" font-family="monospace" fill="#8a857c"
-              text-anchor="middle">Market price</text>
-        <!-- Delta label at midpoint, above or below line -->
-        <text x="${Math.round((fvX+pxX)/2)}" y="${up>=0?40:65}" font-size="10"
-              font-family="monospace" fill="${goodColor}" text-anchor="middle"
-              font-weight="700">${upDisplay}</text>
-      </svg>
-      <div class="fv-badge" style="background:${up>=0?'rgba(45,106,79,.12)':'rgba(155,34,38,.1)'};color:${goodColor}">
-        ${up>=0?'▲':'▼'} ${upDisplay} implied ${up>=0?'upside':'downside'}
+      <div class="fv-vc-row">
+        <div class="fv-vc-side">
+          <div class="fv-vc-lbl">Fair Value</div>
+          <div class="fv-vc-num" style="color:${goodColor}">${fvDisplay}</div>
+          <div class="fv-vc-ccy">${inp.pccy}</div>
+        </div>
+        <div class="fv-vc-mid">
+          <div class="fv-vc-divider"></div>
+          <div class="fv-vc-arrow">${up>=0?'←':'→'}</div>
+          <div class="fv-vc-delta" style="color:${goodColor}">${upDisplay}</div>
+          <div class="fv-vc-divider"></div>
+        </div>
+        <div class="fv-vc-side right">
+          <div class="fv-vc-lbl">Market Price</div>
+          <div class="fv-vc-num" style="color:#2e2b26">${fmt(inp.price)}</div>
+          <div class="fv-vc-ccy">${inp.pccy}</div>
+        </div>
+      </div>
+      <div class="fv-vc-foot">
+        <div class="fv-vc-badge" style="background:${up>=0?'rgba(45,106,79,.12)':'rgba(155,34,38,.1)'};color:${goodColor}">
+          ${up>=0?'▲':'▼'} ${upDisplay} implied ${up>=0?'upside':'downside'}
+        </div>
+        <div class="fv-vc-note">market price ${up>=0?'below':'above'} fair value estimate</div>
       </div>
       `:`<div style="color:#8a857c;font-size:13px;margin-top:8px">Could not calculate at these inputs.</div>`}
     </div>
@@ -1920,68 +1935,27 @@ function renderDCF(inp){
   if(res.ok){
     const up=res.fvps/inp.price-1;
     const good=up>=0;
-    // Hero card
+    // Single unified card: FV | delta | Market + verdict strip
     document.getElementById('dcf-hero').innerHTML=`
-      <div class="rh-left">
-        <div class="rh-label">Fair value per share</div>
-        <div class="rh-value ${good?'good':'bad'}">${fmt(res.fvps)}</div>
-        <div class="rh-sub">${pCcy}</div>
-        <div class="rh-badge ${good?'good':'bad'}">${good?'▲ Stock looks cheap':'▼ Stock looks expensive'}</div>
+      <div class="vc-side">
+        <div class="vc-lbl">Fair Value</div>
+        <div class="vc-num ${good?'fv-good':'fv-bad'}">${fmt(res.fvps)}</div>
+        <div class="vc-ccy">${pCcy}</div>
       </div>
-      <div class="rh-right">
-        <div class="rh-label">Implied upside / downside</div>
-        <div class="rh-value ${good?'good':'bad'}">${up>=0?'+':''}${fmt(up*100,1)}%</div>
-        <div class="rh-sub">vs market price of ${fmt(inp.price)} ${pCcy}</div>
+      <div class="vc-mid">
+        <div class="vc-divider-v"></div>
+        <div class="vc-arrow">${good?'←':'→'}</div>
+        <div class="vc-delta ${good?'good':'bad'}">${up>=0?'+':''}${fmt(up*100,1)}%</div>
+        <div class="vc-divider-v"></div>
+      </div>
+      <div class="vc-side right">
+        <div class="vc-lbl">Market Price</div>
+        <div class="vc-num mkt">${fmt(inp.price)}</div>
+        <div class="vc-ccy">${pCcy}</div>
       </div>`;
-    // Stat row
-    document.getElementById('dcf-stat-row').innerHTML=`
-      <div class="stat-card">
-        <div class="sc-lbl">Market price</div>
-        <div class="sc-val">${fmt(inp.price)}</div>
-        <div class="sc-sub">${pCcy} per share</div>
-      </div>
-      <div class="stat-card">
-        <div class="sc-lbl">Your required return</div>
-        <div class="sc-val">${fmt(inp.disc*100,0)}%</div>
-        <div class="sc-sub">per year</div>
-      </div>`;
-    // Valuation gauge
-    const spread=Math.max(res.fvps,inp.price)*1.5;
-    const fvPct=Math.min(res.fvps/spread*100,95);
-    const pxPct=Math.min(inp.price/spread*100,95);
-    document.getElementById('dcf-cmp').innerHTML=`
-      <div class="vg-title">Fair value vs. market price</div>
-      <div class="vg-numbers">
-        <div class="vg-num">
-          <div class="vg-num-label">Fair value</div>
-          <div class="vg-num-val ${good?'fv-good':'fv-bad'}">${fmt(res.fvps)}</div>
-          <div class="vg-num-ccy">${pCcy}</div>
-        </div>
-        <div class="vg-num" style="text-align:right">
-          <div class="vg-num-label">Market price</div>
-          <div class="vg-num-val mkt">${fmt(inp.price)}</div>
-          <div class="vg-num-ccy">${pCcy}</div>
-        </div>
-      </div>
-      <div class="vg-track-wrap">
-        <div class="vg-track">
-          ${good
-            ? `<div class="vg-fill-good" style="left:${pxPct.toFixed(1)}%;width:${(fvPct-pxPct).toFixed(1)}%"></div>`
-            : `<div class="vg-fill-bad" style="left:${fvPct.toFixed(1)}%;width:${(pxPct-fvPct).toFixed(1)}%"></div>`
-          }
-          <div class="vg-pin" style="left:${pxPct.toFixed(1)}%">
-            <div class="vg-pin-line"></div>
-            <div class="vg-pin-dot"></div>
-            <div class="vg-pin-label">Market</div>
-          </div>
-        </div>
-        <div class="vg-axis">
-          <span>$0</span><span>Fair value range →</span><span>${fmt(spread,0)}</span>
-        </div>
-      </div>
-      <div class="vg-upside">
-        <div class="vg-upside-pill ${good?'good':'bad'}">${good?'▲':'▼'} ${up>=0?'+':''}${fmt(up*100,1)}%</div>
-        <div class="vg-upside-note">implied ${good?'upside — fair value exceeds market price':'downside — market price exceeds fair value'}</div>
+    document.getElementById('dcf-verdict').innerHTML=`
+      <div class="val-card-verdict">
+        <div class="vc-verdict-note ${good?'good':'bad'}">${good?'▲ Undervalued at this required return':'▼ Overvalued at this required return'}</div>
       </div>`;
   } else {
     // Detailed, actionable error diagnosis
@@ -2002,14 +1976,14 @@ function renderDCF(inp){
     if(!diagnose.length){
       diagnose.push({icon:'🔧',text:`The model could not converge on a fair value with these inputs. → Try lowering your required return, raising the revenue growth rate, or confirm that Revenue and Free Cash Flow are both entered correctly.`});
     }
-    document.getElementById('dcf-hero').innerHTML=`<div style="grid-column:1/-1">
-      <div class="calc-warn">
+    document.getElementById('dcf-hero').innerHTML=`<div style="grid-column:1/-1;padding:4px 0">
+      <div class="calc-warn" style="margin-bottom:0;border:none;box-shadow:none;background:none">
         <div class="cw-head"><div class="cw-icon">⛔</div><div class="cw-title">Fair value cannot be calculated</div></div>
         <div class="cw-body">The current combination of inputs produces a mathematically invalid result. Here's what needs to change:</div>
         <div class="cw-list">${diagnose.map(d=>`<div class="cw-item"><span class="cw-item-icon">${d.icon}</span><span>${d.text}</span></div>`).join('')}</div>
       </div>
     </div>`;
-    document.getElementById('dcf-stat-row').innerHTML='';
+    document.getElementById('dcf-verdict').innerHTML='';
     document.getElementById('dcf-cmp').innerHTML='';
   }
   // Sens data
