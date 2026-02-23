@@ -6,7 +6,7 @@
 <title>Valuation Studio</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
 <style>
 /* ═══════════════════════════════════════
    TOKENS — Warm Paper / Old New York
@@ -38,8 +38,8 @@
   --gold:      #b07d2e;
   --gold-bg:   #f8f0dc;
 
-  --ff: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-  --ff-head: 'Cormorant Garamond', Georgia, serif;
+  --ff: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --ff-head: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   --ff-mono: 'DM Mono', 'SF Mono', monospace;
   --r: 10px;
   --r-sm: 7px;
@@ -83,7 +83,8 @@
 html,body{height:100%;overflow:hidden}
 body{
   font-family:var(--ff);background:var(--bg);color:var(--ink);
-  font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased;
+  font-size:14px;line-height:1.5;letter-spacing:-.01em;
+  -webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;
   transition:background .2s,color .2s;
 }
 input,select,button,textarea{font-family:inherit;font-size:inherit}
@@ -147,7 +148,9 @@ a{color:inherit;text-decoration:none}
 #sidebar{
   width:var(--sidebar-w);flex-shrink:0;
   background:var(--surface);border-right:1px solid var(--border);
-  overflow-y:auto;padding:14px 14px 60px;
+  overflow-y:auto;padding:14px 14px 80px;
+  -webkit-overflow-scrolling:touch;
+  overscroll-behavior:contain;
   transition:transform .25s ease,background .2s;
 }
 #sidebar::-webkit-scrollbar{width:0}
@@ -327,7 +330,7 @@ input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.15)}
 .rh-left{padding-right:20px;border-right:1px solid var(--border-2)}
 .rh-right{padding-left:20px}
 .rh-label{font-size:10.5px;font-weight:500;color:var(--ink-5);text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px;font-family:var(--ff-mono)}
-.rh-value{font-family:var(--ff-head);font-size:44px;font-weight:700;letter-spacing:-1.5px;line-height:1}
+.rh-value{font-family:var(--ff-head);font-size:44px;font-weight:700;letter-spacing:-2px;line-height:1}
 .rh-value.good{color:var(--green-dk)}
 .rh-value.bad{color:var(--red-dk)}
 .rh-value.neutral{color:var(--blue)}
@@ -353,7 +356,7 @@ input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.15)}
   border-radius:var(--r);padding:14px 16px;box-shadow:var(--shadow);
 }
 .sc-lbl{font-size:10.5px;font-weight:500;color:var(--ink-5);margin-bottom:5px;font-family:var(--ff-mono);text-transform:uppercase;letter-spacing:.5px}
-.sc-val{font-family:var(--ff-head);font-size:28px;font-weight:700;letter-spacing:-.8px;color:var(--ink)}
+.sc-val{font-family:var(--ff-head);font-size:28px;font-weight:700;letter-spacing:-1px;color:var(--ink)}
 .sc-sub{font-size:11px;color:var(--ink-5);margin-top:3px}
 
 /* ── Data provenance note ── */
@@ -391,7 +394,7 @@ input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.15)}
 .vg-numbers{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:10px}
 .vg-num{text-align:center}
 .vg-num-label{font-size:10px;color:var(--ink-5);font-family:var(--ff-mono);text-transform:uppercase;letter-spacing:.4px;margin-bottom:3px}
-.vg-num-val{font-family:var(--ff-head);font-size:28px;font-weight:700;letter-spacing:-.5px;line-height:1}
+.vg-num-val{font-family:var(--ff-head);font-size:28px;font-weight:700;letter-spacing:-1px;line-height:1}
 .vg-num-val.fv-good{color:var(--green-dk)}
 .vg-num-val.fv-bad{color:var(--red-dk)}
 .vg-num-val.mkt{color:var(--ink-3)}
@@ -428,7 +431,7 @@ input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.15)}
 }
 .disc-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
 .disc-title{font-size:13px;font-weight:600;color:var(--ink)}
-.disc-val{font-family:var(--ff-head);font-size:28px;font-weight:700;color:var(--ink);letter-spacing:-.5px}
+.disc-val{font-family:var(--ff-head);font-size:28px;font-weight:700;color:var(--ink);letter-spacing:-1px}
 .disc-track{position:relative;height:4px;border-radius:2px;margin-bottom:14px;background:linear-gradient(90deg,var(--green) 0%,#d4a332 40%,var(--red) 75%,#7a1a1a 100%)}
 .disc-track input[type=range]{position:absolute;inset:0;width:100%;opacity:0;cursor:pointer;height:20px;top:-8px;margin:0}
 .disc-thumb{position:absolute;top:50%;transform:translate(-50%,-50%);width:15px;height:15px;border-radius:50%;background:var(--surface);border:2px solid var(--ink-3);box-shadow:0 1px 4px rgba(26,24,20,.2);pointer-events:none;transition:left .05s}
@@ -503,13 +506,13 @@ input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.15)}
 .irc-top{display:flex;align-items:flex-start;gap:0;margin-bottom:16px}
 .irc-num-block{flex-shrink:0;padding-right:24px;border-right:1px solid var(--border-2)}
 .irc-num-lbl{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.6px;color:var(--ink-5);font-family:var(--ff-mono);margin-bottom:6px}
-.irc-num{font-family:var(--ff-head);font-size:56px;font-weight:700;letter-spacing:-2px;line-height:1}
+.irc-num{font-family:var(--ff-head);font-size:56px;font-weight:700;letter-spacing:-3px;line-height:1}
 .irc-num.good{color:var(--green-dk)}
 .irc-num.bad{color:var(--red-dk)}
 [data-theme="dark"] .irc-num.good{color:var(--green)}
 [data-theme="dark"] .irc-num.bad{color:var(--red)}
 .irc-verdict{padding-left:20px;flex:1}
-.irc-verdict-main{font-family:var(--ff-head);font-size:17px;font-weight:600;color:var(--ink);margin-bottom:8px;line-height:1.25;letter-spacing:-.2px}
+.irc-verdict-main{font-family:var(--ff-head);font-size:17px;font-weight:600;color:var(--ink);margin-bottom:8px;line-height:1.25;letter-spacing:-.4px}
 .irc-verdict-body{font-size:12.5px;color:var(--ink-4);line-height:1.7}
 .irc-vs-badge{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:20px;font-family:var(--ff-mono);font-size:11.5px;font-weight:600}
 .irc-vs-badge.good{background:var(--green-bg);color:var(--green-dk)}
@@ -537,7 +540,7 @@ input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.15)}
 .rpc-label{font-size:13px;font-weight:600;color:var(--ink);margin-bottom:3px}
 .rpc-sub{font-size:11.5px;color:var(--ink-4);line-height:1.5;max-width:400px}
 .rpc-price-display{text-align:right;flex-shrink:0}
-.rpc-price-val{font-family:var(--ff-head);font-size:28px;font-weight:700;color:var(--ink);letter-spacing:-.5px;line-height:1}
+.rpc-price-val{font-family:var(--ff-head);font-size:28px;font-weight:700;color:var(--ink);letter-spacing:-1px;line-height:1}
 .rpc-price-ccy{font-size:10.5px;color:var(--ink-5);text-align:right;margin-top:2px;font-family:var(--ff-mono)}
 .rpc-slider-row{display:flex;align-items:center;gap:10px;margin-bottom:12px}
 .rpc-bound{font-family:var(--ff-mono);font-size:10px;color:var(--ink-5);white-space:nowrap;min-width:36px}
@@ -738,7 +741,8 @@ input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.15)}
 
 @media(max-width:700px){
   :root{--sidebar-w:88vw}
-  #sidebar{position:fixed;top:var(--header-h);left:0;bottom:0;z-index:45;transform:translateX(-100%);width:var(--sidebar-w);max-width:320px}
+  #sidebar{position:fixed;top:var(--header-h);left:0;bottom:0;z-index:45;transform:translateX(-100%);width:var(--sidebar-w);max-width:320px;
+    padding-bottom:calc(80px + env(safe-area-inset-bottom, 20px))}
   #sidebar.open{transform:translateX(0)}
   #overlay{display:block;opacity:0;pointer-events:none;transition:opacity .2s}
   #overlay.show{opacity:1;pointer-events:auto}
@@ -773,7 +777,6 @@ input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.15)}
   .tab-btn[data-short]::before{content:attr(data-short);font-size:12px}
   .tab-btn[data-short]{font-size:0}
   .tab-btn[data-short]::before{font-size:12px}
-  #sidebar{padding:12px 12px 40px}
   .field input[type=text],.field input[type=number],.field select{font-size:16px}
   .h-name{font-size:14px}
   .h-mark{width:24px;height:24px}
@@ -1617,7 +1620,7 @@ function saveReport(){
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,600&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap');
   *{box-sizing:border-box;margin:0;padding:0}
-  body{font-family:'DM Sans',sans-serif;background:#f4f0e8;color:#1a1814;font-size:13px;line-height:1.5;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  body{font-family:'Inter',sans-serif;background:#f4f0e8;color:#1a1814;font-size:13px;line-height:1.5;-webkit-print-color-adjust:exact;print-color-adjust:exact}
   .page{max-width:800px;margin:0 auto;padding:48px 48px 64px;background:#f4f0e8}
   .report-header{display:flex;justify-content:space-between;align-items:flex-start;padding-bottom:18px;border-bottom:2px solid #1a1814;margin-bottom:28px}
   .rh-brand{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:#8a857c}
@@ -2064,7 +2067,7 @@ function drawSensChart(price,selRate){
   }
 
   // ── Zone labels (subtle text inside the zones)
-  ctx.font=`500 9.5px 'DM Sans', sans-serif`;
+  ctx.font=`500 9.5px 'Inter', sans-serif`;
   if(above.length){
     const midY=Math.max(PAD.t+10, (yp(above[0].fv)+py)/2);
     ctx.fillStyle='rgba(26,122,60,.45)';ctx.textAlign='right';
@@ -2145,7 +2148,7 @@ function drawSensChart(price,selRate){
   }
 
   // ── Axis labels
-  ctx.fillStyle=ink5;ctx.font=`10px 'DM Sans', sans-serif`;ctx.textAlign='center';
+  ctx.fillStyle=ink5;ctx.font=`10px 'Inter', sans-serif`;ctx.textAlign='center';
   ctx.fillText('Required annual return (%)',PAD.l+cw/2,H-4);
   ctx.save();ctx.translate(11,PAD.t+ch/2);ctx.rotate(-Math.PI/2);
   ctx.fillText('Fair value per share',0,0);ctx.restore();
@@ -2533,7 +2536,7 @@ function drawIRRChart(curPrice,curIRR,userDisc,dragPrice){
 
   // ── Axis labels
   ctx.setLineDash([]);
-  ctx.fillStyle=ink5;ctx.font=`10px 'DM Sans', sans-serif`;ctx.textAlign='center';
+  ctx.fillStyle=ink5;ctx.font=`10px 'Inter', sans-serif`;ctx.textAlign='center';
   ctx.fillText('Stock price ('+((buildInp(getInputs())||{}).pccy||'')+')',PAD.l+cw/2,H-4);
   ctx.save();ctx.translate(11,PAD.t+ch/2);ctx.rotate(-Math.PI/2);
   ctx.fillText('Implied annual return (%)',0,0);ctx.restore();
@@ -2717,7 +2720,7 @@ function drawMatrixChart(scenarioKey){
   }).filter(Boolean);
 
   if(!bands.length){
-    ctx.fillStyle=cssVar('--ink-4');ctx.font=`12px 'DM Sans'`;ctx.textAlign='center';
+    ctx.fillStyle=cssVar('--ink-4');ctx.font=`12px 'Inter'`;ctx.textAlign='center';
     ctx.fillText('Not enough data',W/2,H/2);return;
   }
 
@@ -2824,13 +2827,13 @@ function drawMatrixChart(scenarioKey){
 
   // ── Axis labels
   ctx.setLineDash([]);
-  ctx.fillStyle=ink5;ctx.font=`10px 'DM Sans', sans-serif`;ctx.textAlign='center';
+  ctx.fillStyle=ink5;ctx.font=`10px 'Inter', sans-serif`;ctx.textAlign='center';
   ctx.fillText('Revenue growth rate (% per year)',PAD.l+cw/2,H-4);
   ctx.save();ctx.translate(11,PAD.t+ch/2);ctx.rotate(-Math.PI/2);
   ctx.fillText('Implied annual return (%)',0,0);ctx.restore();
 
   // ── Terminal value count annotation
-  ctx.fillStyle=ink5;ctx.font=`9px 'DM Sans', sans-serif`;ctx.textAlign='left';
+  ctx.fillStyle=ink5;ctx.font=`9px 'Inter', sans-serif`;ctx.textAlign='left';
   ctx.fillText(`Range across ${terminals.length} terminal value${terminals.length>1?'s':''}`,PAD.l+4,PAD.t+ch-5);
 }
 
