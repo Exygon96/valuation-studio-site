@@ -273,6 +273,116 @@ a{color:inherit;text-decoration:none}
   animation:spin .7s linear infinite;
 }
 @keyframes spin{to{transform:rotate(360deg)}}
+
+/* ── Data dates strip ── */
+.data-dates{
+  background:var(--surface-2);border:1px solid var(--border-2);
+  border-radius:var(--r-sm);padding:6px 10px;margin-bottom:10px;
+}
+.dd-row{display:flex;justify-content:space-between;align-items:baseline;
+  font-size:11px;padding:2px 0;}
+.dd-row:first-child{border-bottom:1px solid var(--border-2);padding-bottom:4px;margin-bottom:2px}
+.dd-lbl{color:var(--ink-4);font-weight:500}
+.dd-val{font-family:var(--ff-mono);font-size:10.5px;color:var(--ink-3);font-weight:500}
+
+/* ── ⓘ Info button ── */
+.info-btn{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:14px;height:14px;border-radius:50%;
+  font-size:10px;font-style:normal;font-weight:600;line-height:1;
+  color:var(--ink-5);background:none;border:none;cursor:pointer;
+  transition:color .1s;padding:0;vertical-align:middle;margin-left:3px;
+  font-family:var(--ff);
+}
+.info-btn:hover{color:var(--blue)}
+
+/* ── Info modal overlay ── */
+.info-modal-overlay{
+  display:none;position:fixed;inset:0;z-index:500;
+  background:rgba(0,0,0,.35);backdrop-filter:blur(4px);
+  align-items:center;justify-content:center;padding:20px;
+}
+.info-modal-overlay.show{display:flex}
+.info-modal{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:14px;box-shadow:0 20px 60px rgba(0,0,0,.2);
+  max-width:420px;width:100%;max-height:85vh;overflow-y:auto;
+  animation:slideUp .18s cubic-bezier(.4,0,.2,1);
+}
+@keyframes slideUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.im-header{
+  display:flex;justify-content:space-between;align-items:flex-start;
+  padding:18px 20px 12px;border-bottom:1px solid var(--border-2);
+}
+.im-title{font-size:15px;font-weight:700;color:var(--ink);letter-spacing:-.3px}
+.im-subtitle{font-size:11px;color:var(--ink-4);margin-top:2px}
+.im-close{
+  width:26px;height:26px;border-radius:50%;background:var(--surface-2);
+  border:1px solid var(--border);font-size:13px;color:var(--ink-4);
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;flex-shrink:0;transition:all .1s;margin-top:-2px;
+}
+.im-close:hover{background:var(--red-bg);color:var(--red-dk);border-color:rgba(255,59,48,.2)}
+.im-body{padding:16px 20px 20px;font-size:13px;color:var(--ink-3);line-height:1.7}
+.im-section{margin-bottom:14px}
+.im-section:last-child{margin-bottom:0}
+.im-section-title{font-size:11px;font-weight:700;text-transform:uppercase;
+  letter-spacing:.5px;color:var(--ink-4);margin-bottom:5px}
+.im-formula{
+  background:var(--surface-2);border:1px solid var(--border-2);
+  border-radius:6px;padding:8px 12px;font-family:var(--ff-mono);
+  font-size:11.5px;color:var(--blue);line-height:1.8;margin:8px 0;
+}
+.im-warn{
+  background:var(--red-bg);border:1px solid rgba(255,59,48,.15);
+  border-radius:6px;padding:8px 12px;font-size:12px;color:var(--red-dk);
+  margin-top:8px;line-height:1.6;
+}
+[data-theme="dark"] .im-warn{color:var(--red)}
+.im-note{
+  background:var(--blue-bg);border-left:3px solid var(--blue);
+  border-radius:4px;padding:8px 12px;font-size:12px;color:var(--ink-3);
+  line-height:1.6;margin-top:8px;
+}
+[data-theme="dark"] .im-note{background:rgba(10,132,255,.08)}
+.im-tag{
+  display:inline-flex;align-items:center;gap:4px;
+  font-size:10px;font-weight:600;font-family:var(--ff-mono);
+  padding:2px 7px;border-radius:4px;margin-right:4px;margin-bottom:4px;
+}
+.im-tag-green{background:var(--green-bg);color:var(--green-dk)}
+.im-tag-red{background:var(--red-bg);color:var(--red-dk)}
+.im-tag-blue{background:var(--blue-bg);color:var(--blue)}
+[data-theme="dark"] .im-tag-green{color:var(--green)}
+[data-theme="dark"] .im-tag-red{color:var(--red)}
+
+/* ── FCFF toggle ── */
+.fcff-toggle-row{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:8px 10px;margin-bottom:6px;
+  background:var(--surface-2);border:1px solid var(--border);
+  border-radius:var(--r-sm);
+}
+.fcff-toggle-label{
+  font-size:11.5px;font-weight:500;color:var(--ink-3);
+  display:flex;align-items:center;gap:0;flex:1;
+}
+/* Toggle switch */
+.toggle-switch{position:relative;flex-shrink:0;margin-left:8px}
+.toggle-switch input{position:absolute;opacity:0;width:0;height:0}
+.toggle-track{
+  display:flex;align-items:center;
+  width:34px;height:18px;border-radius:9px;
+  background:var(--ink-5);transition:background .2s;cursor:pointer;
+  position:relative;
+}
+.toggle-switch input:checked ~ .toggle-track{background:var(--blue)}
+.toggle-thumb{
+  position:absolute;left:2px;width:14px;height:14px;border-radius:50%;
+  background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.2);
+  transition:left .2s cubic-bezier(.4,0,.2,1);
+}
+.toggle-switch input:checked ~ .toggle-track .toggle-thumb{left:18px}
 .co-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;margin-bottom:12px}
 .co-pill{
   padding:9px 4px;border-radius:var(--r-sm);
@@ -977,9 +1087,15 @@ input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.15)}
     <button class="co-pill" onclick="loadPreset('TSLA')"><span class="pt">TSLA</span></button>
     <button class="co-pill" onclick="loadPreset('NFLX')"><span class="pt">NFLX</span></button>
   </div>
+  <!-- Data freshness note -->
   <div class="data-provenance" id="data-provenance">
     <svg viewBox="0 0 12 12" fill="none" width="10" height="10" style="flex-shrink:0;margin-top:1px"><circle cx="6" cy="6" r="5" stroke="currentColor" stroke-width="1.3"/><path d="M6 5v3.5M6 3.5v.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
-    <span id="provenance-text">Data from annual reports. Prices as of <strong>Feb 2026</strong> — verify before use.</span>
+    <span id="provenance-text">Select a company above to see data sources.</span>
+  </div>
+  <!-- Per-company data dates (shown after load) -->
+  <div class="data-dates" id="data-dates" style="display:none">
+    <div class="dd-row"><span class="dd-lbl">Last filing</span><span class="dd-val" id="dd-filing">—</span></div>
+    <div class="dd-row"><span class="dd-lbl">Price date</span><span class="dd-val" id="dd-price">—</span></div>
   </div>
 
   <div class="field">
@@ -987,7 +1103,9 @@ input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.15)}
     <input type="text" id="inp-company" placeholder="e.g. Netflix"/>
   </div>
   <div class="field">
-    <label>Stock price <span class="note" id="price-ccy-note">USD</span><a id="price-check-link" href="#" target="_blank" rel="noopener noreferrer" onclick="return !!this.dataset.ready" style="display:none;margin-left:auto;font-size:10px;font-weight:500;color:var(--gold);text-decoration:none;font-family:var(--ff-mono);letter-spacing:.1px;white-space:nowrap;border-bottom:1px dashed currentColor;padding-bottom:1px" title="Opens a Google search for the current stock price in a new tab — the price stored here may be out of date">Check price on Google ↗</a></label>
+    <label>Stock price <span class="note" id="price-ccy-note">USD</span>
+      <button class="info-btn" onclick="showInfo('price')" title="About this field">ⓘ</button>
+    </label>
     <input type="text" id="inp-price" placeholder="e.g. 78.00"/>
   </div>
 
@@ -1017,23 +1135,45 @@ input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.15)}
     </div>
   </div>
 
-  <div class="sb-lbl">Financials (all in millions)</div>
+  <div class="sb-lbl">Financials <span style="font-weight:400;text-transform:none;letter-spacing:0">(all in millions)</span></div>
   <div class="field">
-    <label>Shares outstanding</label>
+    <label>Shares outstanding
+      <button class="info-btn" onclick="showInfo('shares')" title="About this field">ⓘ</button>
+    </label>
     <input type="text" id="inp-shares" placeholder="e.g. 4317"/>
   </div>
   <div class="field">
-    <label>Revenue</label>
+    <label>Revenue
+      <button class="info-btn" onclick="showInfo('revenue')" title="About this field">ⓘ</button>
+    </label>
     <input type="text" id="inp-revenue" placeholder="e.g. 45183"/>
   </div>
   <div id="warn-scale" class="warn" style="display:none">⚠ Revenue looks small — remember all figures should be in <strong>millions</strong>. Apple's revenue is ~416,000M, Netflix ~45,000M.</div>
   <div class="field">
-    <label>Free cash flow</label>
+    <label>Free cash flow (FCFE)
+      <button class="info-btn" onclick="showInfo('fcf')" title="About this field">ⓘ</button>
+    </label>
     <input type="text" id="inp-fcf" placeholder="e.g. 9461"/>
   </div>
-  <div class="field">
-    <label>Net cash <span class="note">+ = cash · − = debt</span></label>
-    <input type="text" id="inp-netcash" placeholder="e.g. -4500"/>
+
+  <!-- FCFF toggle — net debt only shown when opted in -->
+  <div class="fcff-toggle-row">
+    <label class="fcff-toggle-label" for="toggle-fcff">
+      <span>Add net debt adjustment <span style="font-size:10px;color:var(--ink-4)">(FCFF approach)</span></span>
+      <button class="info-btn" onclick="showInfo('fcff')" title="FCFE vs FCFF">ⓘ</button>
+    </label>
+    <label class="toggle-switch">
+      <input type="checkbox" id="toggle-fcff" onchange="onFCFFToggle()"/>
+      <span class="toggle-track"><span class="toggle-thumb"></span></span>
+    </label>
+  </div>
+  <div id="netcash-wrap" style="display:none">
+    <div class="field">
+      <label>Net cash <span class="note">+ = cash · − = debt</span>
+        <button class="info-btn" onclick="showInfo('netcash')" title="About this field">ⓘ</button>
+      </label>
+      <input type="text" id="inp-netcash" placeholder="e.g. -4500"/>
+    </div>
   </div>
 
   <div id="margin-chip" style="display:none">
@@ -1048,11 +1188,11 @@ input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.15)}
   <div class="sb-lbl" style="margin-top:4px">Growth assumptions</div>
   <div class="growth-card">
     <div class="sl-row">
-      <div class="sl-top"><span>Years to forecast</span><span id="lbl-years">8 yrs</span></div>
+      <div class="sl-top"><span>Years to forecast <button class="info-btn" onclick="showInfo('years')" title="About this field">ⓘ</button></span><span id="lbl-years">8 yrs</span></div>
       <input type="range" id="sl-years" min="3" max="20" step="1" value="8" oninput="onSl('years')"/>
     </div>
     <div class="sl-row" style="margin-bottom:4px">
-      <div class="sl-top"><span>Revenue growth per year</span><span id="lbl-cagr">10%</span></div>
+      <div class="sl-top"><span>Revenue growth per year <button class="info-btn" onclick="showInfo('cagr')" title="About this field">ⓘ</button></span><span id="lbl-cagr">10%</span></div>
       <input type="range" id="sl-cagr" min="-30" max="100" step="1" value="10" oninput="onSl('cagr')"/>
     </div>
     <div class="bench-grid" id="bench-grid">
@@ -1066,7 +1206,7 @@ input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.15)}
     </div>
   </div>
 
-  <div class="sb-lbl" style="margin-top:4px">Terminal value method</div>
+  <div class="sb-lbl" style="margin-top:4px">Terminal value method <button class="info-btn" onclick="showInfo('terminal')" title="About terminal value">ⓘ</button></div>
   <div class="seg">
     <button class="seg-btn active" id="rb-tg" onclick="setTerm('growth')">Growth rate</button>
     <button class="seg-btn" id="rb-tm" onclick="setTerm('multiple')">Exit multiple</button>
@@ -1116,9 +1256,12 @@ input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.15)}
         Terminal value = last FCF × (1 + long-run growth) ÷ (return − growth)<br><br>
         <strong>Exit Multiple terminal value:</strong><br>
         Terminal value = last FCF × your chosen multiple<br><br>
-        Fair value per share = (sum of all PVs + terminal PV − net debt) ÷ shares
+        <strong>FCFE approach (default):</strong><br>
+        Fair value per share = (PV of FCFs + PV of Terminal) ÷ Shares<br><br>
+        <strong>FCFF approach (optional toggle):</strong><br>
+        Fair value per share = (PV of FCFs + PV of Terminal − Net Debt) ÷ Shares
       </div>
-      <div class="mth-note">Net cash <em>adds</em> to fair value. Net debt <em>reduces</em> it. With Gordon Growth, terminal growth must stay below your required return — otherwise the formula breaks.</div>
+      <div class="mth-note">The default FCFE approach treats cash flows as already belonging to equity holders — no debt adjustment needed. The optional FCFF toggle adds a net debt bridge, useful when a company has a large cash pile or significant debt that materially affects per-share value. With Gordon Growth, terminal growth must stay below your required return — otherwise the formula produces an infinite result.</div>
     </div>
 
     <div class="mth-sec">
@@ -1429,6 +1572,17 @@ input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.15)}
 
 <div id="toast"></div>
 
+<!-- Info modal -->
+<div class="info-modal-overlay" id="info-modal-overlay" onclick="closeInfoModal(event)">
+  <div class="info-modal" id="info-modal">
+    <div class="im-header">
+      <div><div class="im-title" id="im-title"></div><div class="im-subtitle" id="im-subtitle"></div></div>
+      <button class="im-close" onclick="closeInfoModal()">✕</button>
+    </div>
+    <div class="im-body" id="im-body"></div>
+  </div>
+</div>
+
 <script>
 /* ══════════════════════════════════════════
    PRESETS
@@ -1486,10 +1640,13 @@ function fairValue(inp){
   const lastFCF=rows[rows.length-1].fcf;
   if(!isFinite(lastFCF)||lastFCF<=0)return{ok:false,rows};
   const pvTV=terminalPV(inp,lastFCF);
-  const equityPV=pvFCFs+pvTV-inp.netDebt;
-  if(equityPV<=0)return{ok:false,pvFCFs,pvTV,equityPV,lastFCF,rows};
+  // FCFE (default): no net debt adjustment — cash flows already reflect equity perspective
+  // FCFF (optional): subtract net debt to bridge enterprise value → equity value
+  const netDebtAdj = inp.useFCFF ? inp.netDebt : 0;
+  const equityPV=pvFCFs+pvTV-netDebtAdj;
+  if(equityPV<=0)return{ok:false,pvFCFs,pvTV,equityPV,lastFCF,rows,netDebtAdj};
   const fvLocal=equityPV/inp.shares;
-  return{ok:true,pvFCFs,pvTV,equityPV,fvLocal,fvps:fvLocal*inp.fxRate,lastFCF,rows};
+  return{ok:true,pvFCFs,pvTV,equityPV,fvLocal,fvps:fvLocal*inp.fxRate,lastFCF,rows,netDebtAdj};
 }
 function impliedIRR(inp,price){
   const pl=price/inp.fxRate;
@@ -1536,6 +1693,7 @@ function getInputs(){
     revLTM:pf(document.getElementById('inp-revenue').value),
     fcfLTM:pf(document.getElementById('inp-fcf').value),
     netCashRaw:pf(document.getElementById('inp-netcash').value),
+    useFCFF:document.getElementById('toggle-fcff')?.checked||false,
     cagr:parseInt(document.getElementById('sl-cagr').value)/100,
     dpp:parseFloat(document.getElementById('sl-dpp').value)/100,
     years:parseInt(document.getElementById('sl-years').value)||8,
@@ -1558,6 +1716,7 @@ function buildInp(raw){
   if(!isFinite(margin))return null;
   const netDebt=isFinite(raw.netCashRaw)?-raw.netCashRaw:0;
   const fxRate=(raw.fccy===raw.pccy)?1:(isFinite(raw.fxRate)&&raw.fxRate>0?raw.fxRate:1);
+  // netDebt only applied in calculation when useFCFF is true
   return{...raw,fcfMargin:margin,netDebt,fxRate};
 }
 
@@ -1565,6 +1724,271 @@ function buildInp(raw){
    CONTROLS
 ══════════════════════════════════════════ */
 function clearPills(){document.querySelectorAll('.co-pill').forEach(b=>b.classList.remove('active'))}
+
+/* ══════════════════════════════════════════
+   FCFF TOGGLE
+══════════════════════════════════════════ */
+function onFCFFToggle() {
+  const on = document.getElementById('toggle-fcff').checked;
+  document.getElementById('netcash-wrap').style.display = on ? '' : 'none';
+  update();
+}
+
+/* ══════════════════════════════════════════
+   INFO MODAL — transparency tooltips
+══════════════════════════════════════════ */
+const INFO_CONTENT = {
+  price: {
+    title: 'Stock Price',
+    subtitle: 'What you pay per share today',
+    body: `
+      <div class="im-section">
+        <div class="im-section-title">What this is</div>
+        <p>The current market price per share, in the currency shown. This is the price the model compares against the calculated fair value — the gap between the two is the implied upside or downside.</p>
+      </div>
+      <div class="im-section">
+        <div class="im-section-title">Where it comes from</div>
+        <p>When a company is loaded from the database, the price is fetched automatically from <strong>Polygon.io</strong> — the previous trading day's closing price. It is not a real-time quote.</p>
+        <div class="im-note">Price date is shown in the "Data Sources" panel above. Always verify the current price before making any decisions.</div>
+      </div>
+    `
+  },
+  shares: {
+    title: 'Shares Outstanding',
+    subtitle: 'Diluted weighted average, in millions',
+    body: `
+      <div class="im-section">
+        <div class="im-section-title">Diluted vs. Basic</div>
+        <p>We use <strong>diluted</strong> share count — this includes all shares that could exist if every stock option, warrant, and convertible instrument were exercised. It is the more conservative figure.</p>
+        <p style="margin-top:8px">Basic shares = only shares currently issued. Diluted shares = basic + potential shares from options, RSUs, convertibles.</p>
+        <div class="im-formula">Diluted shares ≥ Basic shares (always)</div>
+      </div>
+      <div class="im-section">
+        <div class="im-section-title">Where it comes from</div>
+        <p>From the company's most recent annual report — typically from the cover page of the 10-K (US) or equivalent filing. The figure is the <em>weighted average diluted shares</em> for the fiscal year.</p>
+      </div>
+      <div class="im-section">
+        <div class="im-section-title">Why it matters</div>
+        <p>Fair value = equity value ÷ shares. A higher share count means each share is worth less. Using diluted shares protects against overestimating fair value.</p>
+        <div class="im-warn">⚠ If a company issues lots of stock-based compensation, the diluted count can grow meaningfully year to year. The pre-loaded figures reflect the most recent annual filing.</div>
+      </div>
+    `
+  },
+  revenue: {
+    title: 'Revenue',
+    subtitle: 'Total net revenue, last twelve months, in millions',
+    body: `
+      <div class="im-section">
+        <div class="im-section-title">What this is</div>
+        <p>Total net revenues (after returns and discounts) for the company's most recent fiscal year. This is the top-line figure from the income statement — sometimes called "net sales" or "total net revenue" depending on the company.</p>
+      </div>
+      <div class="im-section">
+        <div class="im-section-title">Where it comes from</div>
+        <p>From the most recent annual report (10-K for US-listed companies). The filing date is shown in the Data Sources panel. All figures are in millions of the reporting currency.</p>
+        <div class="im-note">For non-USD companies (e.g. ASML in EUR), the revenue is kept in the original reporting currency. Use the currency selector and FX rate field if you want to compare against a USD price.</div>
+      </div>
+      <div class="im-section">
+        <div class="im-section-title">How it's used</div>
+        <p>Revenue is projected forward using your growth rate assumption. FCF margin is then applied to each projected revenue figure to arrive at forecast free cash flows.</p>
+        <div class="im-formula">FCF year t = Revenue year t × FCF margin<br>Revenue year t = Revenue × (1 + growth)^t</div>
+      </div>
+    `
+  },
+  fcf: {
+    title: 'Free Cash Flow (FCFE)',
+    subtitle: 'Operating cash flow minus capital expenditure',
+    body: `
+      <div class="im-section">
+        <div class="im-section-title">Definition used here</div>
+        <p>We define FCF as:</p>
+        <div class="im-formula">FCF = Operating Cash Flow − Capital Expenditure</div>
+        <p>This is the cash generated by the business after maintaining and investing in its physical assets, but <em>before</em> debt repayments. It represents cash that flows to equity holders.</p>
+      </div>
+      <div class="im-section">
+        <div class="im-section-title">Why not net income?</div>
+        <p>Net income includes non-cash charges (depreciation, amortisation, stock-based compensation) and is affected by accounting choices. Cash flow is harder to manipulate and better reflects the actual cash a business produces.</p>
+      </div>
+      <div class="im-section">
+        <div class="im-section-title">FCFE vs FCFF</div>
+        <div style="margin-bottom:8px">
+          <span class="im-tag im-tag-blue">FCFE (default)</span> Free Cash Flow to <strong>Equity</strong>. Cash available after operating the business. No debt adjustment needed — divide directly by shares to get per-share value.
+        </div>
+        <div>
+          <span class="im-tag im-tag-green">FCFF (optional)</span> Free Cash Flow to the <strong>Firm</strong>. You add back net debt to convert from enterprise value to equity value. Enable the toggle below to use this approach.
+        </div>
+      </div>
+      <div class="im-section">
+        <div class="im-section-title">Where it comes from</div>
+        <p>From the cash flow statement in the annual report. Operating cash flow is on line 1; capital expenditure appears under "investing activities" (usually labelled "purchases of property, plant and equipment").</p>
+        <div class="im-warn">⚠ Negative FCF means the company is consuming more cash than it generates. The model will still run, but treat results with extra caution.</div>
+      </div>
+    `
+  },
+  fcff: {
+    title: 'FCFE vs FCFF — Net Debt Adjustment',
+    subtitle: 'Two ways to arrive at equity value',
+    body: `
+      <div class="im-section">
+        <div class="im-section-title">The default: FCFE</div>
+        <p>By default this model uses <strong>Free Cash Flow to Equity (FCFE)</strong>. The FCF figure already reflects cash flows from an equity perspective, so you can divide the present value of future cash flows directly by shares to get fair value per share.</p>
+        <div class="im-formula">Fair value = PV(FCFs) + PV(Terminal) ÷ Shares</div>
+      </div>
+      <div class="im-section">
+        <div class="im-section-title">The optional: FCFF + Net Debt</div>
+        <p>If you enable this toggle, the model switches to a <strong>FCFF</strong> approach. The present value gives you <em>enterprise value</em> — the value of the whole business. You then subtract net debt (or add net cash) to get equity value.</p>
+        <div class="im-formula">Equity value = PV(FCFs) + PV(Terminal) − Net Debt<br>Fair value per share = Equity value ÷ Shares</div>
+        <p style="margin-top:8px">This is useful when a company has a large cash pile (like Alphabet's $93B) or significant debt that meaningfully changes per-share value.</p>
+      </div>
+      <div class="im-section">
+        <div class="im-section-title">Net Cash field</div>
+        <p>Enter a <strong>positive number</strong> for net cash (cash exceeds debt). Enter a <strong>negative number</strong> for net debt (debt exceeds cash).</p>
+        <div class="im-formula">Net cash = Cash &amp; equivalents − Total debt</div>
+        <div class="im-note">For most companies the difference is modest relative to the DCF value. For cash-heavy companies (Berkshire, Alphabet) or heavily leveraged ones (McDonald's), it can be material.</div>
+      </div>
+    `
+  },
+  netcash: {
+    title: 'Net Cash / (Net Debt)',
+    subtitle: 'Balance sheet bridge — only used in FCFF mode',
+    body: `
+      <div class="im-section">
+        <div class="im-section-title">Definition</div>
+        <div class="im-formula">Net cash = Cash &amp; equivalents − Total debt</div>
+        <p>A positive number means cash exceeds debt — this adds to equity value. A negative number means debt exceeds cash — this reduces equity value.</p>
+      </div>
+      <div class="im-section">
+        <div class="im-section-title">Where it comes from</div>
+        <p>From the balance sheet in the annual report. Cash & equivalents (plus short-term investments) minus total financial debt (short-term + long-term borrowings).</p>
+      </div>
+      <div class="im-warn">⚠ Only active when the FCFF toggle above is enabled. In default FCFE mode this field is ignored.</div>
+    `
+  },
+  years: {
+    title: 'Forecast Period',
+    subtitle: 'How many years of cash flows to model explicitly',
+    body: `
+      <div class="im-section">
+        <div class="im-section-title">What this controls</div>
+        <p>The number of years for which you project individual cash flows before applying the terminal value. Each year's cash flow is discounted back to today at your required return.</p>
+      </div>
+      <div class="im-section">
+        <div class="im-section-title">How long is right?</div>
+        <p>Most practitioners use 5–10 years. The key question is: how long can the company sustain above-average growth before it matures? For high-growth tech companies, 8–10 years is common. For mature businesses, 5 years is often sufficient.</p>
+        <div class="im-note">Beyond the forecast period, the terminal value takes over. In many DCF models, 60–80% of fair value comes from the terminal value — which is why it's so sensitive to the terminal growth rate.</div>
+      </div>
+    `
+  },
+  cagr: {
+    title: 'Revenue Growth Rate',
+    subtitle: 'Compound annual growth applied to revenue each year',
+    body: `
+      <div class="im-section">
+        <div class="im-section-title">What this is</div>
+        <p>The annual rate at which you expect revenue to grow during the forecast period. Applied as a constant rate each year — so at 10%, revenue doubles in about 7 years.</p>
+        <div class="im-formula">Revenue year t = Revenue × (1 + g)^t</div>
+      </div>
+      <div class="im-section">
+        <div class="im-section-title">The pre-loaded default</div>
+        <p>The suggested rate shown when you load a company from the database reflects the <strong>analyst consensus estimate</strong> at the time the database was last updated (February 2026). It is not a prediction — it is a starting point for your own analysis.</p>
+        <div class="im-warn">⚠ Growth rates are the single most sensitive input in a DCF. A 5pp difference in growth rate can change fair value by 30–50%. Test a range of scenarios rather than relying on one number.</div>
+      </div>
+      <div class="im-section">
+        <div class="im-section-title">Benchmark reference</div>
+        <p>The S&P 500 has grown revenues at roughly 5–7% per year over the long run. Companies growing faster than that are priced for above-average expectations — which means more risk if they disappoint.</p>
+      </div>
+    `
+  },
+  terminal: {
+    title: 'Terminal Value',
+    subtitle: 'The value of all cash flows beyond the forecast period',
+    body: `
+      <div class="im-section">
+        <div class="im-section-title">Why it matters so much</div>
+        <p>The terminal value typically represents <strong>60–80% of total fair value</strong> in a DCF model. Small changes to the terminal assumption have a large effect on the result.</p>
+      </div>
+      <div class="im-section">
+        <div class="im-section-title">Method 1: Gordon Growth</div>
+        <p>Assumes the business grows at a constant rate forever after the forecast period.</p>
+        <div class="im-formula">Terminal Value = Last FCF × (1 + g) ÷ (r − g)</div>
+        <p style="margin-top:6px">Where <em>g</em> = terminal growth rate and <em>r</em> = your required return. The terminal growth rate must stay <strong>below</strong> your required return, or the formula produces an invalid (infinite) result.</p>
+        <div class="im-note">A terminal growth rate of 2–3% roughly matches long-run nominal GDP growth — a reasonable assumption for a business that survives indefinitely.</div>
+      </div>
+      <div class="im-section">
+        <div class="im-section-title">Method 2: Exit Multiple</div>
+        <p>Values the business at a multiple of the final year's free cash flow — as if you're selling it at that price.</p>
+        <div class="im-formula">Terminal Value = Last FCF × Exit Multiple</div>
+        <p style="margin-top:6px">A multiple of 15–25× FCF is typical for quality businesses. This avoids the mathematical sensitivity of the Gordon Growth formula, but requires you to estimate what a buyer would pay.</p>
+      </div>
+      <div class="im-section">
+        <div class="im-section-title">Which to use</div>
+        <p>Both are valid. Many analysts run both and compare. If the results diverge significantly, the assumptions are inconsistent — either the growth rate or the multiple needs adjusting.</p>
+      </div>
+    `
+  },
+  disc: {
+    title: 'Required Return',
+    subtitle: 'Your personal annual return target',
+    body: `
+      <div class="im-section">
+        <div class="im-section-title">What this is</div>
+        <p>The annual return you require to invest in this stock. Higher = stricter = lower fair value. This is <em>not</em> the same as WACC (weighted average cost of capital) — it is your personal hurdle rate.</p>
+      </div>
+      <div class="im-section">
+        <div class="im-section-title">Common benchmarks</div>
+        <div style="margin:6px 0">
+          <span class="im-tag im-tag-blue">8%</span> Aggressive — close to long-run S&P 500 returns
+        </div>
+        <div style="margin:6px 0">
+          <span class="im-tag im-tag-blue">10–12%</span> Moderate — common rule of thumb for equity investing
+        </div>
+        <div style="margin:6px 0">
+          <span class="im-tag im-tag-blue">15%</span> Careful — Buffett's oft-cited personal hurdle
+        </div>
+        <div style="margin:6px 0">
+          <span class="im-tag im-tag-blue">20%+</span> Very strict — used for high-risk or illiquid investments
+        </div>
+      </div>
+      <div class="im-section">
+        <div class="im-section-title">How it affects fair value</div>
+        <p>The required return is the denominator in every discounting step. A higher rate shrinks future cash flows more aggressively, producing a lower fair value. This reflects the principle that a safer, higher-certainty business deserves a lower discount rate.</p>
+        <div class="im-note">The "Implied Return" tab flips this question — instead of you setting the return, it solves for the return implied by the current market price.</div>
+      </div>
+    `
+  },
+};
+
+function showInfo(key) {
+  const c = INFO_CONTENT[key];
+  if (!c) return;
+  document.getElementById('im-title').textContent = c.title;
+  document.getElementById('im-subtitle').textContent = c.subtitle;
+  document.getElementById('im-body').innerHTML = c.body;
+  document.getElementById('info-modal-overlay').classList.add('show');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeInfoModal(e) {
+  if (e && e.target !== document.getElementById('info-modal-overlay')) return;
+  document.getElementById('info-modal-overlay').classList.remove('show');
+  document.body.style.overflow = '';
+}
+
+// Close on Escape
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeInfoModal({ target: document.getElementById('info-modal-overlay') });
+});
+
+/* ── Set data dates in sidebar ── */
+function setDataDates(filingStr, priceStr) {
+  const wrap = document.getElementById('data-dates');
+  const filing = document.getElementById('dd-filing');
+  const price = document.getElementById('dd-price');
+  if (!wrap) return;
+  wrap.style.display = '';
+  if (filing) filing.textContent = filingStr || '—';
+  if (price) price.textContent = priceStr || '—';
+}
+
 function hideOnboardHint(){const h=document.getElementById('onboard-hint');if(h){h.style.display='none';localStorage.setItem('vs-onboarded','1')}}
 
 function setBench(v){
@@ -2321,7 +2745,7 @@ function renderBridge(inp,res){
   el.innerHTML=`<div class="bridge" style="margin-top:10px">
     <div class="br-row"><span class="br-lbl">Value of forecast cash flows</span><span class="br-val">${fmt(res.pvFCFs,0)} M</span></div>
     <div class="br-row"><span class="br-lbl">Value of terminal (beyond forecast)</span><span class="br-val">${fmt(res.pvTV,0)} M</span></div>
-    <div class="br-row"><span class="br-lbl">Less: net debt</span><span class="br-val">(${fmt(inp.netDebt,0)} M)</span></div>
+    ${inp.useFCFF ? `<div class="br-row"><span class="br-lbl">Less: net debt (FCFF adj.)</span><span class="br-val">(${fmt(inp.netDebt,0)} M)</span></div>` : ''}
     <div class="br-row"><span class="br-lbl">Total equity value</span><span class="br-val">${fmt(res.equityPV,0)} M</span></div>
     <div class="br-row"><span class="br-lbl">÷ Shares outstanding</span><span class="br-val">${fmt(inp.shares,0)} M</span></div>
     <div class="br-row"><span class="br-lbl">Fair value per share</span><span class="br-val">${fmt(res.fvps,2)} ${inp.pccy}</span></div>
@@ -3022,63 +3446,63 @@ const POLYGON_KEY = 'Jh93BPZQd6Hn83xAIHbCP4gqJXB2LXwC';
 // sector codes: tech, semi, fin, con, hc, energy, ind
 const _RAW_DB = [
   // ── Mega-cap Tech ──────────────────────────────────────────────────
-  {t:'AAPL', n:'Apple',                rev:416161, fcf:98767,  sh:14773, nc:34000,   cagr:8,  cur:'USD', sec:'tech'},
-  {t:'MSFT', n:'Microsoft',            rev:281724, fcf:71611,  sh:7433,  nc:27000,   cagr:15, cur:'USD', sec:'tech'},
-  {t:'NVDA', n:'Nvidia',               rev:130497, fcf:60853,  sh:24400, nc:38000,   cagr:30, cur:'USD', sec:'semi'},
-  {t:'GOOG', n:'Alphabet',             rev:350018, fcf:72764,  sh:12140, nc:93000,   cagr:12, cur:'USD', sec:'tech'},
-  {t:'META', n:'Meta Platforms',       rev:164501, fcf:52100,  sh:2530,  nc:52000,   cagr:15, cur:'USD', sec:'tech'},
-  {t:'AMZN', n:'Amazon',               rev:637959, fcf:38521,  sh:10580, nc:78000,   cagr:15, cur:'USD', sec:'tech'},
-  {t:'TSLA', n:'Tesla',                rev:94830,  fcf:6200,   sh:3200,  nc:44100,   cagr:20, cur:'USD', sec:'tech'},
-  {t:'NFLX', n:'Netflix',              rev:45183,  fcf:9461,   sh:4317,  nc:-4500,   cagr:12, cur:'USD', sec:'tech'},
+  {t:'AAPL', n:'Apple', filing:'FY2024 (Sep 2024)',                rev:416161, fcf:98767,  sh:14773, nc:34000,   cagr:8,  cur:'USD', sec:'tech'},
+  {t:'MSFT', n:'Microsoft', filing:'FY2024 (Jun 2024)',            rev:281724, fcf:71611,  sh:7433,  nc:27000,   cagr:15, cur:'USD', sec:'tech'},
+  {t:'NVDA', n:'Nvidia', filing:'FY2025 (Jan 2025)',               rev:130497, fcf:60853,  sh:24400, nc:38000,   cagr:30, cur:'USD', sec:'semi'},
+  {t:'GOOG', n:'Alphabet', filing:'FY2024 (Dec 2024)',             rev:350018, fcf:72764,  sh:12140, nc:93000,   cagr:12, cur:'USD', sec:'tech'},
+  {t:'META', n:'Meta Platforms', filing:'FY2024 (Dec 2024)',       rev:164501, fcf:52100,  sh:2530,  nc:52000,   cagr:15, cur:'USD', sec:'tech'},
+  {t:'AMZN', n:'Amazon', filing:'FY2024 (Dec 2024)',               rev:637959, fcf:38521,  sh:10580, nc:78000,   cagr:15, cur:'USD', sec:'tech'},
+  {t:'TSLA', n:'Tesla', filing:'FY2024 (Dec 2024)',                rev:94830,  fcf:6200,   sh:3200,  nc:44100,   cagr:20, cur:'USD', sec:'tech'},
+  {t:'NFLX', n:'Netflix', filing:'FY2024 (Dec 2024)',              rev:45183,  fcf:9461,   sh:4317,  nc:-4500,   cagr:12, cur:'USD', sec:'tech'},
   // ── Software / Cloud ───────────────────────────────────────────────
-  {t:'CRM',  n:'Salesforce',           rev:36472,  fcf:12386,  sh:960,   nc:4500,    cagr:12, cur:'USD', sec:'tech'},
-  {t:'ADBE', n:'Adobe',                rev:21507,  fcf:7852,   sh:430,   nc:4000,    cagr:10, cur:'USD', sec:'tech'},
-  {t:'NOW',  n:'ServiceNow',           rev:11516,  fcf:3482,   sh:204,   nc:4200,    cagr:20, cur:'USD', sec:'tech'},
-  {t:'SNOW', n:'Snowflake',            rev:3634,   fcf:338,    sh:340,   nc:3800,    cagr:25, cur:'USD', sec:'tech'},
-  {t:'PLTR', n:'Palantir',             rev:2865,   fcf:1142,   sh:2130,  nc:4600,    cagr:25, cur:'USD', sec:'tech'},
-  {t:'ORCL', n:'Oracle',               rev:57400,  fcf:11800,  sh:2740,  nc:-88000,  cagr:8,  cur:'USD', sec:'tech'},
-  {t:'INTU', n:'Intuit',               rev:17352,  fcf:4200,   sh:280,   nc:1200,    cagr:12, cur:'USD', sec:'tech'},
-  {t:'SHOP', n:'Shopify',              rev:8877,   fcf:1551,   sh:1260,  nc:5100,    cagr:25, cur:'USD', sec:'tech'},
+  {t:'CRM',  n:'Salesforce', filing:'FY2025 (Jan 2025)',           rev:36472,  fcf:12386,  sh:960,   nc:4500,    cagr:12, cur:'USD', sec:'tech'},
+  {t:'ADBE', n:'Adobe', filing:'FY2024 (Nov 2024)',                rev:21507,  fcf:7852,   sh:430,   nc:4000,    cagr:10, cur:'USD', sec:'tech'},
+  {t:'NOW',  n:'ServiceNow', filing:'FY2024 (Dec 2024)',           rev:11516,  fcf:3482,   sh:204,   nc:4200,    cagr:20, cur:'USD', sec:'tech'},
+  {t:'SNOW', n:'Snowflake', filing:'FY2025 (Jan 2025)',            rev:3634,   fcf:338,    sh:340,   nc:3800,    cagr:25, cur:'USD', sec:'tech'},
+  {t:'PLTR', n:'Palantir', filing:'FY2024 (Dec 2024)',             rev:2865,   fcf:1142,   sh:2130,  nc:4600,    cagr:25, cur:'USD', sec:'tech'},
+  {t:'ORCL', n:'Oracle', filing:'FY2024 (May 2024)',               rev:57400,  fcf:11800,  sh:2740,  nc:-88000,  cagr:8,  cur:'USD', sec:'tech'},
+  {t:'INTU', n:'Intuit', filing:'FY2024 (Jul 2024)',               rev:17352,  fcf:4200,   sh:280,   nc:1200,    cagr:12, cur:'USD', sec:'tech'},
+  {t:'SHOP', n:'Shopify', filing:'FY2024 (Dec 2024)',              rev:8877,   fcf:1551,   sh:1260,  nc:5100,    cagr:25, cur:'USD', sec:'tech'},
   // ── Semiconductors ─────────────────────────────────────────────────
-  {t:'AMD',  n:'Advanced Micro Devices',rev:25785, fcf:1611,   sh:1618,  nc:4000,    cagr:20, cur:'USD', sec:'semi'},
-  {t:'INTC', n:'Intel',                rev:53101,  fcf:-15200, sh:4330,  nc:-11000,  cagr:5,  cur:'USD', sec:'semi'},
-  {t:'QCOM', n:'Qualcomm',             rev:39116,  fcf:11200,  sh:1090,  nc:-4500,   cagr:8,  cur:'USD', sec:'semi'},
-  {t:'AVGO', n:'Broadcom',             rev:51574,  fcf:21528,  sh:4690,  nc:-65000,  cagr:12, cur:'USD', sec:'semi'},
-  {t:'TSM',  n:'TSMC (ADR)',           rev:88900,  fcf:16200,  sh:5180,  nc:25000,   cagr:15, cur:'USD', sec:'semi'},
-  {t:'ASML', n:'ASML',                 rev:28262,  fcf:2600,   sh:394,   nc:2300,    cagr:15, cur:'USD', sec:'semi'},
+  {t:'AMD',  n:'Advanced Micro Devices', filing:'FY2024 (Dec 2024)',rev:25785, fcf:1611,   sh:1618,  nc:4000,    cagr:20, cur:'USD', sec:'semi'},
+  {t:'INTC', n:'Intel', filing:'FY2024 (Dec 2024)',                rev:53101,  fcf:-15200, sh:4330,  nc:-11000,  cagr:5,  cur:'USD', sec:'semi'},
+  {t:'QCOM', n:'Qualcomm', filing:'FY2024 (Sep 2024)',             rev:39116,  fcf:11200,  sh:1090,  nc:-4500,   cagr:8,  cur:'USD', sec:'semi'},
+  {t:'AVGO', n:'Broadcom', filing:'FY2024 (Oct 2024)',             rev:51574,  fcf:21528,  sh:4690,  nc:-65000,  cagr:12, cur:'USD', sec:'semi'},
+  {t:'TSM',  n:'TSMC (ADR)', filing:'FY2024 (Dec 2024)',           rev:88900,  fcf:16200,  sh:5180,  nc:25000,   cagr:15, cur:'USD', sec:'semi'},
+  {t:'ASML', n:'ASML', filing:'FY2024 (Dec 2024)',                 rev:28262,  fcf:2600,   sh:394,   nc:2300,    cagr:15, cur:'USD', sec:'semi'},
   // ── Finance ────────────────────────────────────────────────────────
-  {t:'JPM',  n:'JPMorgan Chase',       rev:177622, fcf:52000,  sh:2860,  nc:0,       cagr:5,  cur:'USD', sec:'fin'},
-  {t:'V',    n:'Visa',                 rev:35926,  fcf:20400,  sh:2050,  nc:-7500,   cagr:10, cur:'USD', sec:'fin'},
-  {t:'MA',   n:'Mastercard',           rev:28172,  fcf:12800,  sh:916,   nc:-5000,   cagr:12, cur:'USD', sec:'fin'},
-  {t:'BRK-B',n:'Berkshire Hathaway',   rev:364482, fcf:42000,  sh:2170,  nc:141000,  cagr:8,  cur:'USD', sec:'fin'},
-  {t:'GS',   n:'Goldman Sachs',        rev:53509,  fcf:12000,  sh:320,   nc:0,       cagr:5,  cur:'USD', sec:'fin'},
-  {t:'PYPL', n:'PayPal',               rev:31797,  fcf:6400,   sh:1040,  nc:-3200,   cagr:6,  cur:'USD', sec:'fin'},
-  {t:'COIN', n:'Coinbase',             rev:6641,   fcf:2118,   sh:253,   nc:7800,    cagr:20, cur:'USD', sec:'fin'},
-  {t:'SQ',   n:'Block (Square)',       rev:23456,  fcf:866,    sh:1005,  nc:7800,    cagr:12, cur:'USD', sec:'fin'},
+  {t:'JPM',  n:'JPMorgan Chase', filing:'FY2024 (Dec 2024)',       rev:177622, fcf:52000,  sh:2860,  nc:0,       cagr:5,  cur:'USD', sec:'fin'},
+  {t:'V',    n:'Visa', filing:'FY2024 (Sep 2024)',                 rev:35926,  fcf:20400,  sh:2050,  nc:-7500,   cagr:10, cur:'USD', sec:'fin'},
+  {t:'MA',   n:'Mastercard', filing:'FY2024 (Dec 2024)',           rev:28172,  fcf:12800,  sh:916,   nc:-5000,   cagr:12, cur:'USD', sec:'fin'},
+  {t:'BRK-B',n:'Berkshire Hathaway', filing:'FY2024 (Dec 2024)',   rev:364482, fcf:42000,  sh:2170,  nc:141000,  cagr:8,  cur:'USD', sec:'fin'},
+  {t:'GS',   n:'Goldman Sachs', filing:'FY2024 (Dec 2024)',        rev:53509,  fcf:12000,  sh:320,   nc:0,       cagr:5,  cur:'USD', sec:'fin'},
+  {t:'PYPL', n:'PayPal', filing:'FY2024 (Dec 2024)',               rev:31797,  fcf:6400,   sh:1040,  nc:-3200,   cagr:6,  cur:'USD', sec:'fin'},
+  {t:'COIN', n:'Coinbase', filing:'FY2024 (Dec 2024)',             rev:6641,   fcf:2118,   sh:253,   nc:7800,    cagr:20, cur:'USD', sec:'fin'},
+  {t:'SQ',   n:'Block (Square)', filing:'FY2024 (Dec 2024)',       rev:23456,  fcf:866,    sh:1005,  nc:7800,    cagr:12, cur:'USD', sec:'fin'},
   // ── Consumer ───────────────────────────────────────────────────────
-  {t:'WMT',  n:'Walmart',              rev:680984, fcf:17200,  sh:8020,  nc:-40000,  cagr:5,  cur:'USD', sec:'con'},
-  {t:'COST', n:'Costco',               rev:254352, fcf:7490,   sh:443,   nc:2400,    cagr:8,  cur:'USD', sec:'con'},
-  {t:'NKE',  n:'Nike',                 rev:51362,  fcf:4200,   sh:1498,  nc:-9800,   cagr:6,  cur:'USD', sec:'con'},
-  {t:'MCD',  n:"McDonald's",           rev:25920,  fcf:7300,   sh:714,   nc:-47000,  cagr:5,  cur:'USD', sec:'con'},
-  {t:'SBUX', n:'Starbucks',            rev:36176,  fcf:3100,   sh:1140,  nc:-13200,  cagr:6,  cur:'USD', sec:'con'},
-  {t:'LULU', n:'Lululemon',            rev:10574,  fcf:1600,   sh:128,   nc:1800,    cagr:10, cur:'USD', sec:'con'},
-  {t:'UBER', n:'Uber',                 rev:43975,  fcf:6940,   sh:2120,  nc:5900,    cagr:18, cur:'USD', sec:'con'},
-  {t:'ABNB', n:'Airbnb',               rev:11000,  fcf:4070,   sh:634,   nc:9400,    cagr:12, cur:'USD', sec:'con'},
-  {t:'SPOT', n:'Spotify',              rev:15673,  fcf:1816,   sh:196,   nc:5400,    cagr:15, cur:'USD', sec:'con'},
-  {t:'DIS',  n:'Walt Disney',          rev:91361,  fcf:8600,   sh:1800,  nc:-40000,  cagr:6,  cur:'USD', sec:'con'},
+  {t:'WMT',  n:'Walmart', filing:'FY2025 (Jan 2025)',              rev:680984, fcf:17200,  sh:8020,  nc:-40000,  cagr:5,  cur:'USD', sec:'con'},
+  {t:'COST', n:'Costco', filing:'FY2024 (Aug 2024)',               rev:254352, fcf:7490,   sh:443,   nc:2400,    cagr:8,  cur:'USD', sec:'con'},
+  {t:'NKE',  n:'Nike', filing:'FY2024 (May 2024)',                 rev:51362,  fcf:4200,   sh:1498,  nc:-9800,   cagr:6,  cur:'USD', sec:'con'},
+  {t:'MCD',  n:"McDonald's",           filing:'FY2024 (Dec 2024)', rev:25920,  fcf:7300,   sh:714,   nc:-47000,  cagr:5,  cur:'USD', sec:'con'},
+  {t:'SBUX', n:'Starbucks', filing:'FY2024 (Sep 2024)',            rev:36176,  fcf:3100,   sh:1140,  nc:-13200,  cagr:6,  cur:'USD', sec:'con'},
+  {t:'LULU', n:'Lululemon', filing:'FY2024 (Jan 2025)',            rev:10574,  fcf:1600,   sh:128,   nc:1800,    cagr:10, cur:'USD', sec:'con'},
+  {t:'UBER', n:'Uber', filing:'FY2024 (Dec 2024)',                 rev:43975,  fcf:6940,   sh:2120,  nc:5900,    cagr:18, cur:'USD', sec:'con'},
+  {t:'ABNB', n:'Airbnb', filing:'FY2024 (Dec 2024)',               rev:11000,  fcf:4070,   sh:634,   nc:9400,    cagr:12, cur:'USD', sec:'con'},
+  {t:'SPOT', n:'Spotify', filing:'FY2024 (Dec 2024)',              rev:15673,  fcf:1816,   sh:196,   nc:5400,    cagr:15, cur:'USD', sec:'con'},
+  {t:'DIS',  n:'Walt Disney', filing:'FY2024 (Sep 2024)',          rev:91361,  fcf:8600,   sh:1800,  nc:-40000,  cagr:6,  cur:'USD', sec:'con'},
   // ── Healthcare ─────────────────────────────────────────────────────
-  {t:'LLY',  n:'Eli Lilly',            rev:45042,  fcf:8400,   sh:950,   nc:-19000,  cagr:20, cur:'USD', sec:'hc'},
-  {t:'JNJ',  n:'Johnson & Johnson',    rev:89096,  fcf:18200,  sh:2400,  nc:-14000,  cagr:5,  cur:'USD', sec:'hc'},
-  {t:'UNH',  n:'UnitedHealth',         rev:400278, fcf:22800,  sh:930,   nc:-8000,   cagr:10, cur:'USD', sec:'hc'},
-  {t:'ABBV', n:'AbbVie',               rev:56334,  fcf:16600,  sh:1770,  nc:-62000,  cagr:6,  cur:'USD', sec:'hc'},
-  {t:'PFE',  n:'Pfizer',               rev:63625,  fcf:12100,  sh:5680,  nc:-48000,  cagr:4,  cur:'USD', sec:'hc'},
+  {t:'LLY',  n:'Eli Lilly', filing:'FY2024 (Dec 2024)',            rev:45042,  fcf:8400,   sh:950,   nc:-19000,  cagr:20, cur:'USD', sec:'hc'},
+  {t:'JNJ',  n:'Johnson & Johnson', filing:'FY2024 (Dec 2024)',    rev:89096,  fcf:18200,  sh:2400,  nc:-14000,  cagr:5,  cur:'USD', sec:'hc'},
+  {t:'UNH',  n:'UnitedHealth', filing:'FY2024 (Dec 2024)',         rev:400278, fcf:22800,  sh:930,   nc:-8000,   cagr:10, cur:'USD', sec:'hc'},
+  {t:'ABBV', n:'AbbVie', filing:'FY2024 (Dec 2024)',               rev:56334,  fcf:16600,  sh:1770,  nc:-62000,  cagr:6,  cur:'USD', sec:'hc'},
+  {t:'PFE',  n:'Pfizer', filing:'FY2024 (Dec 2024)',               rev:63625,  fcf:12100,  sh:5680,  nc:-48000,  cagr:4,  cur:'USD', sec:'hc'},
   // ── Energy ─────────────────────────────────────────────────────────
-  {t:'XOM',  n:'ExxonMobil',           rev:398491, fcf:33000,  sh:4450,  nc:-43000,  cagr:3,  cur:'USD', sec:'energy'},
-  {t:'CVX',  n:'Chevron',              rev:200949, fcf:15300,  sh:1830,  nc:-18000,  cagr:3,  cur:'USD', sec:'energy'},
+  {t:'XOM',  n:'ExxonMobil', filing:'FY2024 (Dec 2024)',           rev:398491, fcf:33000,  sh:4450,  nc:-43000,  cagr:3,  cur:'USD', sec:'energy'},
+  {t:'CVX',  n:'Chevron', filing:'FY2024 (Dec 2024)',              rev:200949, fcf:15300,  sh:1830,  nc:-18000,  cagr:3,  cur:'USD', sec:'energy'},
   // ── International ──────────────────────────────────────────────────
-  {t:'SAP',  n:'SAP',                  rev:35380,  fcf:7600,   sh:1190,  nc:1800,    cagr:10, cur:'EUR', sec:'tech'},
-  {t:'BABA', n:'Alibaba',              rev:130350, fcf:27900,  sh:2160,  nc:61000,   cagr:8,  cur:'USD', sec:'tech'},
-  {t:'NOVO-B',n:'Novo Nordisk',        rev:232260, fcf:62100,  sh:4460,  nc:-19000,  cagr:15, cur:'USD', sec:'hc'},
+  {t:'SAP',  n:'SAP', filing:'FY2024 (Dec 2024)',                  rev:35380,  fcf:7600,   sh:1190,  nc:1800,    cagr:10, cur:'EUR', sec:'tech'},
+  {t:'BABA', n:'Alibaba', filing:'FY2024 (Mar 2024)',              rev:130350, fcf:27900,  sh:2160,  nc:61000,   cagr:8,  cur:'USD', sec:'tech'},
+  {t:'NOVO-B',n:'Novo Nordisk', filing:'FY2024 (Dec 2024)',        rev:232260, fcf:62100,  sh:4460,  nc:-19000,  cagr:15, cur:'USD', sec:'hc'},
 ];
 
 // Deduplicate and build lookup
@@ -3233,6 +3657,9 @@ async function loadCompany(ticker) {
   clearPills();
 
   // ── Populate fundamentals instantly from database ──
+  // Set filing date from database
+  const filingDate = co.filing || 'Feb 2026 (annual report)';
+  setDataDates(filingDate, 'Fetching…');
   document.getElementById('inp-company').value = `${co.n} (${co.t})`;
   document.getElementById('inp-shares').value  = fmt(co.sh, 0);
   document.getElementById('inp-revenue').value = fmt(co.rev, 0);
@@ -3287,6 +3714,7 @@ async function loadCompany(ticker) {
 
         document.getElementById('inp-price').value = fmt(price, 2);
         if (priceStatus) priceStatus.textContent = `Price: ${dateStr}`;
+        setDataDates(filingDate, dateStr + ' close');
 
         // Update provenance
         const prov = document.getElementById('provenance-text');
@@ -3301,6 +3729,7 @@ async function loadCompany(ticker) {
     } catch(err) {
       console.warn('Polygon fetch failed:', err);
       if (priceStatus) priceStatus.textContent = 'Price unavailable — enter manually';
+      setDataDates(filingDate, 'Enter manually');
       const prov = document.getElementById('provenance-text');
       if (prov) prov.innerHTML = `<strong>${co.n}</strong> · Financials Feb 2026 · Price: enter manually`;
     }
@@ -3308,6 +3737,7 @@ async function loadCompany(ticker) {
     // No API key — show helpful message with setup link
     if (priceStatus) priceStatus.innerHTML =
       `No price API key · <a href="https://polygon.io" target="_blank" rel="noopener" style="color:var(--blue)">Get free key</a> or enter price manually`;
+    setDataDates(filingDate, 'No price API key — enter manually');
     const prov = document.getElementById('provenance-text');
     if (prov) prov.innerHTML = `<strong>${co.n}</strong> · Financials from Feb 2026 filing · Enter current stock price above`;
   }
