@@ -2917,8 +2917,7 @@ function downloadMatrix(scLabel){
 /* ══════════════════════════════════════════
    LIVE DATA — Financial Modeling Prep
 ══════════════════════════════════════════ */
-const FMP_KEY = 'aeIoSKG3LgI9jPqWcdb1tsRVPND9TSvS';
-const FMP = 'https://financialmodelingprep.com/api';
+const FMP = '/.netlify/functions/fmp'; // proxy — key lives server-side
 
 let _searchTimer = null;
 let _dropFocusIdx = -1;
@@ -2982,7 +2981,7 @@ function closeDropdown() {
 // ── Autocomplete search ────────────────────
 async function searchTicker(q) {
   try {
-    const r = await fetch(`${FMP}/v3/search?query=${encodeURIComponent(q)}&limit=7&apikey=${FMP_KEY}`);
+    const r = await fetch(`${FMP}?path=/v3/search&query=${encodeURIComponent(q)}&limit=7`);
     const data = await r.json();
     // Filter to equities only
     const results = (Array.isArray(data) ? data : [])
@@ -3029,11 +3028,11 @@ async function loadLiveData(symbol) {
   try {
     // Parallel: fundamentals + quote
     const [profileRes, incomeRes, cashRes, balanceRes, quoteRes] = await Promise.all([
-      fetch(`${FMP}/v3/profile/${symbol}?apikey=${FMP_KEY}`),
-      fetch(`${FMP}/v3/income-statement/${symbol}?limit=1&apikey=${FMP_KEY}`),
-      fetch(`${FMP}/v3/cash-flow-statement/${symbol}?limit=1&apikey=${FMP_KEY}`),
-      fetch(`${FMP}/v3/balance-sheet-statement/${symbol}?limit=1&apikey=${FMP_KEY}`),
-      fetch(`${FMP}/v3/quote-short/${symbol}?apikey=${FMP_KEY}`),
+      fetch(`${FMP}?path=/v3/profile/${symbol}`),
+      fetch(`${FMP}?path=/v3/income-statement/${symbol}&limit=1`),
+      fetch(`${FMP}?path=/v3/cash-flow-statement/${symbol}&limit=1`),
+      fetch(`${FMP}?path=/v3/balance-sheet-statement/${symbol}&limit=1`),
+      fetch(`${FMP}?path=/v3/quote-short/${symbol}`),
     ]);
 
     const [profile, income, cash, balance, quote] = await Promise.all([
