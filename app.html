@@ -1572,6 +1572,28 @@ input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.15)}
 
 <div id="toast"></div>
 
+<!-- Price Debug Panel -->
+<div id="price-debug" style="
+  display:none;
+  position:fixed;bottom:80px;left:50%;transform:translateX(-50%);
+  background:#1c1c1e;color:#f2f2f7;
+  border-radius:12px;padding:16px 20px;
+  font-family:monospace;font-size:12px;line-height:1.8;
+  max-width:90vw;width:460px;
+  box-shadow:0 8px 32px rgba(0,0,0,.5);
+  z-index:9999;
+">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+    <span style="font-weight:700;font-size:13px;color:#0a84ff">🔍 Price Fetch Diagnostics</span>
+    <button onclick="document.getElementById('price-debug').style.display='none'"
+      style="background:none;border:none;color:#636366;font-size:16px;cursor:pointer;padding:0">✕</button>
+  </div>
+  <div id="price-debug-log" style="max-height:260px;overflow-y:auto"></div>
+  <div style="margin-top:10px;padding-top:10px;border-top:1px solid #3a3a3c;font-size:10px;color:#636366">
+    Close this panel once you've noted the results
+  </div>
+</div>
+
 <!-- Info modal -->
 <div class="info-modal-overlay" id="info-modal-overlay" onclick="closeInfoModal(event)">
   <div class="info-modal" id="info-modal">
@@ -3448,35 +3470,71 @@ const POLYGON_TICKER = {
 function toPolygonTicker(t) { return POLYGON_TICKER[t] || t; }
 
 // Central price fetching function — used by both loadPreset and loadCompany
-async function fetchPolygonPrice(ticker) {
-  const pt = toPolygonTicker(ticker);
-  const url = 'https://api.polygon.io/v2/aggs/ticker/' + pt + '/prev?adjusted=true&apiKey=' + POLYGON_KEY;
-  console.log('[Polygon] Fetching:', url);
+// Visible debug logger — writes to on-screen panel
+function dbgLog(msg, color) {
+  var panel = document.getElementById('price-debug');
+  var log = document.getElementById('price-debug-log');
+  if (!panel || !log) return;
+  panel.style.display = 'block';
+  var line = document.createElement('div');
+  line.style.color = color || '#f2f2f7';
+  line.textContent = new Date().toLocaleTimeString() + '  ' + msg;
+  log.appendChild(line);
+  log.scrollTop = log.scrollHeight;
+  console.log('[Polygon]', msg);
+}
 
-  const controller = new AbortController();
-  const timer = setTimeout(function() {
-    console.log('[Polygon] Timeout — aborting');
+async function fetchPolygonPrice(ticker) {
+  var pt = toPolygonTicker(ticker);
+  var url = 'https://api.polygon.io/v2/aggs/ticker/' + pt + '/prev?adjusted=true&apiKey=' + POLYGON_KEY;
+
+  dbgLog('Ticker: ' + ticker + (pt !== ticker ? ' → ' + pt : ''), '#0a84ff');
+  dbgLog('URL: ' + url.replace(POLYGON_KEY, '***KEY***'));
+  dbgLog('Starting fetch…');
+
+  var controller = new AbortController();
+  var timer = setTimeout(function() {
+    dbgLog('⏱ Timeout after 9s — aborting', '#ff9f0a');
     controller.abort();
   }, 9000);
 
   var res;
   try {
     res = await fetch(url, { signal: controller.signal });
-  } finally {
+  } catch(fetchErr) {
     clearTimeout(timer);
+    dbgLog('❌ fetch() threw: ' + fetchErr.name + ' — ' + fetchErr.message, '#ff453a');
+    throw fetchErr;
+  }
+  clearTimeout(timer);
+
+  dbgLog('HTTP status: ' + res.status + ' ' + (res.ok ? '✓' : '✗'), res.ok ? '#30d158' : '#ff453a');
+
+  if (!res.ok) throw new Error('HTTP ' + res.status);
+
+  var data;
+  try {
+    data = await res.json();
+  } catch(jsonErr) {
+    dbgLog('❌ JSON parse error: ' + jsonErr.message, '#ff453a');
+    throw jsonErr;
   }
 
-  console.log('[Polygon] Response status:', res.status, res.ok);
-  if (!res.ok) throw new Error('HTTP ' + res.status);
-  const data = await res.json();
-  console.log('[Polygon] Data:', JSON.stringify(data).slice(0, 200));
-  const result = data && data.results && data.results[0];
-  if (!result || !result.c) throw new Error('no_data');
-  const dateStr = result.t
+  dbgLog('Response keys: ' + Object.keys(data).join(', '));
+  dbgLog('resultsCount: ' + (data.resultsCount !== undefined ? data.resultsCount : 'n/a'));
+
+  var result = data && data.results && data.results[0];
+  if (!result || !result.c) {
+    dbgLog('⚠ No price data (market closed / holiday?)', '#ff9f0a');
+    throw new Error('no_data');
+  }
+
+  var dateStr = result.t
     ? new Date(result.t).toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' })
     : 'prev close';
-  console.log('[Polygon] Success — price:', result.c, 'date:', dateStr);
-  return { price: result.c, dateStr };
+
+  dbgLog('✅ Price: ' + result.c + '  Date: ' + dateStr, '#30d158');
+  return { price: result.c, dateStr: dateStr };
 }
 
 // Shared UI helper — show/hide price loading row and update status text
