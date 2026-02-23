@@ -2117,7 +2117,10 @@ function loadPreset(key,isAuto){
       .catch(function(err) {
         console.warn('Polygon price fetch failed:', err);
         document.getElementById('inp-price').value = p.price;
-        setPriceStatus('Using stored price (live fetch failed)', false);
+        var msg = (err && err.message === 'no_data')
+          ? 'Market closed — using stored price'
+          : 'Live price unavailable — using stored price';
+        setPriceStatus(msg, false);
         setDataDates(filingDate, 'Stored price — verify before use');
         update();
       });
@@ -3448,12 +3451,26 @@ function toPolygonTicker(t) { return POLYGON_TICKER[t] || t; }
 async function fetchPolygonPrice(ticker) {
   const pt = toPolygonTicker(ticker);
   const url = 'https://api.polygon.io/v2/aggs/ticker/' + pt + '/prev?adjusted=true&apiKey=' + POLYGON_KEY;
-  const res = await fetch(url, { signal: AbortSignal.timeout(9000) });
+
+  // Manual timeout using AbortController (works in all modern browsers, unlike AbortSignal.timeout)
+  const controller = new AbortController();
+  const timer = setTimeout(function() { controller.abort(); }, 9000);
+
+  var res;
+  try {
+    res = await fetch(url, { signal: controller.signal });
+  } finally {
+    clearTimeout(timer);
+  }
+
   if (!res.ok) throw new Error('HTTP ' + res.status);
   const data = await res.json();
   const result = data && data.results && data.results[0];
-  if (!result || !result.c) throw new Error('No price in response');
-  // Polygon returns t as Unix ms (midnight of trading day)
+  if (!result || !result.c) {
+    // Polygon returns {status:'OK', resultsCount:0} on weekends/holidays — not an error
+    throw new Error('no_data');
+  }
+  // Polygon returns t as Unix ms (midnight of trading day UTC)
   const dateStr = result.t
     ? new Date(result.t).toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' })
     : 'prev close';
@@ -3462,10 +3479,10 @@ async function fetchPolygonPrice(ticker) {
 
 // Shared UI helper — show/hide price loading row and update status text
 function setPriceStatus(msg, loading) {
-  const row = document.getElementById('price-loading-row');
-  const txt = document.getElementById('price-status-text');
+  var row = document.getElementById('price-loading-row');
+  var txt = document.getElementById('price-status-text');
   if (row) row.classList.toggle('show', !!loading);
-  if (txt) txt.textContent = msg || '';
+  if (txt) txt.innerHTML = msg || '';
 }
 
 // ── Company database ────────────────────────────────────────────────
@@ -3725,7 +3742,10 @@ async function loadCompany(ticker) {
       update();
     } catch(err) {
       console.warn('Polygon price fetch failed:', err);
-      setPriceStatus('Live price unavailable — enter manually', false);
+      var errMsg = (err && err.message === 'no_data')
+        ? 'Market closed — enter current price'
+        : 'Live price unavailable — enter manually';
+      setPriceStatus(errMsg, false);
       setDataDates(filingDate, 'Enter current price manually');
       var prov2 = document.getElementById('provenance-text');
       if (prov2) prov2.innerHTML = '<strong>' + co.n + '</strong> &middot; ' + filingDate + ' &middot; Enter current price above';
