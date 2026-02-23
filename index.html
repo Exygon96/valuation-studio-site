@@ -7,46 +7,46 @@
   <meta name="description" content="Professional DCF valuation tools. Fair value, implied return, and scenario analysis for serious investors."/>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
   <!-- Prevent flash of wrong theme -->
   <script>if(localStorage.getItem('vs-theme')==='dark')document.documentElement.setAttribute('data-theme','dark')</script>
   <style>
     :root {
-      /* Old New York silver-gelatin palette */
-      --ink:        #1a1814;
-      --ink-2:      #2e2b26;
-      --ink-3:      #4a4640;
-      --ink-4:      #8a857c;
-      --ink-5:      #b8b3aa;
-      --ink-6:      #d8d3ca;
+      /* Silver Gelatin / Old New York — unified palette */
+      --ink:        #1C1A16;
+      --ink-2:      #302D28;
+      --ink-3:      #4D4943;
+      --ink-4:      #7A756D;
+      --ink-5:      #A9A49B;
+      --ink-6:      #D0CBC3;
 
-      --paper:      #f4f0e8;
-      --paper-2:    #ede8de;
-      --paper-3:    #e4ddd0;
-      --paper-4:    #d8d0c4;
+      --paper:      #F3EFE7;
+      --paper-2:    #ECE8DF;
+      --paper-3:    #E2DDD3;
+      --paper-4:    #D5D0C7;
 
-      --gold:       #b07d2e;
-      --gold-lt:    #c8952a;
-      --gold-bg:    #f7eed8;
+      --gold:       #9E7528;
+      --gold-lt:    #B88A30;
+      --gold-bg:    #F5EDDA;
 
-      --silver:     #7a7870;
-      --sepia:      #8b7355;
+      --silver:     #7A756D;
+      --sepia:      #7A5F3E;
 
-      --blue:       #1a3a5c;
-      --blue-lt:    #2d5a8e;
-      --blue-bg:    #e8eef5;
+      --blue:       #2B5D8E;
+      --blue-lt:    #3A72A8;
+      --blue-bg:    #E6EEF5;
 
-      --up:         #1a5c32;
-      --dn:         #7a1a1a;
+      --up:         #2E7048;
+      --dn:         #A8382E;
 
-      --ff-head:    'Cormorant Garamond', Georgia, serif;
-      --ff-body:    'DM Sans', system-ui, sans-serif;
-      --ff-mono:    'DM Mono', monospace;
+      --ff-head:    'DM Sans', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+      --ff-body:    'DM Sans', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+      --ff-mono:    'DM Mono', 'SF Mono', ui-monospace, monospace;
 
       --r:          10px;
-      --shadow:     0 1px 3px rgba(26,24,20,.08), 0 1px 2px rgba(26,24,20,.05);
-      --shadow-md:  0 4px 20px rgba(26,24,20,.1);
-      --shadow-lg:  0 12px 48px rgba(26,24,20,.14);
+      --shadow:     0 1px 3px rgba(28,26,22,.06), 0 1px 2px rgba(28,26,22,.04);
+      --shadow-md:  0 4px 14px rgba(28,26,22,.08), 0 2px 4px rgba(28,26,22,.04);
+      --shadow-lg:  0 10px 40px rgba(28,26,22,.12);
     }
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -73,8 +73,9 @@
     /* ── NAV ── */
     nav {
       position: sticky; top: 0; z-index: 100;
-      background: rgba(244,240,232,.94);
+      background: rgba(243,239,231,.94);
       backdrop-filter: blur(20px) saturate(1.8);
+      -webkit-backdrop-filter: blur(20px) saturate(1.8);
       border-bottom: 1px solid var(--paper-4);
     }
     .nav-inner {
@@ -86,7 +87,7 @@
       width: 30px; height: 30px; border-radius: 8px;
       background: var(--ink);
       display: flex; align-items: center; justify-content: center;
-      box-shadow: 0 2px 6px rgba(26,24,20,.2);
+      box-shadow: 0 2px 6px rgba(28,26,22,.2);
     }
     .nav-mark svg { width: 16px; height: 16px; }
     .nav-name {
@@ -106,9 +107,9 @@
       font-size: 13px; font-weight: 500;
       padding: 8px 20px; border-radius: 6px; text-decoration: none;
       transition: all .15s; letter-spacing: .1px;
-      box-shadow: 0 2px 8px rgba(26,24,20,.2);
+      box-shadow: 0 2px 8px rgba(28,26,22,.2);
     }
-    .nav-cta:hover { background: var(--ink-2); transform: translateY(-1px); box-shadow: 0 4px 14px rgba(26,24,20,.25); }
+    .nav-cta:hover { background: var(--ink-2); transform: translateY(-1px); box-shadow: 0 4px 14px rgba(28,26,22,.25); }
 
     /* ── HERO ── */
     .hero {
@@ -125,8 +126,8 @@
         0deg,
         transparent,
         transparent 39px,
-        rgba(26,24,20,.04) 39px,
-        rgba(26,24,20,.04) 40px
+        rgba(28,26,22,.04) 39px,
+        rgba(28,26,22,.04) 40px
       );
       pointer-events: none;
     }
@@ -162,9 +163,9 @@
       background: var(--ink); color: var(--paper);
       font-size: 14px; font-weight: 500; padding: 14px 32px; border-radius: 8px;
       text-decoration: none; transition: all .18s;
-      box-shadow: 0 2px 12px rgba(26,24,20,.25);
+      box-shadow: 0 2px 12px rgba(28,26,22,.2);
     }
-    .btn-primary:hover { background: var(--ink-2); transform: translateY(-2px); box-shadow: 0 6px 24px rgba(26,24,20,.3); }
+    .btn-primary:hover { background: var(--ink-2); transform: translateY(-2px); box-shadow: 0 6px 24px rgba(28,26,22,.25); }
 
     .btn-outline {
       display: inline-flex; align-items: center; gap: 7px;
@@ -210,15 +211,15 @@
       background: var(--paper); border-radius: 8px;
       border: 1px solid var(--paper-3);
     }
-    .hcr-lbl { font-size: 10.5px; font-weight: 500; color: var(--ink-5); text-transform: uppercase; letter-spacing: .8px; margin-bottom: 10px; font-family: var(--ff-mono); }
+    .hcr-lbl { font-size: 10.5px; font-weight: 600; color: var(--ink-4); text-transform: uppercase; letter-spacing: .8px; margin-bottom: 10px; font-family: var(--ff-mono); }
     /* New gauge styles */
     .hcr-gauge { }
     .hcr-g-labels { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 10px; }
     .hcr-g-fv, .hcr-g-px { }
-    .hcr-g-name { font-size: 9.5px; color: var(--ink-5); font-family: var(--ff-mono); text-transform: uppercase; letter-spacing: .4px; margin-bottom: 2px; }
+    .hcr-g-name { font-size: 10px; color: var(--ink-4); font-family: var(--ff-mono); text-transform: uppercase; letter-spacing: .4px; margin-bottom: 2px; }
     .hcr-g-val-fv { font-family: var(--ff-mono); font-size: 13px; font-weight: 600; color: var(--ink-4); font-style: italic; }
     .hcr-g-val-mkt { font-family: var(--ff-mono); font-size: 15px; font-weight: 600; color: var(--ink); text-align: right; }
-    .hcr-g-sub { font-size: 9px; color: var(--ink-5); margin-top: 2px; }
+    .hcr-g-sub { font-size: 9.5px; color: var(--ink-4); margin-top: 2px; }
     .hcr-g-track {
       height: 5px; background: var(--paper-3); border-radius: 3px;
       position: relative; margin: 2px 0 10px;
@@ -235,7 +236,7 @@
       content: 'Market'; position: absolute; top: 16px; left: 50%; transform: translateX(-50%);
       font-family: var(--ff-mono); font-size: 8.5px; color: var(--ink-5); white-space: nowrap;
     }
-    .hcr-g-note { font-size: 10px; color: var(--ink-5); font-family: var(--ff-mono); font-style: italic; text-align: center; margin-top: 4px; }
+    .hcr-g-note { font-size: 10.5px; color: var(--ink-4); font-family: var(--ff-mono); font-style: italic; text-align: center; margin-top: 4px; }
     /* Keep old classes for compat */
     .hcr-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
     .hcr-row:last-child { margin-bottom: 0; }
@@ -246,7 +247,7 @@
 
     /* Heatmap mini */
     .hc-hm { margin-top: 12px; }
-    .hc-hm-label { font-size: 10px; color: var(--ink-5); font-family: var(--ff-mono); text-transform: uppercase; letter-spacing: .8px; margin-bottom: 6px; }
+    .hc-hm-label { font-size: 10.5px; color: var(--ink-4); font-family: var(--ff-mono); text-transform: uppercase; letter-spacing: .8px; margin-bottom: 6px; }
     .hm-grid { display: grid; grid-template-columns: repeat(5,1fr); gap: 2px; }
     .hm-c {
       padding: 5px 2px; border-radius: 3px; text-align: center;
@@ -266,7 +267,7 @@
     }
     .ticker-label {
       font-family: var(--ff-mono); font-size: 9.5px; font-weight: 600;
-      text-transform: uppercase; letter-spacing: 1px; color: var(--ink-5);
+      text-transform: uppercase; letter-spacing: 1px; color: var(--ink-4);
       white-space: nowrap;
     }
     .ticker-pills { display: flex; gap: 6px; flex-wrap: wrap; }
@@ -295,7 +296,7 @@
       padding: 10px 16px;
     }
     .prov-icon { font-size: 14px; flex-shrink: 0; opacity: .75; }
-    .prov-title { font-family: var(--ff-mono); font-size: 9px; font-weight: 600; text-transform: uppercase; letter-spacing: .7px; color: var(--ink-4); margin-bottom: 2px; }
+    .prov-title { font-family: var(--ff-mono); font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: .7px; color: var(--ink-4); margin-bottom: 2px; }
     .prov-body { font-family: var(--ff-mono); font-size: 11px; font-weight: 500; color: var(--ink-2); }
     .prov-divider { width: 1px; background: var(--paper-4); align-self: stretch; }
 
@@ -360,7 +361,7 @@
       font-size: 13.5px; color: var(--ink-3); line-height: 1.65; margin-bottom: 20px;
     }
     .tool-detail {
-      font-family: var(--ff-mono); font-size: 11px; color: var(--ink-5);
+      font-family: var(--ff-mono); font-size: 11.5px; color: var(--ink-4);
       line-height: 2.3; border-top: 1px solid var(--paper-3); padding-top: 16px;
     }
     .tool-detail span { color: var(--gold); }
@@ -391,7 +392,7 @@
     .step-rule { width: 32px; height: 2px; background: var(--gold); margin-bottom: 20px; }
     .step-title { font-family: var(--ff-head); font-size: 20px; font-weight: 600; color: var(--ink); margin-bottom: 10px; }
     .step-body { font-size: 13.5px; color: var(--ink-3); line-height: 1.7; }
-    .step-note { font-family: var(--ff-mono); font-size: 10.5px; color: var(--ink-5); letter-spacing: .3px; margin-top: 14px; }
+    .step-note { font-family: var(--ff-mono); font-size: 11px; color: var(--ink-4); letter-spacing: .3px; margin-top: 14px; }
 
     /* ── CTA ── */
     .cta-section { padding: 112px 0; text-align: center; }
@@ -412,7 +413,7 @@
       display: flex; justify-content: space-between; align-items: center; gap: 24px; flex-wrap: wrap;
     }
     .footer-brand { font-family: var(--ff-head); font-size: 14px; color: var(--ink-4); }
-    .footer-legal { font-size: 11px; color: var(--ink-5); line-height: 1.6; max-width: 560px; font-family: var(--ff-mono); letter-spacing: .2px; }
+    .footer-legal { font-size: 11px; color: var(--ink-4); line-height: 1.6; max-width: 560px; font-family: var(--ff-mono); letter-spacing: .2px; }
 
     /* ── ANIMATIONS ── */
     .fade-up { opacity: 0; transform: translateY(24px); animation: fadeUp .8s cubic-bezier(.4,0,.2,1) forwards; }
@@ -471,25 +472,26 @@
     }
     /* ── Dark mode ── */
     [data-theme="dark"] {
-      --ink:     #f0ece4;
-      --ink-2:   #ddd8d0;
-      --ink-3:   #b8b3aa;
-      --ink-4:   #7a7570;
-      --ink-5:   #52504c;
-      --ink-6:   #3a3835;
-      --paper:   #0f0e0c;
-      --paper-2: #1a1814;
-      --paper-3: #242220;
-      --paper-4: #302e2b;
-      --gold:    #c8952a;
-      --gold-bg: #1a1200;
-      --blue:    #4a8cc8;
-      --blue-bg: #0a1520;
-      --up:      #3a9c5a;
-      --dn:      #c04040;
+      --ink:     #F0ECE4;
+      --ink-2:   #DDD8CF;
+      --ink-3:   #B5B0A7;
+      --ink-4:   #8A857D;
+      --ink-5:   #5E5A54;
+      --ink-6:   #3A3835;
+      --paper:   #121110;
+      --paper-2: #1C1A17;
+      --paper-3: #262421;
+      --paper-4: #32302C;
+      --gold:    #C8952A;
+      --gold-bg: #1A1508;
+      --sepia:   #C8A060;
+      --blue:    #6AAAD4;
+      --blue-bg: #141E28;
+      --up:      #5EAE78;
+      --dn:      #D47265;
     }
     [data-theme="dark"] body { background: var(--paper); color: var(--ink); }
-    [data-theme="dark"] nav { background: rgba(15,14,12,.92); border-bottom-color: var(--paper-4); }
+    [data-theme="dark"] nav { background: rgba(18,17,16,.94); border-bottom-color: var(--paper-4); }
     [data-theme="dark"] .nav-link { color: var(--ink-3); }
     [data-theme="dark"] .nav-link:hover { color: var(--ink); }
     [data-theme="dark"] footer { border-top-color: var(--paper-4); }
@@ -526,7 +528,7 @@
   <div class="nav-inner">
     <div class="nav-logo">
       <div class="nav-mark">
-        <svg viewBox="0 0 20 20" fill="none"><path d="M3 15l4-6 4 4 3-4 3 3" stroke="#f4f0e8" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <svg viewBox="0 0 20 20" fill="none"><path d="M3 15l4-6 4 4 3-4 3 3" stroke="#F0ECE4" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </div>
       <span class="nav-name">Valuation Studio</span>
     </div>
