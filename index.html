@@ -3,830 +3,199 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-  <title>Valuation Studio — Intrinsic value, calculated properly.</title>
-  <meta name="description" content="Professional DCF valuation tools. Fair value, implied return, and scenario analysis for serious investors."/>
+  <title>Valuation Studio — DCF valuation, step by step.</title>
+  <meta name="description" content="A free DCF toolkit. Fair value, implied return, and scenario analysis — every calculation shown step by step."/>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet"/>
-  <!-- Prevent flash of wrong theme -->
   <script>if(localStorage.getItem('vs-theme')==='dark')document.documentElement.setAttribute('data-theme','dark')</script>
   <style>
-    :root {
-      /* Silver Gelatin / Old New York — unified palette */
-      --ink:        #1C1A16;
-      --ink-2:      #302D28;
-      --ink-3:      #4D4943;
-      --ink-4:      #7A756D;
-      --ink-5:      #A9A49B;
-      --ink-6:      #D0CBC3;
-
-      --paper:      #F3EFE7;
-      --paper-2:    #ECE8DF;
-      --paper-3:    #E2DDD3;
-      --paper-4:    #D5D0C7;
-
-      --gold:       #9E7528;
-      --gold-lt:    #B88A30;
-      --gold-bg:    #F5EDDA;
-
-      --silver:     #7A756D;
-      --sepia:      #7A5F3E;
-
-      --blue:       #2B5D8E;
-      --blue-lt:    #3A72A8;
-      --blue-bg:    #E6EEF5;
-
-      --up:         #2E7048;
-      --dn:         #A8382E;
-
-      --ff-head:    'DM Sans', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
-      --ff-body:    'DM Sans', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
-      --ff-mono:    'JetBrains Mono', 'SF Mono', ui-monospace, monospace;
-
-      --r:          10px;
-      --shadow:     0 1px 3px rgba(28,26,22,.06), 0 1px 2px rgba(28,26,22,.04);
-      --shadow-md:  0 4px 14px rgba(28,26,22,.08), 0 2px 4px rgba(28,26,22,.04);
-      --shadow-lg:  0 10px 40px rgba(28,26,22,.12);
-    }
-
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    html { scroll-behavior: smooth; }
-    body {
-      font-family: var(--ff-body);
-      background: var(--paper);
-      color: var(--ink);
-      line-height: 1.6;
-      -webkit-font-smoothing: antialiased;
-      overflow-x: hidden;
-    }
-
-    /* Grain overlay */
-    body::after {
-      content: '';
-      position: fixed; inset: 0;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
-      pointer-events: none; z-index: 999; opacity: 0.6; mix-blend-mode: multiply;
-    }
-
-    .container { max-width: 1100px; margin: 0 auto; padding: 0 2rem; position: relative; z-index: 1; }
-
-    /* ── NAV ── */
-    nav {
-      position: sticky; top: 0; z-index: 100;
-      background: rgba(243,239,231,.94);
-      backdrop-filter: blur(20px) saturate(1.8);
-      -webkit-backdrop-filter: blur(20px) saturate(1.8);
-      border-bottom: 1px solid var(--paper-4);
-    }
-    .nav-inner {
-      max-width: 1100px; margin: 0 auto; padding: 0 2rem;
-      height: 58px; display: flex; align-items: center; justify-content: space-between;
-    }
-    .nav-logo { display: flex; align-items: center; gap: 11px; }
-    .nav-mark {
-      width: 30px; height: 30px; border-radius: 8px;
-      background: var(--ink);
-      display: flex; align-items: center; justify-content: center;
-      box-shadow: 0 2px 6px rgba(28,26,22,.2);
-    }
-    .nav-mark svg { width: 16px; height: 16px; }
-    .nav-name {
-      font-family: var(--ff-head); font-size: 17px; font-weight: 600;
-      color: var(--ink); letter-spacing: -.2px;
-    }
-    .nav-links { display: flex; align-items: center; gap: 28px; }
-    .nav-link {
-      font-size: 13px; font-weight: 400; color: var(--ink-4);
-      text-decoration: none; letter-spacing: .1px;
-      transition: color .15s;
-    }
-    .nav-link:hover { color: var(--ink); }
-    .nav-cta {
-      display: inline-flex; align-items: center; gap: 7px;
-      background: var(--ink); color: var(--paper);
-      font-size: 13px; font-weight: 500;
-      padding: 8px 20px; border-radius: 6px; text-decoration: none;
-      transition: all .15s; letter-spacing: .1px;
-      box-shadow: 0 2px 8px rgba(28,26,22,.2);
-    }
-    .nav-cta:hover { background: var(--ink-2); transform: translateY(-1px); box-shadow: 0 4px 14px rgba(28,26,22,.25); }
-
-    /* ── HERO ── */
-    .hero {
-      padding: 100px 0 90px;
-      border-bottom: 1px solid var(--paper-4);
-      position: relative; overflow: hidden;
-    }
-
-    /* decorative ruled lines background */
-    .hero::before {
-      content: '';
-      position: absolute; inset: 0;
-      background-image: repeating-linear-gradient(
-        0deg,
-        transparent,
-        transparent 39px,
-        rgba(28,26,22,.04) 39px,
-        rgba(28,26,22,.04) 40px
-      );
-      pointer-events: none;
-    }
-
-    .hero-inner { display: grid; grid-template-columns: 1fr 420px; gap: 80px; align-items: start; }
-
-    .hero-eyebrow {
-      display: inline-flex; align-items: center; gap: 10px;
-      font-family: var(--ff-mono); font-size: 10.5px; font-weight: 500;
-      letter-spacing: 2px; text-transform: uppercase;
-      color: var(--gold); margin-bottom: 24px;
-    }
-    .eyebrow-rule { width: 28px; height: 1px; background: var(--gold); }
-
-    h1.hero-headline {
-      font-family: var(--ff-head);
-      font-size: clamp(48px, 5.8vw, 76px);
-      font-weight: 700; color: var(--ink);
-      letter-spacing: -2px; line-height: 1.0;
-      margin-bottom: 28px;
-    }
-    h1.hero-headline em { font-style: italic; color: var(--sepia); }
-
-    .hero-body {
-      font-size: 17px; color: var(--ink-3); line-height: 1.75;
-      font-weight: 300; margin-bottom: 40px; max-width: 480px;
-    }
-
-    .hero-actions { display: flex; align-items: center; gap: 14px; margin-bottom: 48px; flex-wrap: wrap; }
-
-    .btn-primary {
-      display: inline-flex; align-items: center; gap: 9px;
-      background: var(--ink); color: var(--paper);
-      font-size: 14px; font-weight: 500; padding: 14px 32px; border-radius: 8px;
-      text-decoration: none; transition: all .18s;
-      box-shadow: 0 2px 12px rgba(28,26,22,.2);
-    }
-    .btn-primary:hover { background: var(--ink-2); transform: translateY(-2px); box-shadow: 0 6px 24px rgba(28,26,22,.25); }
-
-    .btn-outline {
-      display: inline-flex; align-items: center; gap: 7px;
-      background: transparent; color: var(--ink-3);
-      font-size: 14px; font-weight: 400; padding: 14px 24px; border-radius: 8px;
-      text-decoration: none; border: 1px solid var(--paper-4); transition: all .15s;
-    }
-    .btn-outline:hover { border-color: var(--ink-5); color: var(--ink); background: var(--paper-2); }
-
-    .hero-disclaimer { font-size: 11px; color: var(--ink-5); font-family: var(--ff-mono); letter-spacing: .3px; }
-
-    /* Hero right — floating card */
-    .hero-card {
-      background: linear-gradient(135deg, #F9F7F2 0%, #F0EDE5 100%);
-      border: 1px solid rgba(28,26,22,.09);
-      border-radius: 14px; overflow: hidden;
-      box-shadow: 0 4px 20px rgba(28,26,22,.08), inset 0 1px 0 rgba(255,255,255,.7);
-      position: relative; top: 0;
-    }
-    .hc-header {
-      padding: 16px 20px; border-bottom: 1px solid var(--paper-3);
-      display: flex; align-items: center; justify-content: space-between;
-    }
-    .hc-title { font-family: var(--ff-head); font-size: 15px; font-weight: 600; color: var(--ink); }
-    .hc-badge {
-      display: inline-flex; align-items: center; gap: 5px;
-      font-family: var(--ff-mono); font-size: 9.5px; font-weight: 500;
-      padding: 3px 9px; border-radius: 20px; letter-spacing: .5px;
-      background: var(--paper-3); color: var(--ink-4); text-transform: uppercase;
-    }
-    .hc-body { padding: 16px 20px; }
-    .hc-row {
-      display: flex; justify-content: space-between; align-items: baseline;
-      padding: 6px 0; border-bottom: 1px solid var(--paper-3); font-size: 12.5px;
-    }
-    .hc-row:last-of-type { border-bottom: none; }
-    .hc-lbl { color: var(--ink-4); }
-    .hc-val { font-family: var(--ff-mono); font-size: 12px; font-weight: 500; color: var(--ink); }
-    .hc-val.pos { color: var(--up); }
-    .hc-val.neg { color: var(--dn); }
-    .hc-divider { height: 1px; background: var(--paper-3); margin: 4px 0; }
-    .hc-result {
-      margin-top: 16px; padding: 14px 16px;
-      background: var(--paper); border-radius: 8px;
-      border: 1px solid var(--paper-3);
-    }
-    .hcr-lbl { font-size: 10.5px; font-weight: 600; color: var(--ink-4); text-transform: uppercase; letter-spacing: .8px; margin-bottom: 10px; font-family: var(--ff-mono); }
-    /* New gauge styles */
-    .hcr-gauge { }
-    .hcr-g-labels { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 10px; }
-    .hcr-g-fv, .hcr-g-px { }
-    .hcr-g-name { font-size: 10px; color: var(--ink-4); font-family: var(--ff-mono); text-transform: uppercase; letter-spacing: .4px; margin-bottom: 2px; }
-    .hcr-g-val-fv { font-family: var(--ff-mono); font-size: 13px; font-weight: 600; color: var(--ink-4); font-style: italic; }
-    .hcr-g-val-mkt { font-family: var(--ff-mono); font-size: 15px; font-weight: 600; color: var(--ink); text-align: right; }
-    .hcr-g-sub { font-size: 9.5px; color: var(--ink-4); margin-top: 2px; }
-    .hcr-g-track {
-      height: 5px; background: var(--paper-3); border-radius: 3px;
-      position: relative; margin: 2px 0 10px;
-    }
-    .hcr-g-pin {
-      position: absolute; top: -5px; transform: translateX(-50%);
-      width: 0; height: 0;
-    }
-    .hcr-g-pin::before {
-      content: ''; position: absolute; top: 0; left: 50%; transform: translateX(-50%);
-      width: 2px; height: 15px; background: var(--ink-3); border-radius: 1px;
-    }
-    .hcr-g-pin::after {
-      content: 'Market'; position: absolute; top: 16px; left: 50%; transform: translateX(-50%);
-      font-family: var(--ff-mono); font-size: 8.5px; color: var(--ink-5); white-space: nowrap;
-    }
-    .hcr-g-note { font-size: 10.5px; color: var(--ink-4); font-family: var(--ff-mono); font-style: italic; text-align: center; margin-top: 4px; }
-    /* Keep old classes for compat */
-    .hcr-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
-    .hcr-row:last-child { margin-bottom: 0; }
-    .hcr-name { font-size: 12px; color: var(--ink-3); }
-    .bar-wrap { flex: 1; height: 6px; background: var(--paper-3); border-radius: 3px; margin: 0 10px; overflow: hidden; }
-    .bar-fill { height: 100%; border-radius: 3px; }
-    .hcr-val { font-family: var(--ff-mono); font-size: 11px; font-weight: 500; color: var(--ink); min-width: 44px; text-align: right; }
-
-    /* Heatmap mini */
-    .hc-hm { margin-top: 12px; }
-    .hc-hm-label { font-size: 10.5px; color: var(--ink-4); font-family: var(--ff-mono); text-transform: uppercase; letter-spacing: .8px; margin-bottom: 6px; }
-    .hm-grid { display: grid; grid-template-columns: repeat(5,1fr); gap: 2px; }
-    .hm-c {
-      padding: 5px 2px; border-radius: 3px; text-align: center;
-      font-family: var(--ff-mono); font-size: 9.5px; font-weight: 500;
-    }
-
-    /* ── TICKER STRIP ── */
-    .ticker-strip {
-      padding: 20px 0;
-      border-bottom: 1px solid var(--paper-4);
-    }
-    .ticker-row {
-      display: flex; align-items: center; justify-content: space-between; gap: 24px; flex-wrap: wrap;
-    }
-    .ticker-left {
-      display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
-    }
-    .ticker-label {
-      font-family: var(--ff-mono); font-size: 9.5px; font-weight: 600;
-      text-transform: uppercase; letter-spacing: 1px; color: var(--ink-4);
-      white-space: nowrap;
-    }
-    .ticker-pills { display: flex; gap: 6px; flex-wrap: wrap; }
-    .ticker-pill {
-      display: inline-flex; align-items: center; justify-content: center;
-      padding: 6px 14px; border-radius: 7px;
-      background: var(--paper-2); border: 1px solid var(--paper-4);
-      text-decoration: none; transition: all .14s;
-      box-shadow: var(--shadow);
-    }
-    .ticker-pill:hover {
-      border-color: var(--ink-5); background: var(--paper);
-      transform: translateY(-1px); box-shadow: var(--shadow-md);
-    }
-    .tp-sym { font-family: var(--ff-mono); font-size: 12px; font-weight: 500; color: var(--ink-2); letter-spacing: .3px; }
-
-    /* Provenance card */
-    .ticker-right { flex-shrink: 0; }
-    .provenance-card {
-      display: flex; align-items: stretch; gap: 0;
-      background: linear-gradient(135deg, #F9F7F2 0%, #F0EDE5 100%);
-      border: 1px solid rgba(28,26,22,.09);
-      border-radius: 10px; overflow: hidden;
-      box-shadow: 0 2px 8px rgba(28,26,22,.05), inset 0 1px 0 rgba(255,255,255,.7);
-    }
-    .prov-item {
-      display: flex; align-items: center; gap: 9px;
-      padding: 10px 16px;
-    }
-    .prov-icon { font-size: 14px; flex-shrink: 0; opacity: .75; }
-    .prov-title { font-family: var(--ff-mono); font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: .7px; color: var(--ink-4); margin-bottom: 2px; }
-    .prov-body { font-family: var(--ff-mono); font-size: 11px; font-weight: 500; color: var(--ink-2); }
-    .prov-divider { width: 1px; background: var(--paper-4); align-self: stretch; }
-
-    .ticker-data-note { display: none; }
-    .data-source-note { display: none; } /* hidden — replaced by provenance-card */
-
-    @media(max-width: 780px) {
-      .ticker-row { flex-direction: column; align-items: flex-start; gap: 14px; }
-      .provenance-card { flex-wrap: wrap; }
-    }
-
-    /* ── STATS ── */
-    .stats-section {
-      padding: 56px 0;
-      border-bottom: 1px solid var(--paper-4);
-    }
-    .stats-grid { display: grid; grid-template-columns: repeat(4,1fr); }
-    .stat-item { padding: 0 0 0 36px; border-left: 1px solid var(--paper-4); }
-    .stat-item:first-child { padding-left: 0; border-left: none; }
-    .stat-num {
-      font-family: var(--ff-head); font-size: 40px; font-weight: 600;
-      color: var(--ink); letter-spacing: -1px; line-height: 1; margin-bottom: 6px;
-    }
-    .stat-lbl { font-size: 12px; color: var(--ink-4); letter-spacing: .2px; }
-
-    /* ── TOOLS ── */
-    .tools-section { padding: 96px 0; border-bottom: 1px solid var(--paper-4); }
-    .section-eyebrow {
-      font-family: var(--ff-mono); font-size: 10px; letter-spacing: 2px;
-      text-transform: uppercase; color: var(--gold); margin-bottom: 14px;
-    }
-    .section-title {
-      font-family: var(--ff-head); font-size: clamp(32px,3.8vw,46px);
-      font-weight: 600; color: var(--ink); letter-spacing: -1px;
-      line-height: 1.12; margin-bottom: 14px; max-width: 540px;
-    }
-    .section-body {
-      font-size: 16px; color: var(--ink-3); font-weight: 300;
-      line-height: 1.75; max-width: 520px; margin-bottom: 56px;
-    }
-
-    .tools-grid {
-      display: grid; grid-template-columns: repeat(3,1fr);
-      border: 1px solid rgba(28,26,22,.09); border-radius: 14px; overflow: hidden;
-      box-shadow: 0 2px 12px rgba(28,26,22,.06), inset 0 1px 0 rgba(255,255,255,.5);
-    }
-    .tool-card {
-      padding: 32px 28px; border-right: 1px solid var(--paper-4);
-      background: linear-gradient(135deg, #F9F7F2 0%, #F0EDE5 100%);
-      transition: background .15s;
-      position: relative;
-    }
-    .tool-card:last-child { border-right: none; }
-    .tool-card:hover { background: var(--paper-2); }
-    .tool-num {
-      font-family: var(--ff-mono); font-size: 10px; color: var(--gold);
-      letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 16px;
-    }
-    .tool-title {
-      font-family: var(--ff-head); font-size: 22px; font-weight: 600;
-      color: var(--ink); letter-spacing: -.3px; margin-bottom: 12px; line-height: 1.2;
-    }
-    .tool-desc {
-      font-size: 13.5px; color: var(--ink-3); line-height: 1.65; margin-bottom: 20px;
-    }
-    .tool-detail {
-      font-family: var(--ff-mono); font-size: 11.5px; color: var(--ink-4);
-      line-height: 2.3; border-top: 1px solid var(--paper-3); padding-top: 16px;
-    }
-    .tool-detail span { color: var(--gold); }
-
-    /* ── FEATURES ── */
-    .features-strip {
-      display: grid; grid-template-columns: repeat(4,1fr);
-      border: 1px solid rgba(28,26,22,.09); border-radius: 12px; overflow: hidden;
-      margin-top: 16px;
-      box-shadow: 0 2px 12px rgba(28,26,22,.06), inset 0 1px 0 rgba(255,255,255,.5);
-    }
-    .feat-cell {
-      padding: 22px 22px; border-right: 1px solid var(--paper-4);
-      background: linear-gradient(135deg, #F9F7F2 0%, #F0EDE5 100%);
-      transition: background .15s;
-    }
-    .feat-cell:last-child { border-right: none; }
-    .feat-cell:hover { background: var(--paper-3); }
-    .feat-icon { font-size: 18px; margin-bottom: 10px; }
-    .feat-title { font-size: 13px; font-weight: 600; color: var(--ink); margin-bottom: 5px; }
-    .feat-body { font-size: 12px; color: var(--ink-4); line-height: 1.55; }
-
-    /* ── HOW IT WORKS ── */
-    .how-section { padding: 96px 0; border-bottom: 1px solid var(--paper-4); }
-    .steps-row { display: grid; grid-template-columns: repeat(3,1fr); gap: 56px; margin-top: 56px; }
-    .step-num {
-      font-family: var(--ff-head); font-size: 52px; font-weight: 600;
-      color: var(--paper-3); line-height: 1; margin-bottom: 20px;
-    }
-    .step-rule { width: 32px; height: 2px; background: var(--gold); margin-bottom: 20px; }
-    .step-title { font-family: var(--ff-head); font-size: 20px; font-weight: 600; color: var(--ink); margin-bottom: 10px; }
-    .step-body { font-size: 13.5px; color: var(--ink-3); line-height: 1.7; }
-    .step-note { font-family: var(--ff-mono); font-size: 11px; color: var(--ink-4); letter-spacing: .3px; margin-top: 14px; }
-
-    /* ── CTA ── */
-    .cta-section { padding: 112px 0; text-align: center; }
-    .cta-rule { width: 40px; height: 1px; background: var(--gold); margin: 0 auto 24px; }
-    .cta-headline {
-      font-family: var(--ff-head); font-size: clamp(42px,5vw,64px);
-      font-weight: 700; color: var(--ink); letter-spacing: -1.5px;
-      line-height: 1.05; margin-bottom: 20px;
-    }
-    .cta-headline em { font-style: italic; color: var(--sepia); }
-    .cta-body { font-size: 17px; color: var(--ink-3); font-weight: 300; margin-bottom: 40px; }
-    .cta-disclaimer { margin-top: 20px; font-size: 11px; color: var(--ink-5); font-family: var(--ff-mono); letter-spacing: .3px; }
-
-    /* ── FOOTER ── */
-    footer { border-top: 1px solid var(--paper-4); padding: 32px 0; }
-    .footer-inner {
-      max-width: 1100px; margin: 0 auto; padding: 0 2rem;
-      display: flex; justify-content: space-between; align-items: center; gap: 24px; flex-wrap: wrap;
-    }
-    .footer-brand { font-family: var(--ff-head); font-size: 14px; color: var(--ink-4); }
-    .footer-legal { font-size: 11px; color: var(--ink-4); line-height: 1.6; max-width: 560px; font-family: var(--ff-mono); letter-spacing: .2px; }
-
-    /* ── ANIMATIONS ── */
-    .fade-up { opacity: 0; transform: translateY(24px); animation: fadeUp .8s cubic-bezier(.4,0,.2,1) forwards; }
-    .d1{animation-delay:.06s}.d2{animation-delay:.18s}.d3{animation-delay:.3s}.d4{animation-delay:.42s}.d5{animation-delay:.54s}
-    @keyframes fadeUp { to { opacity:1; transform:translateY(0); } }
-
-    /* scroll reveal */
-    .reveal { opacity: 0; transform: translateY(20px); transition: opacity .7s ease, transform .7s ease; }
-    .reveal.visible { opacity: 1; transform: translateY(0); }
-
-    /* ── RESPONSIVE ── */
-    @media(max-width:1000px) {
-      .hero-inner { grid-template-columns: 1fr; gap: 48px; }
-      .hero-card { max-width: 460px; }
-      .features-strip { grid-template-columns: 1fr 1fr; }
-    }
-    @media(max-width:800px) {
-      .tools-grid { grid-template-columns: 1fr; }
-      .tool-card { border-right: none; border-bottom: 1px solid var(--paper-4); }
-      .tool-card:last-child { border-bottom: none; }
-      .stats-grid { grid-template-columns: 1fr 1fr; gap: 24px; }
-      .stat-item { border-left: none; padding-left: 0; border-top: 1px solid var(--paper-4); padding-top: 24px; }
-      .stat-item:first-child, .stat-item:nth-child(2) { border-top: none; padding-top: 0; }
-      .steps-row { grid-template-columns: 1fr; gap: 40px; }
-      .nav-links { display: none; }
-      /* Ticker strip: stack on mobile */
-      .ticker-row { flex-direction: column; align-items: flex-start; gap: 16px; }
-      .ticker-right { width: 100%; }
-      .provenance-card { flex-direction: row; flex-wrap: wrap; gap: 12px; padding: 12px 16px; }
-      .prov-divider { display: none; }
-      /* Hero: reduce padding */
-      .hero { padding: 56px 0 48px; }
-      .hero-headline { font-size: clamp(36px,7vw,56px); }
-      .section-body { font-size: 15px; margin-bottom: 40px; }
-    }
-    @media(max-width:560px) {
-      .container { padding: 0 1.25rem; }
-      .features-strip { grid-template-columns: 1fr; }
-      .feat-cell { border-right: none; border-bottom: 1px solid var(--paper-4); padding: 18px 20px; }
-      .feat-cell:last-child { border-bottom: none; }
-      /* Nav: tighter */
-      .nav-inner { padding: 0 1.25rem; }
-      .nav-cta { padding: 7px 14px; font-size: 13px; }
-      .nav-cta svg { display: none; }
-      /* Stats: 2-col stays fine */
-      /* Steps: tighten */
-      .steps-row { gap: 32px; margin-top: 36px; }
-      .step-num { font-size: 40px; margin-bottom: 14px; }
-      /* CTA */
-      .cta-section { padding: 72px 0; }
-      .cta-headline { font-size: clamp(34px,8vw,48px); }
-      /* Tools section */
-      .tools-section { padding: 64px 0; }
-      .how-section { padding: 64px 0; }
-      .section-title { font-size: clamp(28px,6vw,36px); }
-    }
-    /* ── Dark mode ── */
-    [data-theme="dark"] {
-      --ink:     #F0ECE4;
-      --ink-2:   #DDD8CF;
-      --ink-3:   #B5B0A7;
-      --ink-4:   #8A857D;
-      --ink-5:   #5E5A54;
-      --ink-6:   #3A3835;
-      --paper:   #121110;
-      --paper-2: #1C1A17;
-      --paper-3: #262421;
-      --paper-4: #32302C;
-      --gold:    #C8952A;
-      --gold-bg: #1A1508;
-      --sepia:   #C8A060;
-      --blue:    #6AAAD4;
-      --blue-bg: #141E28;
-      --up:      #5EAE78;
-      --dn:      #D47265;
-    }
-    [data-theme="dark"] body { background: var(--paper); color: var(--ink); }
-    [data-theme="dark"] nav { background: rgba(18,17,16,.94); border-bottom-color: var(--paper-4); }
-    [data-theme="dark"] .nav-link { color: var(--ink-3); }
-    [data-theme="dark"] .nav-link:hover { color: var(--ink); }
-    [data-theme="dark"] footer { border-top-color: var(--paper-4); }
-    [data-theme="dark"] .footer-brand, [data-theme="dark"] .footer-legal { color: var(--ink-4); }
-    [data-theme="dark"] .stats-section { border-color: var(--paper-4); }
-    [data-theme="dark"] .stat-item { border-color: var(--paper-4); }
-    [data-theme="dark"] .ticker-strip, [data-theme="dark"] .ticker-pill,
-    [data-theme="dark"] .provenance-card { background: linear-gradient(135deg,#1E1C19 0%,#242220 100%); border-color: var(--paper-4); }
-    [data-theme="dark"] .prov-divider { background: var(--paper-4); }
-    [data-theme="dark"] .tools-section { background: var(--paper); }
-    [data-theme="dark"] .tool-card { background: linear-gradient(135deg,#1E1C19 0%,#242220 100%); border-color: var(--paper-4); }
-    [data-theme="dark"] .tool-card:hover { background: var(--paper-3); }
-    [data-theme="dark"] .feat-cell { background: linear-gradient(135deg,#1E1C19 0%,#242220 100%); border-color: var(--paper-4); }
-    [data-theme="dark"] .hero-card, [data-theme="dark"] .hc-row { background: linear-gradient(135deg,#1E1C19 0%,#242220 100%); border-color: rgba(240,236,228,.10); box-shadow: 0 4px 20px rgba(0,0,0,.25), inset 0 1px 0 rgba(255,255,255,.04); }
-    [data-theme="dark"] .step-card { background: linear-gradient(135deg,#1E1C19 0%,#242220 100%); border-color: rgba(240,236,228,.10); box-shadow: 0 2px 8px rgba(0,0,0,.2), inset 0 1px 0 rgba(255,255,255,.04); }
-    [data-theme="dark"] .cta-section { border-color: var(--paper-4); }
-
-    /* Dark toggle button in nav */
-    .nav-dark-btn {
-      width: 30px; height: 30px; border-radius: 7px;
-      background: var(--paper-2); border: 1px solid var(--paper-4);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 13px; cursor: pointer; transition: all .15s;
-      margin-right: 8px; flex-shrink: 0;
-    }
-    .nav-dark-btn:hover { background: var(--paper-3); }
-
+    :root{--ink:#1C1A16;--ink-2:#302D28;--ink-3:#4D4943;--ink-4:#7A756D;--ink-5:#A9A49B;--ink-6:#D0CBC3;--paper:#F3EFE7;--paper-2:#ECE8DF;--paper-3:#E2DDD3;--paper-4:#D5D0C7;--gold:#9E7528;--gold-lt:#B88A30;--gold-bg:#F5EDDA;--sepia:#7A5F3E;--blue:#2B5D8E;--blue-lt:#3A72A8;--blue-bg:#E6EEF5;--up:#2E7048;--dn:#A8382E;--ff-head:'DM Sans',-apple-system,BlinkMacSystemFont,system-ui,sans-serif;--ff-body:'DM Sans',-apple-system,BlinkMacSystemFont,system-ui,sans-serif;--ff-mono:'JetBrains Mono','SF Mono',ui-monospace,monospace;--r:10px;--shadow:0 1px 3px rgba(28,26,22,.06),0 1px 2px rgba(28,26,22,.04);--shadow-md:0 4px 14px rgba(28,26,22,.08),0 2px 4px rgba(28,26,22,.04)}
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    html{scroll-behavior:smooth}
+    body{font-family:var(--ff-body);background:var(--paper);color:var(--ink);line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+    body::after{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");pointer-events:none;z-index:999;opacity:.6;mix-blend-mode:multiply}
+    .container{max-width:1100px;margin:0 auto;padding:0 2rem;position:relative;z-index:1}
+    nav{position:sticky;top:0;z-index:100;background:rgba(243,239,231,.94);backdrop-filter:blur(20px) saturate(1.8);-webkit-backdrop-filter:blur(20px) saturate(1.8);border-bottom:1px solid var(--paper-4)}
+    .nav-inner{max-width:1100px;margin:0 auto;padding:0 2rem;height:58px;display:flex;align-items:center;justify-content:space-between}
+    .nav-logo{display:flex;align-items:center;gap:11px}
+    .nav-mark{width:30px;height:30px;border-radius:8px;background:var(--ink);display:flex;align-items:center;justify-content:center;box-shadow:0 2px 6px rgba(28,26,22,.2)}
+    .nav-mark svg{width:16px;height:16px}
+    .nav-name{font-family:var(--ff-head);font-size:17px;font-weight:600;color:var(--ink);letter-spacing:-.2px}
+    .nav-links{display:flex;align-items:center;gap:28px}
+    .nav-link{font-size:13px;font-weight:400;color:var(--ink-4);text-decoration:none;letter-spacing:.1px;transition:color .15s}
+    .nav-link:hover{color:var(--ink)}
+    .nav-cta{display:inline-flex;align-items:center;gap:7px;background:var(--ink);color:var(--paper);font-size:13px;font-weight:500;padding:8px 20px;border-radius:6px;text-decoration:none;transition:all .15s;letter-spacing:.1px;box-shadow:0 2px 8px rgba(28,26,22,.2)}
+    .nav-cta:hover{background:var(--ink-2);transform:translateY(-1px);box-shadow:0 4px 14px rgba(28,26,22,.25)}
+    .nav-dark-btn{width:30px;height:30px;border-radius:7px;background:var(--paper-2);border:1px solid var(--paper-4);display:flex;align-items:center;justify-content:center;font-size:13px;cursor:pointer;transition:all .15s;margin-right:8px;flex-shrink:0}
+    .nav-dark-btn:hover{background:var(--paper-3)}
+    .hero{padding:100px 0 80px;border-bottom:1px solid var(--paper-4);position:relative;overflow:hidden}
+    .hero::before{content:'';position:absolute;inset:0;background-image:repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(28,26,22,.04) 39px,rgba(28,26,22,.04) 40px);pointer-events:none}
+    .hero-center{max-width:640px;margin:0 auto;text-align:center}
+    h1.hero-headline{font-family:var(--ff-head);font-size:clamp(40px,5.2vw,64px);font-weight:700;color:var(--ink);letter-spacing:-2px;line-height:1.05;margin-bottom:24px}
+    h1.hero-headline em{font-style:italic;color:var(--sepia)}
+    .hero-body{font-size:17px;color:var(--ink-3);line-height:1.75;font-weight:300;margin-bottom:36px;max-width:520px;margin-left:auto;margin-right:auto}
+    .hero-actions{display:flex;align-items:center;justify-content:center;gap:14px;margin-bottom:20px;flex-wrap:wrap}
+    .btn-primary{display:inline-flex;align-items:center;gap:9px;background:var(--ink);color:var(--paper);font-size:14px;font-weight:500;padding:14px 32px;border-radius:8px;text-decoration:none;transition:all .18s;box-shadow:0 2px 12px rgba(28,26,22,.2)}
+    .btn-primary:hover{background:var(--ink-2);transform:translateY(-2px);box-shadow:0 6px 24px rgba(28,26,22,.25)}
+    .btn-outline{display:inline-flex;align-items:center;gap:7px;background:transparent;color:var(--ink-3);font-size:14px;font-weight:400;padding:14px 24px;border-radius:8px;text-decoration:none;border:1px solid var(--paper-4);transition:all .15s}
+    .btn-outline:hover{border-color:var(--ink-5);color:var(--ink);background:var(--paper-2)}
+    .hero-note{font-size:12px;color:var(--ink-5);line-height:1.6;max-width:420px;margin:0 auto}
+    .what-section{padding:80px 0;border-bottom:1px solid var(--paper-4)}
+    .what-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:0;border:1px solid rgba(28,26,22,.09);border-radius:14px;overflow:hidden;box-shadow:0 2px 12px rgba(28,26,22,.06),inset 0 1px 0 rgba(255,255,255,.5)}
+    .what-card{padding:32px 28px;border-right:1px solid var(--paper-4);background:linear-gradient(135deg,#F9F7F2 0%,#F0EDE5 100%);transition:background .15s}
+    .what-card:last-child{border-right:none}
+    .what-card:hover{background:var(--paper-2)}
+    .what-num{font-family:var(--ff-mono);font-size:10px;color:var(--gold);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:16px}
+    .what-title{font-family:var(--ff-head);font-size:20px;font-weight:600;color:var(--ink);letter-spacing:-.3px;margin-bottom:10px;line-height:1.2}
+    .what-desc{font-size:13.5px;color:var(--ink-3);line-height:1.65}
+    .what-ask{font-family:var(--ff-mono);font-size:11.5px;color:var(--ink-4);margin-top:16px;padding-top:14px;border-top:1px solid var(--paper-3);line-height:1.7;font-style:italic}
+    .how-section{padding:80px 0;border-bottom:1px solid var(--paper-4)}
+    .sec-eyebrow{font-family:var(--ff-mono);font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:14px}
+    .sec-title{font-family:var(--ff-head);font-size:clamp(28px,3.5vw,40px);font-weight:600;color:var(--ink);letter-spacing:-1px;line-height:1.12;margin-bottom:14px;max-width:500px}
+    .sec-body{font-size:15px;color:var(--ink-3);font-weight:300;line-height:1.75;max-width:500px;margin-bottom:48px}
+    .steps-row{display:grid;grid-template-columns:repeat(3,1fr);gap:56px}
+    .step-num{font-family:var(--ff-head);font-size:48px;font-weight:600;color:var(--paper-3);line-height:1;margin-bottom:18px}
+    .step-rule{width:28px;height:2px;background:var(--gold);margin-bottom:18px}
+    .step-title{font-family:var(--ff-head);font-size:18px;font-weight:600;color:var(--ink);margin-bottom:8px}
+    .step-body{font-size:13px;color:var(--ink-3);line-height:1.7}
+    .data-note{padding:48px 0;border-bottom:1px solid var(--paper-4)}
+    .data-note-inner{display:flex;align-items:flex-start;gap:14px;max-width:680px;margin:0 auto;padding:20px 24px;background:var(--paper-2);border:1px solid var(--paper-3);border-radius:var(--r)}
+    .data-note-icon{font-size:16px;flex-shrink:0;margin-top:1px}
+    .data-note-text{font-size:13px;color:var(--ink-3);line-height:1.7}
+    .data-note-text strong{color:var(--ink-2);font-weight:500}
+    .cta-section{padding:96px 0;text-align:center}
+    .cta-rule{width:40px;height:1px;background:var(--gold);margin:0 auto 24px}
+    .cta-headline{font-family:var(--ff-head);font-size:clamp(36px,4.5vw,56px);font-weight:700;color:var(--ink);letter-spacing:-1.5px;line-height:1.05;margin-bottom:18px}
+    .cta-headline em{font-style:italic;color:var(--sepia)}
+    .cta-body{font-size:16px;color:var(--ink-3);font-weight:300;margin-bottom:36px}
+    footer{border-top:1px solid var(--paper-4);padding:32px 0}
+    .footer-inner{max-width:1100px;margin:0 auto;padding:0 2rem;display:flex;justify-content:space-between;align-items:center;gap:24px;flex-wrap:wrap}
+    .footer-brand{font-family:var(--ff-head);font-size:14px;color:var(--ink-4)}
+    .footer-legal{font-size:11px;color:var(--ink-4);line-height:1.6;max-width:560px;font-family:var(--ff-mono);letter-spacing:.2px}
+    .fade-up{opacity:0;transform:translateY(24px);animation:fadeUp .8s cubic-bezier(.4,0,.2,1) forwards}
+    .d1{animation-delay:.06s}.d2{animation-delay:.18s}.d3{animation-delay:.3s}.d4{animation-delay:.42s}
+    @keyframes fadeUp{to{opacity:1;transform:translateY(0)}}
+    .reveal{opacity:0;transform:translateY(20px);transition:opacity .7s ease,transform .7s ease}
+    .reveal.visible{opacity:1;transform:translateY(0)}
+    @media(max-width:800px){.what-grid{grid-template-columns:1fr}.what-card{border-right:none;border-bottom:1px solid var(--paper-4)}.what-card:last-child{border-bottom:none}.steps-row{grid-template-columns:1fr;gap:36px}.nav-links{display:none}.hero{padding:56px 0 48px}.what-section,.how-section{padding:56px 0}}
+    @media(max-width:560px){.container{padding:0 1.25rem}.nav-inner{padding:0 1.25rem}.nav-cta{padding:7px 14px;font-size:13px}.nav-cta svg{display:none}.cta-section{padding:64px 0}}
+    [data-theme="dark"]{--ink:#F0ECE4;--ink-2:#DDD8CF;--ink-3:#B5B0A7;--ink-4:#8A857D;--ink-5:#5E5A54;--ink-6:#3A3835;--paper:#121110;--paper-2:#1C1A17;--paper-3:#262421;--paper-4:#32302C;--gold:#C8952A;--gold-bg:#1A1508;--sepia:#C8A060;--blue:#6AAAD4;--blue-bg:#141E28;--up:#5EAE78;--dn:#D47265}
+    [data-theme="dark"] body{background:var(--paper);color:var(--ink)}
+    [data-theme="dark"] nav{background:rgba(18,17,16,.94);border-bottom-color:var(--paper-4)}
+    [data-theme="dark"] .nav-link{color:var(--ink-3)}[data-theme="dark"] .nav-link:hover{color:var(--ink)}
+    [data-theme="dark"] footer{border-top-color:var(--paper-4)}
+    [data-theme="dark"] .what-card{background:linear-gradient(135deg,#1E1C19 0%,#242220 100%);border-color:var(--paper-4)}
+    [data-theme="dark"] .what-card:hover{background:var(--paper-3)}
+    [data-theme="dark"] .data-note-inner{background:var(--paper-2);border-color:var(--paper-4)}
   </style>
 </head>
 <body>
-
-<!-- NAV -->
 <nav>
   <div class="nav-inner">
     <div class="nav-logo">
-      <div class="nav-mark">
-        <svg viewBox="0 0 20 20" fill="none"><path d="M3 15l4-6 4 4 3-4 3 3" stroke="#F0ECE4" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      </div>
+      <div class="nav-mark"><svg viewBox="0 0 20 20" fill="none"><path d="M3 15l4-6 4 4 3-4 3 3" stroke="#F0ECE4" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
       <span class="nav-name">Valuation Studio</span>
     </div>
     <div class="nav-links">
-      <a href="#tools" class="nav-link">Tools</a>
+      <a href="#what" class="nav-link">What it does</a>
       <a href="#how" class="nav-link">How it works</a>
     </div>
     <button class="nav-dark-btn" id="idx-dark-btn" onclick="toggleIdxDark()" title="Toggle dark mode">🌙</button>
-    <a href="app.html?blank=1" class="nav-cta">
-      Open App
-      <svg viewBox="0 0 14 14" fill="none" width="11" height="11"><path d="M2.5 7h9M8 3.5L11.5 7 8 10.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
-    </a>
+    <a href="app.html?blank=1" class="nav-cta">Open App <svg viewBox="0 0 14 14" fill="none" width="11" height="11"><path d="M2.5 7h9M8 3.5L11.5 7 8 10.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
   </div>
 </nav>
-
-<!-- HERO -->
 <section class="hero">
   <div class="container">
-    <div class="hero-inner">
-      <div class="hero-left">
-        <h1 class="hero-headline fade-up d1">
-          Intrinsic value,<br><em>calculated</em><br>properly.
-        </h1>
-        <p class="hero-body fade-up d2">
-          A DCF toolkit for investors who want to think for themselves. Enter any company's numbers, set your own assumptions, and see what the stock is actually worth — or what return the current price implies.
-        </p>
-        <div class="hero-actions fade-up d3">
-          <a href="app.html?blank=1" class="btn-primary">
-            Open the App — Free
-            <svg viewBox="0 0 14 14" fill="none" width="13" height="13"><path d="M2.5 7h9M8 3.5L11.5 7 8 10.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          </a>
-          <a href="#tools" class="btn-outline">See the tools</a>
-        </div>
-        <p class="hero-disclaimer fade-up d4">For informational purposes only — not financial advice.</p>
+    <div class="hero-center">
+      <h1 class="hero-headline fade-up d1">What is this stock<br>actually <em>worth?</em></h1>
+      <p class="hero-body fade-up d2">A free DCF calculator that shows every step. Enter a company's numbers, set your own assumptions, and see the result — nothing hidden.</p>
+      <div class="hero-actions fade-up d3">
+        <a href="app.html?blank=1" class="btn-primary">Open the App <svg viewBox="0 0 14 14" fill="none" width="13" height="13"><path d="M2.5 7h9M8 3.5L11.5 7 8 10.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+        <a href="#what" class="btn-outline">Learn more</a>
       </div>
-
-      <div class="hero-right fade-up d3">
-        <div class="hero-card">
-          <div class="hc-header">
-            <div class="hc-title">Netflix (NFLX) — FY2025</div>
-            <div class="hc-badge">Example</div>
-          </div>
-          <div class="hc-body">
-            <div class="hc-row"><span class="hc-lbl">Revenue (LTM)</span><span class="hc-val">$45,183M</span></div>
-            <div class="hc-row"><span class="hc-lbl">Free Cash Flow</span><span class="hc-val pos">$9,461M</span></div>
-            <div class="hc-row"><span class="hc-lbl">FCF Margin</span><span class="hc-val pos">20.9%</span></div>
-            <div class="hc-row"><span class="hc-lbl">Net Debt</span><span class="hc-val neg">$4,500M</span></div>
-            <div class="hc-row"><span class="hc-lbl">Growth (8yr)</span><span class="hc-val">+12% / yr</span></div>
-            <div class="hc-row"><span class="hc-lbl">Market Price</span><span class="hc-val">$78.67</span></div>
-            <div class="hc-result">
-              <div class="hcr-lbl">Scenario grid preview — implied annual returns</div>
-              <div style="font-size:11px;color:var(--ink-4);margin-bottom:10px;line-height:1.5">Bear · Base · Bull scenarios across growth and terminal value assumptions.</div>
-              <div class="hm-grid">
-                <div class="hm-c" style="background:#fca5a5;color:#7f1d1d">5.2%</div>
-                <div class="hm-c" style="background:#fdd8b8;color:#78350f">7.1%</div>
-                <div class="hm-c" style="background:#fef9ee;color:#92400e">9.4%</div>
-                <div class="hm-c" style="background:#d1e8f0;color:#1a3a5c">11.8%</div>
-                <div class="hm-c" style="background:#93c5fd;color:#1e3a8a">14.2%</div>
-                <div class="hm-c" style="background:#fca5a5;color:#7f1d1d">6.1%</div>
-                <div class="hm-c" style="background:#fef9ee;color:#92400e">8.9%</div>
-                <div class="hm-c" style="background:#d1e8f0;color:#1a3a5c">11.2%</div>
-                <div class="hm-c" style="background:#93c5fd;color:#1e3a8a">13.5%</div>
-                <div class="hm-c" style="background:#3b82f6;color:#fff">16.1%</div>
-                <div class="hm-c" style="background:#fdd8b8;color:#78350f">7.8%</div>
-                <div class="hm-c" style="background:#fef9ee;color:#92400e">10.3%</div>
-                <div class="hm-c" style="background:#d1e8f0;color:#1a3a5c">12.7%</div>
-                <div class="hm-c" style="background:#3b82f6;color:#fff">15.2%</div>
-                <div class="hm-c" style="background:#1e3a8a;color:#fff">18.0%</div>
-              </div>
-              <div style="margin-top:12px;font-size:10.5px;color:var(--ink-5);font-family:var(--ff-mono);font-style:italic;text-align:center">Open the app to calculate with your own assumptions →</div>
-            </div>
-          </div>
-        </div>
+      <p class="hero-note fade-up d4">Free, no account needed. For informational purposes only — not financial advice.</p>
+    </div>
+  </div>
+</section>
+<section class="what-section reveal" id="what">
+  <div class="container">
+    <div class="what-grid">
+      <div class="what-card">
+        <div class="what-num">01 — Fair Value</div>
+        <div class="what-title">What should the stock cost?</div>
+        <div class="what-desc">Estimate how much cash the company will make over the next 10 years, bring it back to today's value, and divide by the number of shares. You get a fair price — shown alongside the market price so you can compare.</div>
+        <div class="what-ask">The question: "Is this stock cheap or expensive right now?"</div>
+      </div>
+      <div class="what-card">
+        <div class="what-num">02 — Implied Return</div>
+        <div class="what-title">What return does the price assume?</div>
+        <div class="what-desc">Flip the model. Instead of guessing what the stock should cost, start from the market price and work backwards. If the implied return is higher than your personal target, the stock might be worth a closer look.</div>
+        <div class="what-ask">The question: "If I buy at today's price, what am I signing up for?"</div>
+      </div>
+      <div class="what-card">
+        <div class="what-num">03 — Scenario Grid</div>
+        <div class="what-title">What if things turn out differently?</div>
+        <div class="what-desc">Nobody knows exactly how fast a company will grow. The grid tests many combinations of growth and exit assumptions — in bear, base, and bull cases. A heatmap shows which scenarios give good returns and which don't.</div>
+        <div class="what-ask">The question: "How much room for error do I have?"</div>
       </div>
     </div>
   </div>
 </section>
-
-<!-- TICKER STRIP -->
-<div class="ticker-strip">
-  <div class="container">
-    <div class="ticker-row">
-      <div class="ticker-left">
-        <span class="ticker-label">Pre-loaded</span>
-        <div class="ticker-pills">
-          <a href="app.html?preset=AAPL" class="ticker-pill"><span class="tp-sym">AAPL</span></a>
-          <a href="app.html?preset=MSFT" class="ticker-pill"><span class="tp-sym">MSFT</span></a>
-          <a href="app.html?preset=NVDA" class="ticker-pill"><span class="tp-sym">NVDA</span></a>
-          <a href="app.html?preset=META" class="ticker-pill"><span class="tp-sym">META</span></a>
-          <a href="app.html?preset=TSLA" class="ticker-pill"><span class="tp-sym">TSLA</span></a>
-          <a href="app.html?preset=NFLX" class="ticker-pill"><span class="tp-sym">NFLX</span></a>
-        </div>
-      </div>
-      <div class="ticker-right">
-        <div class="provenance-card">
-          <div class="prov-item">
-            <div class="prov-icon">📄</div>
-            <div>
-              <div class="prov-title">Financials</div>
-              <div class="prov-body">Most recent annual report</div>
-            </div>
-          </div>
-          <div class="prov-divider"></div>
-          <div class="prov-item">
-            <div class="prov-icon">📅</div>
-            <div>
-              <div class="prov-title">Prices verified</div>
-              <div class="prov-body">February 2026</div>
-            </div>
-          </div>
-          <div class="prov-divider"></div>
-          <div class="prov-item">
-            <div class="prov-icon">⚠️</div>
-            <div>
-              <div class="prov-title">Always confirm</div>
-              <div class="prov-body">Before any decision</div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- STATS -->
-<div class="stats-section reveal">
-  <div class="container">
-    <div class="stats-grid">
-      <div class="stat-item">
-        <div class="stat-num">3</div>
-        <div class="stat-lbl">Valuation tools</div>
-      </div>
-      <div class="stat-item">
-        <div class="stat-num">100+</div>
-        <div class="stat-lbl">Companies in database</div>
-      </div>
-      <div class="stat-item">
-        <div class="stat-num">100%</div>
-        <div class="stat-lbl">Free, no account needed</div>
-      </div>
-      <div class="stat-item">
-        <div class="stat-num">∞</div>
-        <div class="stat-lbl">Scenarios to explore</div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- TOOLS -->
-<section class="tools-section reveal" id="tools">
-  <div class="container">
-    <div class="section-eyebrow">The Three Tools</div>
-    <h2 class="section-title">Everything you need to value a stock properly.</h2>
-    <p class="section-body">No black boxes. All three tools share the same engine — estimate future cash, bring it back to today's value, and show you every step.</p>
-
-    <div class="tools-grid">
-      <div class="tool-card">
-        <div class="tool-num">01 — Normal DCF</div>
-        <div class="tool-title">Fair Value per Share</div>
-        <div class="tool-desc">Project free cash flow at your assumed growth rate, discount it back at your required return, add the terminal value. Outputs a fair value per share — colour-coded against the market price.</div>
-        <div class="tool-detail">
-          <span>→</span> Step-by-step calculation breakdown<br>
-          <span>→</span> Sensitivity chart across every discount rate<br>
-          <span>→</span> Gordon Growth or Exit Multiple terminal value<br>
-          <span>→</span> Full year-by-year forecast table &amp; CSV export
-        </div>
-      </div>
-      <div class="tool-card">
-        <div class="tool-num">02 — Reverse DCF</div>
-        <div class="tool-title">Implied Return</div>
-        <div class="tool-desc">Flip the model. Instead of asking what the company is worth, ask what return the current stock price implies. Compare to your own required return — you decide what's attractive.</div>
-        <div class="tool-detail">
-          <span>→</span> Step-by-step calculation breakdown<br>
-          <span>→</span> Interactive price slider with live readout<br>
-          <span>→</span> Implied IRR chart across price range<br>
-          <span>→</span> Sensitivity table &amp; CSV export
-        </div>
-      </div>
-      <div class="tool-card">
-        <div class="tool-num">03 — IRR Matrix</div>
-        <div class="tool-title">Scenario Grid</div>
-        <div class="tool-desc">Run the Reverse DCF across every combination of revenue growth and terminal assumption — in Bear, Base, and Bull margin scenarios simultaneously. View as a heatmap table or a line chart.</div>
-        <div class="tool-detail">
-          <span>→</span> Bear / Base / Bull side-by-side<br>
-          <span>→</span> Median return summary strip<br>
-          <span>→</span> Heatmap or chart view<br>
-          <span>→</span> CSV export per scenario
-        </div>
-      </div>
-    </div>
-
-    <div class="features-strip">
-      <div class="feat-cell">
-        <div class="feat-icon">🔍</div>
-        <div class="feat-title">Full transparency</div>
-        <div class="feat-body">Every result shows a step-by-step calculation. Every ⓘ button explains the input, formula, and company-specific data.</div>
-      </div>
-      <div class="feat-cell">
-        <div class="feat-icon">⬆</div>
-        <div class="feat-title">Share &amp; export</div>
-        <div class="feat-body">Share via URL, download PDF reports, or export CSV. All inputs encoded so anyone sees your exact analysis.</div>
-      </div>
-      <div class="feat-cell">
-        <div class="feat-icon">💱</div>
-        <div class="feat-title">Multi-currency</div>
-        <div class="feat-body">Financials in EUR, price in USD? Set an FX rate and fair value converts automatically.</div>
-      </div>
-      <div class="feat-cell">
-        <div class="feat-icon">📱</div>
-        <div class="feat-title">Any device, dark mode</div>
-        <div class="feat-body">Full access on phone, tablet, or desktop. Light and dark mode with sticky result bar on mobile.</div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- HOW IT WORKS -->
 <section class="how-section reveal" id="how">
   <div class="container">
-    <div class="section-eyebrow">How it works</div>
-    <h2 class="section-title">From zero to insight in minutes.</h2>
+    <div class="sec-eyebrow">How it works</div>
+    <div class="sec-title">Three steps, nothing hidden.</div>
+    <div class="sec-body">Every calculation is shown in plain English. Every input has an ⓘ button that explains what it means. You control the assumptions — the tool just does the math.</div>
     <div class="steps-row">
       <div class="step">
         <div class="step-num">01</div>
         <div class="step-rule"></div>
-        <div class="step-title">Search or enter a company</div>
-        <div class="step-body">Search for a company by name or ticker — all numbers load automatically from annual reports. Or type any company's numbers by hand. Always check pre-loaded data against the latest filings.</div>
-        <div class="step-note">Revenue · FCF · capex · net cash · shares · beta</div>
+        <div class="step-title">Load or enter a company</div>
+        <div class="step-body">Search for one of 100+ pre-loaded companies, or type any company's numbers by hand. Revenue, free cash flow, shares, and stock price — that's all you need.</div>
       </div>
       <div class="step">
         <div class="step-num">02</div>
         <div class="step-rule"></div>
         <div class="step-title">Set your assumptions</div>
-        <div class="step-body">Growth rate, margin change, years to forecast, terminal value method, and your required return (defaults to 12% for all stocks). Every ⓘ button explains what the input means and why that default was chosen.</div>
-        <div class="step-note">All sliders · results update live</div>
+        <div class="step-body">How fast will revenue grow? How long will you forecast? What return do you require? Move the sliders and watch the result update live.</div>
       </div>
       <div class="step">
         <div class="step-num">03</div>
         <div class="step-rule"></div>
-        <div class="step-title">See the full calculation</div>
-        <div class="step-body">Fair value and implied return both show a step-by-step breakdown — every number explained in plain English. No black boxes. Click ⓘ next to any result to understand exactly how it was calculated.</div>
-        <div class="step-note">Share via URL · Save PDF report · Export CSV · Dark mode</div>
+        <div class="step-title">Read the result</div>
+        <div class="step-body">Fair value, implied return, or a full scenario grid — each with a step-by-step breakdown you can export, share, or save as PDF.</div>
       </div>
     </div>
   </div>
 </section>
-
-<!-- CTA -->
+<div class="data-note reveal">
+  <div class="container">
+    <div class="data-note-inner">
+      <div class="data-note-icon">ℹ</div>
+      <div class="data-note-text"><strong>About the data.</strong> Pre-loaded company numbers come from the most recent annual reports available at time of entry. Stock prices are fetched live from Polygon.io. These figures may become outdated — always verify against the latest filings before making any decisions. You can also enter any company's numbers by hand.</div>
+    </div>
+  </div>
+</div>
 <section class="cta-section reveal">
   <div class="container" style="text-align:center">
     <div class="cta-rule"></div>
-    <h2 class="cta-headline">What's the stock<br>actually <em>worth?</em></h2>
-    <p class="cta-body">Open the app, enter your assumptions, and find out in under a minute.</p>
-    <a href="app.html?blank=1" class="btn-primary" style="display:inline-flex;margin:0 auto">
-      Open Valuation Studio — Free
-      <svg viewBox="0 0 14 14" fill="none" width="13" height="13"><path d="M2.5 7h9M8 3.5L11.5 7 8 10.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
-    </a>
-    <p class="cta-disclaimer">For informational purposes only — not financial or investment advice.</p>
+    <h2 class="cta-headline">Run the numbers<br><em>yourself.</em></h2>
+    <p class="cta-body">Open the app, set your assumptions, and decide for yourself.</p>
+    <a href="app.html?blank=1" class="btn-primary" style="display:inline-flex;margin:0 auto">Open Valuation Studio <svg viewBox="0 0 14 14" fill="none" width="13" height="13"><path d="M2.5 7h9M8 3.5L11.5 7 8 10.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
   </div>
 </section>
-
-<!-- FOOTER -->
 <footer>
   <div class="footer-inner">
     <div class="footer-brand">Valuation Studio</div>
-    <div class="footer-legal">For informational purposes only — not financial or investment advice. All outputs are illustrative. Users are solely responsible for their own investment decisions. Pre-loaded data may not reflect the latest filings.</div>
+    <div class="footer-legal">For informational purposes only — not financial or investment advice. All outputs are illustrative. Pre-loaded data may not reflect the latest filings — always verify.</div>
   </div>
 </footer>
-
 <script>
-  // Restore dark mode from app
-  (function(){
-    const t=localStorage.getItem('vs-theme');
-    if(t){document.documentElement.setAttribute('data-theme',t);}
-    const btn=document.getElementById('idx-dark-btn');
-    if(btn)btn.textContent=(localStorage.getItem('vs-theme')==='dark')?'☀️':'🌙';
-  })();
-
-  function toggleIdxDark(){
-    const isDark=document.documentElement.getAttribute('data-theme')==='dark';
-    const next=isDark?'light':'dark';
-    document.documentElement.setAttribute('data-theme',next);
-    localStorage.setItem('vs-theme',next);
-    document.getElementById('idx-dark-btn').textContent=next==='dark'?'☀️':'🌙';
-  }
-
-  // Scroll reveal
-  const obs = new IntersectionObserver((entries) => {
-    entries.forEach(e => { if(e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); } });
-  }, { threshold: 0.1 });
-  document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+  (function(){const t=localStorage.getItem('vs-theme');if(t)document.documentElement.setAttribute('data-theme',t);const btn=document.getElementById('idx-dark-btn');if(btn)btn.textContent=(localStorage.getItem('vs-theme')==='dark')?'☀️':'🌙'})();
+  function toggleIdxDark(){const isDark=document.documentElement.getAttribute('data-theme')==='dark';const next=isDark?'light':'dark';document.documentElement.setAttribute('data-theme',next);localStorage.setItem('vs-theme',next);document.getElementById('idx-dark-btn').textContent=next==='dark'?'☀️':'🌙'}
+  const obs=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');obs.unobserve(e.target)}})},{threshold:0.1});
+  document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
 </script>
 </body>
 </html>

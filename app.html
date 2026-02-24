@@ -657,16 +657,6 @@ input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.15)}
 .sc-val{font-family:var(--ff-head);font-size:28px;font-weight:700;letter-spacing:-1px;color:var(--ink)}
 .sc-sub{font-size:11px;color:var(--ink-4);margin-top:3px}
 
-/* ── Data provenance note ── */
-.data-provenance{
-  display:flex;align-items:flex-start;gap:7px;
-  background:var(--surface-2);border-radius:var(--r-sm);
-  padding:8px 11px;margin-bottom:8px;
-  font-size:11.5px;color:var(--ink-3);line-height:1.55;
-  border:1px solid var(--border-2);
-}
-.data-provenance strong{color:var(--ink-3);font-weight:500}
-
 /* ── Calc warning card ── */
 .calc-warn{
   background:var(--surface);border:1px solid rgba(168,56,46,.2);
@@ -1010,22 +1000,39 @@ input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.15)}
 [data-theme="dark"] .sc-col-badge.good{color:var(--green)}
 [data-theme="dark"] .sc-col-badge.bad{color:var(--red)}
 
+/* Scenario guide — collapsible */
+.sc-guide{margin:0 0 12px;border:1px solid var(--border-2);border-radius:var(--r-sm);background:var(--surface-2);overflow:hidden}
+.sc-guide-toggle{display:block;padding:10px 14px;font-size:12px;font-weight:500;color:var(--blue);cursor:pointer;user-select:none;list-style:none}
+.sc-guide-toggle::-webkit-details-marker{display:none}
+.sc-guide-toggle::before{content:'▸';display:inline-block;margin-right:6px;transition:transform .15s}
+.sc-guide[open] .sc-guide-toggle::before{transform:rotate(90deg)}
+.sc-guide-body{padding:0 14px 14px;font-size:12.5px;color:var(--ink-3);line-height:1.7}
+.sc-guide-body p{margin-bottom:8px}
+.sc-guide-body p:last-child{margin-bottom:0}
+.sc-guide-body strong{color:var(--ink-2);font-weight:500}
+
 /* Matrix controls */
-.mc-ctrl{
+.mc-ctrl{margin-bottom:10px;display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.mc-card{
   background:linear-gradient(135deg,#F9F7F2 0%,#F0EDE5 100%);
   border:1px solid rgba(28,26,22,.09);
-  border-radius:var(--r);padding:14px 16px;margin-bottom:10px;
-  display:grid;grid-template-columns:1fr 1fr;gap:14px;
+  border-radius:var(--r);overflow:hidden;
   box-shadow:0 2px 8px rgba(28,26,22,.05),inset 0 1px 0 rgba(255,255,255,.7);
 }
-[data-theme="dark"] .mc-ctrl{
+.mc-card:last-child{}
+[data-theme="dark"] .mc-card{
   background:linear-gradient(135deg,#1E1C19 0%,#242220 100%);
   border-color:rgba(240,236,228,.10);
   box-shadow:0 2px 8px rgba(0,0,0,.2),inset 0 1px 0 rgba(255,255,255,.04);
 }
-.mc-group-label{font-size:10.5px;font-weight:600;color:var(--ink-4);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;font-family:var(--ff-mono)}
-.mc-inputs{display:flex;gap:6px}
-.mc-inputs .field{flex:1;margin-bottom:0}
+.mc-card-hdr{padding:10px 16px;border-bottom:1px solid rgba(28,26,22,.07);font-size:10.5px;font-weight:600;color:var(--ink-4);text-transform:uppercase;letter-spacing:.5px;font-family:var(--ff-mono)}
+[data-theme="dark"] .mc-card-hdr{border-bottom-color:rgba(240,236,228,.06)}
+.mc-card-cells{display:grid;grid-template-columns:repeat(3,1fr)}
+.mc-card-cell{padding:10px 16px;border-right:1px solid rgba(28,26,22,.07)}
+.mc-card-cell:last-child{border-right:none}
+[data-theme="dark"] .mc-card-cell{border-right-color:rgba(240,236,228,.06)}
+.mc-card-cell label{display:block;font-size:10px;font-weight:600;color:var(--ink-4);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;font-family:var(--ff-mono)}
+.mc-card-cell input{width:100%;border:1px solid var(--border);border-radius:var(--r-sm);padding:6px 8px;font-size:13px;font-family:var(--ff-mono);font-weight:600;color:var(--ink);background:var(--bg);text-align:center}
 
 /* Heatmap */
 .hm-legend{
@@ -1181,6 +1188,7 @@ input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.15)}
   .irc-verdict{padding-left:0}
   .irc-inputs{grid-template-columns:1fr 1fr}
   .mc-ctrl{grid-template-columns:1fr}
+  .mc-card-cells{grid-template-columns:repeat(3,1fr)}
   .sc-cols{grid-template-columns:1fr}
   .stat-row{grid-template-columns:1fr}
   .rpc-top{flex-direction:column;gap:8px}
@@ -1244,7 +1252,7 @@ input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.15)}
         class="ticker-search-input"
         id="ticker-search"
         type="text"
-        placeholder="Search by ticker or company name…"
+        placeholder="Search or enter a company…"
         autocomplete="off"
         spellcheck="false"
         oninput="onTickerInput(this.value)"
@@ -1261,7 +1269,7 @@ input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.15)}
     </div>
   </div>
 
-  <div style="font-size:10.5px;color:var(--ink-4);margin-bottom:8px;line-height:1.4">Or try a popular one:</div>
+  <div style="font-size:10.5px;color:var(--ink-4);margin-bottom:8px;line-height:1.4">Quick start:</div>
   <div class="co-grid" id="co-grid">
     <button class="co-pill" onclick="loadPreset('AAPL')"><span class="pt">AAPL</span></button>
     <button class="co-pill" onclick="loadPreset('MSFT')"><span class="pt">MSFT</span></button>
@@ -1271,11 +1279,6 @@ input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.15)}
     <button class="co-pill" onclick="loadPreset('NFLX')"><span class="pt">NFLX</span></button>
   </div>
 
-  <!-- Data freshness note -->
-  <div class="data-provenance" id="data-provenance">
-    <svg viewBox="0 0 12 12" fill="none" width="10" height="10" style="flex-shrink:0;margin-top:1px"><circle cx="6" cy="6" r="5" stroke="currentColor" stroke-width="1.3"/><path d="M6 5v3.5M6 3.5v.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
-    <span id="provenance-text">Pick a company above, or type your own numbers below.</span>
-  </div>
   <!-- Per-company data dates (shown after load) -->
   <div class="data-dates" id="data-dates" style="display:none">
     <div class="dd-row"><span class="dd-lbl">Last filing</span><span class="dd-val" id="dd-filing">—</span></div>
@@ -1320,7 +1323,7 @@ input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.15)}
     </div>
 
     <!-- SBC input (editable) -->
-    <div id="sbc-field-wrap" style="display:none">
+    <div id="sbc-field-wrap">
       <div class="field" style="margin-bottom:4px">
         <label>Stock-based compensation (SBC)
           <button class="info-btn" onclick="showInfo('sbc')" title="About SBC"><svg viewBox="0 0 12 12"><circle cx="6" cy="3" r="0.8" fill="currentColor" stroke="none"/><path d="M6 5.5v4"/></svg></button>
@@ -1337,13 +1340,7 @@ input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.15)}
       </div>
     </div>
     <!-- CAPEX notes (acquisitions, intangibles, divestitures) -->
-    <div id="capex-notes-wrap" style="display:none">
-      <div style="background:var(--gold-bg);border:1px solid rgba(158,117,40,.18);border-radius:var(--r-sm);padding:6px 10px;margin-bottom:6px;line-height:1.5">
-        <div style="font-size:10px;font-weight:600;color:var(--gold-pill);text-transform:uppercase;letter-spacing:.4px;margin-bottom:3px;font-family:var(--ff-mono)">Not included in Capex</div>
-        <div id="capex-notes-list" style="font-size:11px;color:var(--ink-3)"></div>
-        <div style="font-size:10px;color:var(--ink-4);margin-top:3px;font-style:italic">Adjust FCF or Capex manually if you want to include these.</div>
-      </div>
-    </div>
+
     <div id="warn-fcf" class="warn">⚠ Negative cash flow — results may not be meaningful.</div>
     <div id="err-rev" class="err">Revenue must be a positive number.</div>
   </div>
@@ -1427,7 +1424,7 @@ input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.15)}
   <div class="sb-card">
     <div class="sl-row">
       <div class="sl-top"><span>How many years to project? <button class="info-btn" onclick="showInfo('years')" title="About this field"><svg viewBox="0 0 12 12"><circle cx="6" cy="3" r="0.8" fill="currentColor" stroke="none"/><path d="M6 5.5v4"/></svg></button></span><span id="lbl-years">8 yrs</span></div>
-      <input type="range" id="sl-years" min="3" max="20" step="1" value="8" oninput="onSl('years')"/>
+      <input type="range" id="sl-years" min="3" max="20" step="1" value="10" oninput="onSl('years')"/>
     </div>
     <div class="sl-row" style="margin-bottom:4px">
       <div class="sl-top"><span>How fast will revenue grow? <button class="info-btn" onclick="showInfo('cagr')" title="About this field"><svg viewBox="0 0 12 12"><circle cx="6" cy="3" r="0.8" fill="currentColor" stroke="none"/><path d="M6 5.5v4"/></svg></button></span><span id="lbl-cagr">10%</span></div>
@@ -1487,10 +1484,11 @@ input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.15)}
     <p class="mth-intro">All three tools use the same idea: how much cash will this company make in the future, and what is that worth today? Everything is shown step by step — no black boxes.</p>
 
     <div class="mth-sec">
-      <h2 class="mth-h2">Getting started — search or type your own</h2>
+      <h2 class="mth-h2">Getting started — search or enter manually</h2>
       <p class="mth-p">You have two ways to load a company:</p>
       <p class="mth-p"><strong>Search</strong> — type a ticker (like AAPL) or company name into the search box. We have over 100 companies with numbers already filled in from their latest annual reports. Pick one and everything loads automatically, including a live stock price.</p>
-      <p class="mth-p"><strong>Type your own</strong> — you can enter any company's numbers by hand: price, shares, revenue, free cash flow. This works for any company in the world, even private ones not in our list.</p>
+      <p class="mth-p"><strong>Enter manually</strong> — you can type any company's numbers by hand: price, shares, revenue, free cash flow. This works for any company in the world, even private ones not in our list.</p>
+      <div class="mth-note"><strong>Important:</strong> Pre-loaded numbers are sourced from annual reports and may become outdated. Always verify against the latest filings before making any decisions.</div>
       <div class="mth-note"><strong>Important:</strong> The pre-loaded numbers come from annual reports and are a starting point. Revenue, margins, and cash flows change every quarter. Always check the latest numbers before making decisions. The report date is shown in the sidebar.</div>
     </div>
 
@@ -1511,7 +1509,9 @@ input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.15)}
         Whole-firm mode (FCFF): (sum of all future cash − debt + cash on hand) ÷ shares
       </div>
       <p class="mth-p"><strong>Stock-based pay:</strong> By default, we subtract what the company gives employees in stock because it shrinks your ownership over time. This is the safer approach. You can turn this off under "Options" in the sidebar if you prefer the standard calculation.</p>
-      <p class="mth-p"><strong>Discount rate starts at 12%.</strong> The same number for every company. This is higher than what most stocks "should" return based on theory (usually 8–12%), giving you a built-in safety cushion. We use one number for everyone instead of guessing a different rate per stock — it's simpler and more honest. Move the slider to set your own target.</p>
+      <p class="mth-p"><strong>Discount rate starts at 12%.</strong> The same number for every company. This is higher than what most stocks "should" return based on theory (usually 8–12%), giving you a built-in safety cushion. Move the slider to set your own target.</p>
+      <p class="mth-p"><strong>Revenue growth defaults to 10%.</strong> This is roughly the long-run average return of the stock market, making it a neutral starting point. Every company is different — adjust it to match your own view.</p>
+      <p class="mth-p"><strong>Forecast period defaults to 10 years.</strong> Long enough for growing companies to show their potential, short enough to keep predictions honest. You can change this with the slider.</p>
       <p class="mth-p">Click the <strong>ⓘ button next to the fair value number</strong> to see the full step-by-step calculation — every number explained in plain language.</p>
       <div class="mth-note">When using perpetual growth, the growth rate must be lower than your discount rate — otherwise the math breaks.</div>
     </div>
@@ -1533,7 +1533,8 @@ input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.15)}
     <div class="mth-sec">
       <h2 class="mth-h2">4. Where the numbers come from</h2>
       <p class="mth-p">Every ⓘ button in the app opens a plain-English explanation of that number — where it came from, how it's used, and what to watch out for.</p>
-      <p class="mth-p"><strong>Stock prices:</strong> fetched live from Polygon.io (previous trading day close). <strong>Company numbers:</strong> from the latest annual report, including revenue, cash from operations, equipment spending, stock-based pay, shares, and cash/debt. The report date is shown in the sidebar.</p>
+      <p class="mth-p"><strong>Stock prices:</strong> fetched live from Polygon.io (previous trading day close). <strong>Company numbers:</strong> from the most recent annual report available at the time of entry, including revenue, cash from operations, equipment spending, stock-based pay, shares, and cash/debt. The report date is shown in the sidebar.</p>
+      <div class="mth-note"><strong>Data may be outdated.</strong> The pre-loaded figures were entered at a specific point in time and may not reflect the company's latest filings. Always check the numbers against the most recent reports before relying on them.</div>
     </div>
 
     <div class="mth-sec">
@@ -1563,8 +1564,8 @@ input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.15)}
     <div class="tab-panel active" id="tab-dcf">
       <div id="dcf-empty" class="empty">
         <svg viewBox="0 0 40 40" fill="none"><path d="M6 30l8-12 8 8 6-8 6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        <div class="empty-title">Pick a company to start</div>
-        <div class="empty-body" id="dcf-empty-body">Search for a company by name or ticker above — or type your own numbers in the sidebar. Every calculation is shown step by step.</div>
+        <div class="empty-title">Search or enter a company to start</div>
+        <div class="empty-body" id="dcf-empty-body">Search for a company in the database, or enter any company's numbers manually in the sidebar. Pre-loaded data may be out of date — always verify against the latest filings. Every calculation is shown step by step.</div>
       </div>
       <div id="dcf-content" style="display:none">
 
@@ -1633,8 +1634,8 @@ input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.15)}
     <div class="tab-panel" id="tab-rev">
       <div id="rev-empty" class="empty">
         <svg viewBox="0 0 40 40" fill="none"><circle cx="20" cy="20" r="12" stroke="currentColor" stroke-width="2"/><path d="M20 14v6l4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-        <div class="empty-title">Pick a company to see the implied return</div>
-        <div class="empty-body" id="rev-empty-body">Search for a company above or type your own numbers. The implied return tells you: what yearly return does today's price assume? Full step-by-step shown.</div>
+        <div class="empty-title">Search or enter a company to see the implied return</div>
+        <div class="empty-body" id="rev-empty-body">Search the database or enter numbers manually. The implied return tells you: what yearly return does today's price assume? Pre-loaded data should be verified before use.</div>
       </div>
       <div id="rev-content" style="display:none">
 
@@ -1702,8 +1703,8 @@ input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.15)}
     <div class="tab-panel" id="tab-matrix">
       <div id="matrix-empty" class="empty">
         <svg viewBox="0 0 40 40" fill="none"><rect x="6" y="6" width="11" height="11" rx="2" stroke="currentColor" stroke-width="1.8"/><rect x="23" y="6" width="11" height="11" rx="2" stroke="currentColor" stroke-width="1.8"/><rect x="6" y="23" width="11" height="11" rx="2" stroke="currentColor" stroke-width="1.8"/><rect x="23" y="23" width="11" height="11" rx="2" stroke="currentColor" stroke-width="1.8"/></svg>
-        <div class="empty-title">Pick a company to see the scenarios</div>
-        <div class="empty-body" id="matrix-empty-body">The grid shows your implied return across many different growth and exit assumptions at once.</div>
+        <div class="empty-title">Search or enter a company to see scenarios</div>
+        <div class="empty-body" id="matrix-empty-body">The scenario grid tests many combinations of growth and exit assumptions at once, showing your implied return for each. Pre-loaded data should be verified before use.</div>
       </div>
       <div id="matrix-content" style="display:none">
 
@@ -1712,6 +1713,20 @@ input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.15)}
 
         <!-- Scenario summary strip -->
         <div class="sc-strip" id="sc-strip"></div>
+
+        <!-- How to read this — collapsible beginner explanation -->
+        <details class="sc-guide" id="sc-guide">
+          <summary class="sc-guide-toggle">How to read this</summary>
+          <div class="sc-guide-body">
+            <p><strong>What is this grid?</strong> Each cell shows a number — that's the yearly return you'd earn if you bought the stock today and the company performed according to that particular combination of assumptions.</p>
+            <p><strong>Rows</strong> = how fast the company grows its revenue each year. Higher rows = faster growth.</p>
+            <p><strong>Columns</strong> = what happens after the forecast ends (the "terminal value"). Higher columns = more optimistic exit.</p>
+            <p><strong>Colours:</strong> Blue cells are higher returns (good). Red cells are lower returns (not as good). The darker the blue, the better the return. The darker the red, the worse.</p>
+            <p><strong>Bear / Base / Bull:</strong> Three versions of the same grid. Bear = margins get worse over time. Base = margins stay the same. Bull = margins improve. This gives you a range of outcomes.</p>
+            <p><strong>The summary strip above</strong> shows the middle (median) result across all the cells in each scenario — so you can quickly see the typical outcome, not just the best or worst case.</p>
+            <p><strong>How to use it:</strong> Find the row and column that match what you think is most likely. If that cell shows a return higher than your target (like 12%), the stock might be worth a closer look. If most of the grid is blue, there's a wide margin of safety. If most is red, the stock may be priced for perfection.</p>
+          </div>
+        </details>
 
         <!-- View toggle -->
         <div class="mx-view-toggle">
@@ -1801,20 +1816,20 @@ input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.15)}
 
         <!-- Matrix controls -->
         <div class="mc-ctrl" id="mc-ctrl">
-          <div>
-            <div class="mc-group-label">Rows — revenue growth range</div>
-            <div class="mc-inputs">
-              <div class="field"><label>Min %</label><input type="number" id="mc-gmin" value="0" step="1" oninput="renderMatrix()"/></div>
-              <div class="field"><label>Max %</label><input type="number" id="mc-gmax" value="20" step="1" oninput="renderMatrix()"/></div>
-              <div class="field"><label>Rows</label><input type="number" id="mc-grows" value="6" min="2" max="12" oninput="renderMatrix()"/></div>
+          <div class="mc-card">
+            <div class="mc-card-hdr">Rows — revenue growth range</div>
+            <div class="mc-card-cells">
+              <div class="mc-card-cell"><label>Min %</label><input type="number" id="mc-gmin" value="0" step="1" oninput="renderMatrix()"/></div>
+              <div class="mc-card-cell"><label>Max %</label><input type="number" id="mc-gmax" value="20" step="1" oninput="renderMatrix()"/></div>
+              <div class="mc-card-cell"><label>Rows</label><input type="number" id="mc-grows" value="6" min="2" max="12" oninput="renderMatrix()"/></div>
             </div>
           </div>
-          <div>
-            <div class="mc-group-label" id="mc-col-lbl">Columns — terminal growth range</div>
-            <div class="mc-inputs">
-              <div class="field"><label id="mc-min-lbl">Min %</label><input type="number" id="mc-tmin" value="0" step="0.5" oninput="renderMatrix()"/></div>
-              <div class="field"><label id="mc-max-lbl">Max %</label><input type="number" id="mc-tmax" value="4" step="0.5" oninput="renderMatrix()"/></div>
-              <div class="field"><label>Cols</label><input type="number" id="mc-tcols" value="5" min="2" max="10" oninput="renderMatrix()"/></div>
+          <div class="mc-card">
+            <div class="mc-card-hdr" id="mc-col-lbl">Columns — terminal growth range</div>
+            <div class="mc-card-cells">
+              <div class="mc-card-cell"><label id="mc-min-lbl">Min %</label><input type="number" id="mc-tmin" value="0" step="0.5" oninput="renderMatrix()"/></div>
+              <div class="mc-card-cell"><label id="mc-max-lbl">Max %</label><input type="number" id="mc-tmax" value="4" step="0.5" oninput="renderMatrix()"/></div>
+              <div class="mc-card-cell"><label>Cols</label><input type="number" id="mc-tcols" value="5" min="2" max="10" oninput="renderMatrix()"/></div>
             </div>
           </div>
         </div>
@@ -1860,12 +1875,12 @@ input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.15)}
    PRESETS
 ══════════════════════════════════════════ */
 const PRESETS={
-  NFLX:{company:'Netflix (NFLX)',price:'78.67',shares:'4317',revenue:'45183',fcf:'9461',netcash:'-4500',cagr:12,dpp:0,years:8,termMode:'growth',tg:3,tmult:'15',fccy:'USD',pccy:'USD'},
-  AAPL:{company:'Apple (AAPL)',price:'264',shares:'14680',revenue:'416161',fcf:'98767',netcash:'34000',cagr:8,dpp:0.2,years:8,termMode:'growth',tg:2.5,tmult:'20',fccy:'USD',pccy:'USD'},
-  MSFT:{company:'Microsoft (MSFT)',price:'397',shares:'7433',revenue:'281724',fcf:'71611',netcash:'27000',cagr:15,dpp:0.1,years:8,termMode:'growth',tg:3,tmult:'20',fccy:'USD',pccy:'USD'},
-  NVDA:{company:'Nvidia (NVDA)',price:'190',shares:'24400',revenue:'130497',fcf:'60853',netcash:'38000',cagr:30,dpp:0,years:8,termMode:'growth',tg:3,tmult:'25',fccy:'USD',pccy:'USD'},
-  META:{company:'Meta (META)',price:'656',shares:'2530',revenue:'164501',fcf:'52100',netcash:'52000',cagr:15,dpp:0.2,years:8,termMode:'growth',tg:3,tmult:'18',fccy:'USD',pccy:'USD'},
-  TSLA:{company:'Tesla (TSLA)',price:'412',shares:'3200',revenue:'94830',fcf:'6200',netcash:'44100',cagr:20,dpp:0.5,years:8,termMode:'growth',tg:3,tmult:'20',fccy:'USD',pccy:'USD'},
+  NFLX:{company:'Netflix (NFLX)',price:'78.67',shares:'4317',revenue:'45183',fcf:'9461',netcash:'-4500',cagr:12,dpp:0,years:10,termMode:'growth',tg:3,tmult:'15',fccy:'USD',pccy:'USD'},
+  AAPL:{company:'Apple (AAPL)',price:'264',shares:'14680',revenue:'416161',fcf:'98767',netcash:'34000',cagr:8,dpp:0.2,years:10,termMode:'growth',tg:2.5,tmult:'20',fccy:'USD',pccy:'USD'},
+  MSFT:{company:'Microsoft (MSFT)',price:'397',shares:'7433',revenue:'281724',fcf:'71611',netcash:'27000',cagr:15,dpp:0.1,years:10,termMode:'growth',tg:3,tmult:'20',fccy:'USD',pccy:'USD'},
+  NVDA:{company:'Nvidia (NVDA)',price:'190',shares:'24400',revenue:'130497',fcf:'60853',netcash:'38000',cagr:30,dpp:0,years:10,termMode:'growth',tg:3,tmult:'25',fccy:'USD',pccy:'USD'},
+  META:{company:'Meta (META)',price:'656',shares:'2530',revenue:'164501',fcf:'52100',netcash:'52000',cagr:15,dpp:0.2,years:10,termMode:'growth',tg:3,tmult:'18',fccy:'USD',pccy:'USD'},
+  TSLA:{company:'Tesla (TSLA)',price:'412',shares:'3200',revenue:'94830',fcf:'6200',netcash:'44100',cagr:20,dpp:0.5,years:10,termMode:'growth',tg:3,tmult:'20',fccy:'USD',pccy:'USD'},
 };
 // Guard flag — prevents the company-name input listener from clearing fields during programmatic load
 let _loadingPreset = false;
@@ -1883,14 +1898,19 @@ var _store = {
 ══════════════════════════════════════════ */
 // ── Live price fetch — completely sandboxed, never throws ──────────────
 // Uses Polygon.io end-of-day API. Add your free key at polygon.io to enable.
-// If no key, or fetch fails for ANY reason, the stored price stays. Silent.
 var POLYGON_KEY = 'Jh93BPZQd6Hn83xAIHbCP4gqJXB2LXwC';
+
+function _showPriceFail(filingDate) {
+  var field = document.getElementById('inp-price');
+  if (field && !field.value) {
+    setDataDates(filingDate || '—', 'Enter price manually');
+  }
+}
 
 function tryFetchLivePrice(ticker, filingDate) {
   // Hard exit if no key
-  if (!POLYGON_KEY || POLYGON_KEY === 'YOUR_POLYGON_KEY') return;
+  if (!POLYGON_KEY || POLYGON_KEY === 'YOUR_POLYGON_KEY') { _showPriceFail(filingDate); return; }
 
-  // Map tickers that differ in Polygon's system
   var pt = ({
     'BRK-B': 'BRK.B',
     'GOOGL': 'GOOGL',
@@ -1899,33 +1919,31 @@ function tryFetchLivePrice(ticker, filingDate) {
 
   var url = 'https://api.polygon.io/v2/aggs/ticker/' + pt + '/prev?adjusted=true&apiKey=' + POLYGON_KEY;
 
-  // Completely wrapped — nothing can escape this try/catch
   try {
-    if (typeof XMLHttpRequest === 'undefined') return;
+    if (typeof XMLHttpRequest === 'undefined') { _showPriceFail(filingDate); return; }
     var xhr = new XMLHttpRequest();
     xhr.timeout = 8000;
     xhr.open('GET', url, true);
     xhr.onload = function() {
       try {
-        if (xhr.status !== 200) return;
+        if (xhr.status !== 200) { _showPriceFail(filingDate); return; }
         var data = JSON.parse(xhr.responseText);
         var r = data && data.results && data.results[0];
-        if (!r || !r.c) return; // weekend / holiday
+        if (!r || !r.c) { _showPriceFail(filingDate); return; }
         var px = String(r.c);
-        var dateStr = r.t ? new Date(r.t).toLocaleDateString('en-GB', {day:'numeric',month:'short',year:'numeric'}) : '21 Feb 2025';
-        // Only update if user hasn't manually edited the price field
+        var dateStr = r.t ? new Date(r.t).toLocaleDateString('en-GB', {day:'numeric',month:'short',year:'numeric'}) : '';
         var field = document.getElementById('inp-price');
-        if (field) {
+        if (field && !field.value) {
           field.value = px;
           setDataDates(filingDate, 'Live · ' + dateStr);
           update();
         }
-      } catch(e) { /* silent */ }
+      } catch(e) { _showPriceFail(filingDate); }
     };
-    xhr.onerror   = function() { /* silent */ };
-    xhr.ontimeout = function() { /* silent */ };
+    xhr.onerror   = function() { _showPriceFail(filingDate); };
+    xhr.ontimeout = function() { _showPriceFail(filingDate); };
     xhr.send();
-  } catch(e) { /* silent */ }
+  } catch(e) { _showPriceFail(filingDate); }
 }
 
 
@@ -2056,6 +2074,8 @@ const SEC_LABEL = {
 function pf(s){
   if(s===null||s===undefined||s==='')return NaN;
   s=String(s).trim();
+  // Strip any spaces used as thousand separators (regular, thin, non-breaking)
+  s=s.replace(/[\s\u2009\u00A0]/g,'');
   // Detect comma-as-decimal: if comma appears once and after it are exactly 1-2 digits at end
   // e.g. "199,78" or "1,5" → treat comma as decimal point
   // But "1,000" or "1,000,000" → treat commas as thousand separators
@@ -2124,7 +2144,7 @@ function impliedIRR(inp,price){
 let termMode='growth',activeTab='dcf';
 let _sensData=[],_revData=[],_forecastRows=[];
 
-function fmt(n,d=2){if(!isFinite(n))return'—';return n.toLocaleString('en-US',{minimumFractionDigits:d,maximumFractionDigits:d})}
+function fmt(n,d=2){if(!isFinite(n))return'—';var s=n.toLocaleString('en-US',{minimumFractionDigits:d,maximumFractionDigits:d});return s.replace(/,/g,'\u2009')}
 function fmtPct(n,d=1){if(!isFinite(n))return'—';return(n>=0?'+':'')+fmt(n*100,d)+'%'}
 function fmtPctPlain(n,d=1){return fmt(n*100,d)+'%'}
 function cssVar(v){return getComputedStyle(document.documentElement).getPropertyValue(v).trim()}
@@ -2150,7 +2170,7 @@ function getInputs(){
     useFCFF:document.getElementById('toggle-fcff')?.checked||false,
     cagr:parseInt(document.getElementById('sl-cagr').value)/100,
     dpp:parseFloat(document.getElementById('sl-dpp').value)/100,
-    years:parseInt(document.getElementById('sl-years').value)||8,
+    years:parseInt(document.getElementById('sl-years').value)||10,
     disc:parseInt(document.getElementById('sl-disc').value)/100,
     termMode,
     tg:parseFloat(document.getElementById('sl-tg').value)/100,
@@ -2194,11 +2214,12 @@ function onFCFFToggle() {
    SBC HANDLING — stock-based compensation
 ══════════════════════════════════════════ */
 let _currentSBC = 0; // SBC amount for currently loaded company
+let _baseFCF = null; // FCF before SBC adjustment (from DB or manual entry)
+let _recalcingFCF = false; // flag to prevent circular updates
 
 function onSBCToggle() {
   const subtractSBC = document.getElementById('toggle-sbc').checked;
-  const sbc = pf(document.getElementById('inp-sbc').value) || 0;
-  // Show/hide SBC field
+  // Always show/hide SBC field based on toggle
   document.getElementById('sbc-field-wrap').style.display = subtractSBC ? '' : 'none';
   // Recalculate FCF based on toggle
   recalcFCFWithSBC();
@@ -2207,17 +2228,19 @@ function onSBCToggle() {
 
 function onSBCInput() {
   recalcFCFWithSBC();
+  _checkShowReset();
   update();
 }
 
 function recalcFCFWithSBC() {
-  const co = _currentTicker ? DB_MAP[_currentTicker] : null;
-  if (!co) return;
+  // Works for both DB-loaded companies and manual entry
+  if (_baseFCF === null) return; // no base FCF set yet
   const subtractSBC = document.getElementById('toggle-sbc').checked;
   const sbc = pf(document.getElementById('inp-sbc').value) || 0;
-  const baseFCF = co.fcf; // FCF without SBC adjustment
-  const adjFCF = subtractSBC ? baseFCF - sbc : baseFCF;
+  const adjFCF = subtractSBC ? _baseFCF - sbc : _baseFCF;
+  _recalcingFCF = true;
   document.getElementById('inp-fcf').value = fmt(adjFCF, 0);
+  _recalcingFCF = false;
 }
 
 function applySBCToFCF(co) {
@@ -2390,19 +2413,19 @@ const INFO_CONTENT = {
     body: `
       <div class="im-section">
         <div class="im-section-title">What is this?</div>
-        <p>This is how many years we look ahead and try to predict the company's cash flow, one year at a time. It's like saying "I'm going to guess how much this lemonade stand will make for the next 8 summers."</p>
+        <p>This is how many years we look ahead and try to predict the company's cash flow, one year at a time. It's like saying "I'm going to guess how much this lemonade stand will make for the next 10 summers."</p>
       </div>
       <div class="im-section">
-        <div class="im-section-title">Our default: 8 years</div>
-        <p>We use <strong>8 years</strong> as the default. Why?</p>
+        <div class="im-section-title">Our default: 10 years</div>
+        <p>We use <strong>10 years</strong> as the default. Why?</p>
         <p style="margin-top:6px">It's a sweet spot. Too short (3–4 years) and you miss a lot of the company's future growth. Too long (15+ years) and your guesses get really unreliable — nobody can predict that far ahead accurately.</p>
-        <p style="margin-top:6px">8 years gives fast-growing companies enough time to show their potential, while keeping us honest about the limits of predicting the future.</p>
+        <p style="margin-top:6px">10 years gives growing companies enough time to show their potential, while keeping us honest about the limits of predicting the future.</p>
         <div class="im-note">After these years, the "terminal value" takes over — that's our way of saying "and then it grows slowly forever." In most models, 60–80% of the fair value actually comes from that forever part.</div>
       </div>
       <div class="im-section">
         <div class="im-section-title">When to change it</div>
         <p><strong>Shorter (3–5 years):</strong> for big, slow-growing companies where the growth phase is basically over.</p>
-        <p><strong>Longer (10–15 years):</strong> for young, fast-growing companies where you believe the high growth will last a long time.</p>
+        <p><strong>Longer (12–15 years):</strong> for young, fast-growing companies where you believe the high growth will last a long time.</p>
       </div>
     `
   },
@@ -2418,9 +2441,10 @@ const INFO_CONTENT = {
       </div>
       <div class="im-section">
         <div class="im-section-title">How we chose the default</div>
-        <p>When you load a company, we look at how fast it <strong>actually grew historically</strong>, then <strong>subtract 2 percentage points</strong> as a safety cushion. Why?</p>
-        <p style="margin-top:6px">Because companies almost never keep growing as fast as they did in the past. Growth usually slows down as a company gets bigger. By starting a bit lower than history, we're being cautious — which helps protect you from overpaying.</p>
-        <div class="im-note">Example: If a company grew 15% historically, we default to 13%. If it grew 5%, we default to 3%.</div>
+        <p>We default to <strong>10% revenue growth</strong> for every company. Why?</p>
+        <p style="margin-top:6px">The long-run average return of the stock market is roughly 10% per year, which makes it a sensible neutral starting point. It's high enough to be realistic for healthy growing companies, but conservative enough that you're not baking in aggressive assumptions from the start.</p>
+        <p style="margin-top:6px">Of course, every company is different — a mature utility won't grow at 10%, and a hot tech company might grow much faster. That's why this is a slider: adjust it to match your own view of the company.</p>
+        <div class="im-note">Tip: Start at 10%, then ask yourself — does this company deserve a higher or lower growth rate? Adjust from there.</div>
       </div>
       <div class="im-section">
         <div class="im-section-title">How much does it matter?</div>
@@ -2437,7 +2461,7 @@ const INFO_CONTENT = {
         <div class="im-section-title">What is this?</div>
         <p>The "FCF margin" is what percentage of revenue turns into actual free cash. If a company makes $100 in sales and keeps $20 as free cash, its margin is 20%.</p>
         <p style="margin-top:6px">This slider lets you say: <strong>"I think the margin will go up (or down) a little bit each year."</strong> It's measured in "percentage points per year" (pp/yr).</p>
-        <p style="margin-top:6px">For example: if the margin starts at 20% and you set +0.5pp/yr, after 8 years the margin would be 24%.</p>
+        <p style="margin-top:6px">For example: if the margin starts at 20% and you set +0.5pp/yr, after 10 years the margin would be 25%.</p>
       </div>
       <div class="im-section">
         <div class="im-section-title">How we chose the default</div>
@@ -2459,7 +2483,7 @@ const INFO_CONTENT = {
     body: `
       <div class="im-section">
         <div class="im-section-title">What is this?</div>
-        <p>After our year-by-year forecast ends (say, after 8 years), the company doesn't just disappear. It keeps making money! The <strong>terminal value</strong> is our way of estimating all that future cash in one big number.</p>
+        <p>After our year-by-year forecast ends (say, after 10 years), the company doesn't just disappear. It keeps making money! The <strong>terminal value</strong> is our way of estimating all that future cash in one big number.</p>
         <p style="margin-top:6px">This is actually the <strong>most important part</strong> of the model — typically 60–80% of the total fair value comes from the terminal value. So small changes here make a big difference.</p>
       </div>
       <div class="im-section">
@@ -2620,6 +2644,33 @@ function _dynamicInfo(key) {
   return null;
 }
 
+function _parseCN(note) {
+  // Parse raw shorthand notes like "Cash Aq of 5279" into structured, professional descriptions
+  var lower = note.toLowerCase().trim();
+  // Extract the numeric amount (last number token, commas may be decimal separators)
+  var amtMatch = note.match(/[\d]+[,.]?[\d]*/g);
+  var rawAmt = amtMatch ? amtMatch[amtMatch.length - 1] : null;
+  var numVal = rawAmt ? parseFloat(rawAmt.replace(',', '.')) : 0;
+  var fmtAmt = fmt(numVal, 0);
+
+  if (/cash\s*a[qc]/i.test(lower)) {
+    return { label: 'Cash paid for acquisitions', amount: fmtAmt, deduct: true };
+  }
+  if (/intangible/i.test(lower) && /purchase|pursch/i.test(lower)) {
+    return { label: 'Purchases of intangible assets', amount: fmtAmt, deduct: true };
+  }
+  if (/sale.*intangible/i.test(lower)) {
+    return { label: 'Proceeds from intangible asset sales', amount: fmtAmt, deduct: false };
+  }
+  if (/sale.*cap/i.test(lower)) {
+    return { label: 'Proceeds from asset sales', amount: fmtAmt, deduct: false };
+  }
+  if (/divestit/i.test(lower)) {
+    return { label: 'Proceeds from divestitures', amount: fmtAmt, deduct: false };
+  }
+  return { label: note, amount: fmtAmt, deduct: false };
+}
+
 function showInfo(key) {
   // Try dynamic generator first
   const dyn = _dynamicInfo(key);
@@ -2656,8 +2707,36 @@ function showInfo(key) {
             </span>
           </div>
           <p style="margin-top:8px">FCF margin: <strong>${margin}%</strong> of revenue (${fmt(co.rev,0)} M).${sbcVal > 0 ? ` SBC of ${fmt(sbcVal,0)} M represents ${fmt(sbcVal/ocf*100,1)}% of operating cash flow.` : ''}</p>
-          ${co.cn && co.cn.length > 0 ? `<p style="margin-top:6px;font-size:12px;color:var(--ink-4)"><strong>Note:</strong> ${co.cn.join('; ')} — not included in Capex above.</p>` : ''}
         </div>`;
+      // ── Additional investing activities (cn notes) ──
+      if (co.cn && co.cn.length > 0) {
+        const parsed = co.cn.map(_parseCN);
+        const deductions = parsed.filter(p => p.deduct);
+        const additions = parsed.filter(p => !p.deduct);
+        let cnHtml = `<div class="im-section">
+          <div class="im-section-title">Other investing activities not included in FCF</div>
+          <p style="margin-bottom:8px">The following items from the cash flow statement are <strong>not</strong> included in the free cash flow figure above. Depending on the company, you may want to factor them in.</p>
+          <div class="im-formula">`;
+        if (deductions.length > 0) {
+          deductions.forEach(d => {
+            cnHtml += `${d.label}: <strong>${d.amount} M ${co.cur}</strong><br>`;
+          });
+        }
+        if (additions.length > 0) {
+          additions.forEach(a => {
+            cnHtml += `${a.label}: <strong>${a.amount} M ${co.cur}</strong><br>`;
+          });
+        }
+        cnHtml += `</div>`;
+        if (deductions.length > 0) {
+          cnHtml += `<p style="margin-top:8px"><strong>When to deduct:</strong> If the company makes <em>regular, recurring</em> acquisitions or intangible asset purchases as part of its core business strategy, consider subtracting these from free cash flow. One-off transactions may not need adjustment.</p>`;
+        }
+        if (additions.length > 0) {
+          cnHtml += `<p style="margin-top:8px"><strong>When to add back:</strong> Proceeds from asset sales or divestitures increase cash available to shareholders. If these are non-recurring, they may not recur in future years — consider whether to include them.</p>`;
+        }
+        cnHtml += `<div class="im-note">These amounts are shown for reference only. To adjust, manually edit the Free Cash Flow field in the sidebar.</div></div>`;
+        extraHtml += cnHtml;
+      }
     }
     document.getElementById('im-title').textContent = c.title;
     document.getElementById('im-subtitle').textContent = c.subtitle;
@@ -2737,23 +2816,74 @@ function onDiscChange(){
 function setDisc(v){document.getElementById('sl-disc').value=v;onDiscChange();}
 
 // Event bindings — deferred to ensure DOM is ready in all environments
+// Auto-format number with thin-space thousands on blur
+function _autoFmtNum(el) {
+  var raw = el.value.trim();
+  if (!raw) return;
+  var n = pf(raw);
+  if (!isFinite(n)) return;
+  // Format: integer part gets thin spaces, preserve decimals
+  var isNeg = n < 0;
+  var abs = Math.abs(n);
+  var parts = abs.toString().split('.');
+  var intPart = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, '\u2009');
+  el.value = (isNeg ? '-' : '') + intPart + (parts[1] !== undefined ? '.' + parts[1] : '');
+}
+
+// Check if any input field has a value and show/hide reset button
+function _checkShowReset() {
+  var hasAny = ['inp-company','inp-price','inp-shares','inp-revenue','inp-fcf','inp-netcash','inp-sbc'].some(function(id) {
+    var el = document.getElementById(id);
+    return el && el.value.trim() !== '';
+  });
+  var rb = document.getElementById('btn-reset');
+  if (rb) rb.style.display = hasAny ? '' : 'none';
+}
+
 function _bindInputEvents() {
   ['inp-price','inp-shares','inp-revenue','inp-fcf','inp-netcash']
     .forEach(function(id){
       var el = document.getElementById(id);
-      if(el) el.addEventListener('input',function(){clearPills();update();});
+      if(el) {
+        el.addEventListener('input',function(){
+          clearPills();
+          // Track base FCF when user manually types in FCF field
+          if(id === 'inp-fcf' && !_recalcingFCF) {
+            var val = pf(this.value);
+            if(isFinite(val)) {
+              var sbcOn = document.getElementById('toggle-sbc').checked;
+              var sbcAmt = pf(document.getElementById('inp-sbc').value) || 0;
+              // What user typed is the adjusted value; base = adjusted + SBC
+              _baseFCF = sbcOn ? val + sbcAmt : val;
+            }
+          }
+          _checkShowReset();
+          update();
+        });
+        el.addEventListener('blur',function(){_autoFmtNum(this);});
+      }
     });
+
+  // SBC blur auto-format
+  var sbcEl = document.getElementById('inp-sbc');
+  if(sbcEl) sbcEl.addEventListener('blur', function(){ _autoFmtNum(this); });
 
   var companyEl = document.getElementById('inp-company');
   if(companyEl) companyEl.addEventListener('input',function(){
     if(_loadingPreset) return;
     clearPills();
     if(this.value.trim()===''){
+      _currentTicker = null;
+      _baseFCF = null;
       ['inp-price','inp-shares','inp-revenue','inp-fcf','inp-netcash'].forEach(function(id){
         var el=document.getElementById(id); if(el) el.value='';
       });
-      var rb=document.getElementById('btn-reset'); if(rb) rb.style.display='none';
+      var dd=document.getElementById('data-dates'); if(dd) dd.style.display='none';
+      var sw=document.getElementById('sb-sum-wrap'); if(sw) sw.style.display='none';
+      var pcl=document.getElementById('price-check-link'); if(pcl) pcl.style.display='none';
+      document.getElementById('inp-sbc').value='';
     }
+    _checkShowReset();
     update();
   });
 }
@@ -2818,6 +2948,7 @@ function loadPreset(key, isAuto) {
   g('inp-shares').value  = p.shares;
   g('inp-revenue').value = p.revenue;
   g('inp-fcf').value     = p.fcf;
+  _baseFCF = pf(p.fcf);
   g('inp-netcash').value = p.netcash;
   g('sl-cagr').value     = p.cagr;  g('lbl-cagr').textContent = p.cagr + '%'; syncBenchPills();
   g('sl-dpp').value      = p.dpp;   g('lbl-dpp').textContent  = p.dpp.toFixed(1) + 'pp';
@@ -2830,17 +2961,15 @@ function loadPreset(key, isAuto) {
   onCurrencyChange();
   g('btn-reset').style.display = '';
 
-  // Set price from DB (stored Feb 2025), fall back to PRESETS price
-  var storedPx = p.price || '';
-  g('inp-price').value = storedPx;
+  // Price: always fetch live, never use stored
+  g('inp-price').value = '';
   _loadingPreset = false;
 
-  // Show provenance
-  setDataDates('Annual report', 'Stored · Feb 2025');
-  var prov = document.getElementById('provenance-text');
-  if (prov) prov.textContent = p.company;
+  setDataDates('Annual report', 'Fetching price…');
 
   update();
+  // Try to fetch live price for preset ticker
+  tryFetchLivePrice(key, 'Annual report');
   } catch(e) { _loadingPreset = false; }
 }
 
@@ -2849,14 +2978,22 @@ function resetInputs(){
   clearPills();
   _currentTicker = null;
   _currentSBC = 0;
-  var sbcWrap = document.getElementById('sbc-field-wrap');
-  if (sbcWrap) sbcWrap.style.display = 'none';
+  _baseFCF = null;
   document.getElementById('inp-sbc').value = '';
   document.getElementById('toggle-sbc').checked = true;
-  var cnWrap = document.getElementById('capex-notes-wrap');
-  if (cnWrap) cnWrap.style.display = 'none';
+  // SBC field stays visible since toggle is on
+  var sbcWrap = document.getElementById('sbc-field-wrap');
+  if (sbcWrap) sbcWrap.style.display = '';
+  // Hide data dates and summary
+  var ddWrap = document.getElementById('data-dates');
+  if (ddWrap) ddWrap.style.display = 'none';
+  var sumWrap = document.getElementById('sb-sum-wrap');
+  if (sumWrap) sumWrap.style.display = 'none';
+  // Hide price check link
+  var pcl = document.getElementById('price-check-link');
+  if (pcl) pcl.style.display = 'none';
   ['inp-company','inp-price','inp-shares','inp-revenue','inp-fcf','inp-netcash'].forEach(id=>document.getElementById(id).value='');
-  document.getElementById('sl-years').value=8;document.getElementById('lbl-years').textContent='8 yrs';
+  document.getElementById('sl-years').value=10;document.getElementById('lbl-years').textContent='10 yrs';
   document.getElementById('sl-cagr').value=10;document.getElementById('lbl-cagr').textContent='10%';syncBenchPills();
   document.getElementById('sl-dpp').value=0;document.getElementById('lbl-dpp').textContent='0.0pp';
   document.getElementById('sl-tg').value=2.5;document.getElementById('lbl-tg').textContent='2.5%';
@@ -3167,6 +3304,7 @@ function loadFromURL(){
   const set=(id,v)=>{if(v&&v!=='null')document.getElementById(id).value=v};
   set('inp-company',p.get('co'));set('inp-price',p.get('px'));set('inp-shares',p.get('sh'));
   set('inp-revenue',p.get('rev'));set('inp-fcf',p.get('fcf'));set('inp-netcash',p.get('nc'));
+  if(p.get('fcf')) _baseFCF = pf(p.get('fcf'));
   if(p.get('yr')){const v=+p.get('yr');document.getElementById('sl-years').value=v;document.getElementById('lbl-years').textContent=v+' yrs'}
   if(p.get('tmult')){const v=+p.get('tmult');if(v>0){document.getElementById('sl-tmult').value=v;document.getElementById('lbl-tmult').textContent=v.toFixed(1)+'×';}}
   if(p.get('cagr')){const v=+p.get('cagr');document.getElementById('sl-cagr').value=v;document.getElementById('lbl-cagr').textContent=v+'%';syncBenchPills()}
@@ -4324,7 +4462,7 @@ function drawMatrixChart(scenarioKey){
 /* ══════════════════════════════════════════
    CSV
 ══════════════════════════════════════════ */
-function dlCSV(fn,rows){const c=rows.map(r=>r.map(c=>`"${String(c).replace(/"/g,'""')}"`).join(',')).join('\n');const a=document.createElement('a');a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(c);a.download=fn;a.click()}
+function dlCSV(fn,rows){const c=rows.map(r=>r.map(c=>`"${String(c).replace(/\u2009/g,'').replace(/"/g,'""')}"`).join(',')).join('\n');const a=document.createElement('a');a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(c);a.download=fn;a.click()}
 function downloadForecast(){const rows=[['Year','Revenue (M)','FCF margin','Free cash flow (M)','Discount factor','Value today (M)']];_forecastRows.forEach(r=>rows.push([r.year,fmt(r.rev,0),fmtPctPlain(r.marg,2),fmt(r.fcf,0),fmt(r.df,4),fmt(r.discFcf,0)]));dlCSV('forecast.csv',rows)}
 function downloadRevDCF(){const inp=buildInp(getInputs());if(!inp)return;const rows=[['Price','vs today','Implied return']];for(let i=-5;i<=5;i++){const p=inp.price*(1+.1*i);if(p>0){const r=impliedIRR(inp,p);rows.push([fmt(p,2),fmtPct(p/inp.price-1),r!==null?fmt(r*100,2)+'%':'—'])}}dlCSV('reverse_dcf.csv',rows)}
 function downloadMatrix(scLabel){
@@ -4433,18 +4571,17 @@ function highlight(text, q) {
 function renderDropdown(results, q = '') {
   const dd = document.getElementById('ticker-dropdown');
   if (!results.length) {
-    dd.innerHTML = `<div class="td-empty">No companies found for "<strong>${q}</strong>"<br><span style="font-size:10.5px;color:var(--ink-5)">Try a ticker like AAPL or company name</span></div>`;
+    dd.innerHTML = `<div class="td-empty">No matches for "<strong>${q}</strong>" in the database.<br><span style="font-size:10.5px;color:var(--ink-5)">Not listed? Enter any company's numbers manually in the fields below.</span></div>`;
     dd.classList.add('open');
     return;
   }
   const rows = results.map((r, i) => {
     const secLabel = SEC_LABEL[r.sec] || r.sec || '';
-    const cagr = r.cagr ? `+${r.cagr}%/yr` : '';
     return `<div class="td-item" data-i="${i}" onmousedown="pickTicker('${r.t}')">
       <span class="td-ticker">${highlight(r.t, q.toUpperCase())}</span>
       <span class="td-info">
         <span class="td-name">${highlight(r.n, q)}</span>
-        <span class="td-sub">${secLabel}${cagr ? ' · Est. ' + cagr : ''}</span>
+        <span class="td-sub">${secLabel}</span>
       </span>
       <span class="td-badge">${r.cur}</span>
     </div>`;
@@ -4484,35 +4621,21 @@ async function loadCompany(ticker) {
   const subtractSBC = document.getElementById('toggle-sbc').checked;
   if (co.sbc > 0) {
     if (sbcField) sbcField.value = fmt(co.sbc, 0);
-    if (sbcWrap) sbcWrap.style.display = subtractSBC ? '' : 'none';
   } else {
     if (sbcField) sbcField.value = '';
-    if (sbcWrap) sbcWrap.style.display = 'none';
   }
+  if (sbcWrap) sbcWrap.style.display = subtractSBC ? '' : 'none';
   _currentSBC = co.sbc || 0;
+  _baseFCF = co.fcf; // Store base FCF for SBC recalculation
 
   // ── FCF: apply SBC based on toggle ──
-  const baseFCF = co.fcf;
-  const adjFCF = (subtractSBC && co.sbc > 0) ? baseFCF - co.sbc : baseFCF;
+  const adjFCF = (subtractSBC && co.sbc > 0) ? _baseFCF - co.sbc : _baseFCF;
   document.getElementById('inp-fcf').value = fmt(adjFCF, 0);
   document.getElementById('inp-netcash').value = '0';
 
-  // ── CAPEX notes ──
-  const cnWrap = document.getElementById('capex-notes-wrap');
-  const cnList = document.getElementById('capex-notes-list');
-  if (cnWrap && cnList) {
-    if (co.cn && co.cn.length > 0) {
-      cnWrap.style.display = '';
-      cnList.innerHTML = co.cn.map(function(n){ return '• ' + n }).join('<br>');
-    } else {
-      cnWrap.style.display = 'none';
-      cnList.innerHTML = '';
-    }
-  }
-
   // ══ DEFAULT ASSUMPTIONS ══
-  // Revenue growth: use historical cagr with conservative margin (subtract 2pp)
-  var defaultGrowth = Math.max(co.cagr - 2, 0);
+  // Revenue growth: default 10% for all companies
+  var defaultGrowth = 10;
   document.getElementById('sl-cagr').value = defaultGrowth;
   document.getElementById('lbl-cagr').textContent = defaultGrowth + '%';
   syncBenchPills();
@@ -4530,9 +4653,9 @@ async function loadCompany(ticker) {
   if (adjFCF < 0 && co.rev > 0) {
     // Calculate minimum dpp needed to turn FCF positive by end of projection
     var currentMargin = adjFCF / co.rev;
-    // Target: at least 5% margin by year 8
+    // Target: at least 5% margin by year 10
     var targetMargin = 0.05;
-    var dppNeeded = (targetMargin - currentMargin) / 8;
+    var dppNeeded = (targetMargin - currentMargin) / 10;
     defaultDpp = Math.min(Math.round(dppNeeded * 1000) / 10, 5); // cap at 5pp, round to 0.1
     defaultDpp = Math.max(defaultDpp, 0.5); // minimum 0.5pp if negative FCF
   }
@@ -4556,13 +4679,10 @@ async function loadCompany(ticker) {
   var hint = document.getElementById('onboard-hint');
   if (hint) { hint.style.animation = 'none'; hint.style.opacity = '0'; }
 
-  // ── Set stored price immediately so the model runs right away ──
-  var storedPrice = co.px ? String(co.px) : '';
-  document.getElementById('inp-price').value = storedPrice;
+  // ── Price: always fetch live, never use stored ──
+  document.getElementById('inp-price').value = '';
   _loadingPreset = false;
-  setDataDates(filingDate, storedPrice ? 'Stored · Feb 2025' : 'Enter price above');
-  var prov0 = document.getElementById('provenance-text');
-  if (prov0) prov0.textContent = co.n + ' (' + co.t + ') · ' + filingDate;
+  setDataDates(filingDate, 'Fetching price…');
 
   // ── Show margin adjustment note if FCF is negative ──
   if (defaultDpp > 0) {
